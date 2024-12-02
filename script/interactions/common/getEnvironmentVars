@@ -1,0 +1,18 @@
+#!/bin/bash
+
+function getNetworkURL() {
+    echo $RPC_URL
+}
+
+function getNetworkKey() {
+    echo $DEPLOYMENT_OWNER_KEY
+}
+
+function getLegacyArg() {
+    if [[ $1 == "sepolia" ]]; then
+        legacyArg="--legacy"
+    else
+        legacyArg=""
+    fi
+    echo $legacyArg
+}

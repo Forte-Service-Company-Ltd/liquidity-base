@@ -1,0 +1,249 @@
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.17;
+
+import {IERC20} from "forge-std/interfaces/IERC20.sol";
+import {ALTBCFactory} from "src/factory/altbc/ALTBCFactory.sol";
+import {URQTBCFactory} from "src/factory/urqtbc/URQTBCFactory.sol";
+import {FactoryBase} from "src/factory/base/FactoryBase.sol";
+import {AllowList} from "src/allowList/AllowList.sol";
+import {GenericERC20} from "src/example/ERC20/GenericERC20.sol";
+import {GenericERC20FixedSupply} from "src/example/ERC20/GenericERC20FixedSupply.sol";
+import {TwentyTwoDecimalERC20} from "src/example/ERC20/TwentyTwoDecimalERC20.sol";
+import {SixDecimalERC20} from "src/example/ERC20/SixDecimalERC20.sol";
+import {FeeOnTransferERC20} from "src/example/ERC20/FeeOnTransferERC20.sol";
+import {TwentyTwoDecimalERC20} from "src/example/ERC20/TwentyTwoDecimalERC20.sol";
+import {PoolBase} from "src/amm/base/PoolBase.sol";
+import {TestCommon} from "test/util/TestCommon.sol";
+import {TestModifiers} from "test/util/TestModifiers.sol";
+import {ALTBCInput} from "src/common/TBC.sol";
+import {DeployPool} from "test/util/DeployPool.sol";
+import {ALTBCPool} from "src/amm/altbc/ALTBCPool.sol";
+import {TBCType} from "src/common/TBC.sol";
+
+/**
+ * @title Test Common Foundry
+ * @dev This contract is an abstract template to be reused by all the Foundry tests. NOTE: function prefixes and their usages are as follows:
+ * setup = set to proper user, deploy contracts, set global variables, reset user
+ * create = set to proper user, deploy contracts, reset user, return the contract
+ * _create = deploy contract, return the contract
+ */
+abstract contract TestCommonSetup is TestCommon, TestModifiers, DeployPool {
+    function _setUpTokens(uint256 _xTokenSupply) internal startAsAdmin endWithStopPrank {
+        xToken = new GenericERC20FixedSupply("x token", "GAME", _xTokenSupply + 1);
+        yToken = new GenericERC20("collateral token", "COLL");
+        stableCoin = new SixDecimalERC20("stable coin", "USDX");
+        highDecimalCoin = new TwentyTwoDecimalERC20("high deciaml coin", "HDEX");
+        fotCoin = new FeeOnTransferERC20("FOT Token", "FOT", transferFee);
+    }
+
+    function _loadAdminAndAlice() internal startAsAdmin endWithStopPrank {
+        GenericERC20(address(yToken)).mint(admin, 1e12 * ERC20_DECIMALS);
+        GenericERC20(address(yToken)).mint(alice, 1e12 * ERC20_DECIMALS);
+        stableCoin.mint(alice, 1e12 * STABLECOIN_DEC);
+        stableCoin.mint(admin, 1e12 * STABLECOIN_DEC);
+        fotCoin.mint(admin, 1e20 * ERC20_DECIMALS);
+    }
+
+    function _deployFactoriesAndAllowLists() internal startAsAdmin endWithStopPrank {
+        altbcFactory = new ALTBCFactory();
+        urqtbcFactory = new URQTBCFactory();
+        yTokenAllowList = new AllowList();
+        deployerAllowList = new AllowList();
+    }
+
+    function _setupAllowLists() internal startAsAdmin endWithStopPrank {
+        yTokenAllowList.addToAllowList(address(yToken));
+        yTokenAllowList.addToAllowList(address(stableCoin));
+        yTokenAllowList.addToAllowList(address(highDecimalCoin));
+        deployerAllowList.addToAllowList(address(admin));
+    }
+
+    function _setupFactory(address factory) internal startAsAdmin endWithStopPrank {
+        FactoryBase(factory).setDeployerAllowList(address(deployerAllowList));
+        FactoryBase(factory).setYTokenAllowList(address(yTokenAllowList));
+        FactoryBase(factory).proposeProtocolFeeCollector(address(0xb0b));
+        vm.startPrank(address(0xb0b));
+        FactoryBase(factory).confirmProtocolFeeCollector();
+    }
+
+    function _approvePool(PoolBase poolRet, bool usdt) internal startAsAdmin endWithStopPrank {
+        IERC20 _xToken = IERC20(poolRet.xToken());
+        IERC20 _yToken = IERC20(poolRet.yToken());
+        _xToken.approve(address(poolRet), X_TOKEN_MAX_SUPPLY);
+        if (!usdt) {
+            _yToken.approve(address(poolRet), _yToken.balanceOf(admin));
+        }
+        vm.startPrank(alice);
+        _xToken.approve(address(poolRet), X_TOKEN_MAX_SUPPLY);
+        if (!usdt) {
+            _yToken.approve(address(poolRet), _yToken.balanceOf(alice));
+        }
+    }
+
+    function _addInitialLiquidity(PoolBase poolRet, TBCType _tbcType, uint _amount) internal startAsAdmin endWithStopPrank {
+        _tbcType;
+        PoolBase(address(poolRet)).addXSupply(_amount);
+    }
+
+    function _setupPool(bool withStableCoin, TBCType _tbcType) internal endWithStopPrank returns (PoolBase poolRet) {
+        _setUpTokens(X_TOKEN_MAX_SUPPLY);
+        _loadAdminAndAlice();
+        _deployFactoriesAndAllowLists();
+        _setupFactory(_tbcType == TBCType.ALTBC ? address(altbcFactory) : address(urqtbcFactory));
+        _setupAllowLists();
+        poolRet = PoolBase(_deployPool(30, withStableCoin, _tbcType));
+        vm.startPrank(admin);
+        poolRet.enableSwaps(true);
+        _approvePool(poolRet, false);
+        _addInitialLiquidity(poolRet, _tbcType, X_TOKEN_MAX_SUPPLY);
+        amountMinBound = 2;
+    }
+
+    function _setupPoolWithFee(bool withStableCoin, uint16 fee, TBCType _tbcType) internal endWithStopPrank returns (PoolBase poolRet) {
+        poolRet = _setupPoolWithFee(withStableCoin, address(xToken), fee, _tbcType);
+    }
+
+    function _setupPoolWithFee(
+        bool withStableCoin,
+        address _xTokenAddress,
+        uint16 fee,
+        TBCType _tbcType
+    ) internal endWithStopPrank returns (PoolBase poolRet) {
+        if (_tbcType == TBCType.ALTBC) {
+            poolRet = PoolBase(_deployPool(_xTokenAddress, fee, withStableCoin));
+        } else {
+            poolRet = PoolBase(_deployPool(_xTokenAddress, fee, urqtbcInput, withStableCoin));
+        }
+        vm.startPrank(admin);
+        poolRet.enableSwaps(true);
+        _approvePool(poolRet, false);
+        _addInitialLiquidity(poolRet, _tbcType, X_TOKEN_MAX_SUPPLY);
+    }
+
+    function _setupPoolForkTest(
+        address owner,
+        address _yTokenAddress,
+        uint16 fee,
+        bool usdt,
+        TBCType _tbcType
+    ) internal endWithStopPrank returns (PoolBase poolRet) {
+        _deployFactoriesAndAllowLists();
+        _setupFactory(_tbcType == TBCType.ALTBC ? address(altbcFactory) : address(urqtbcFactory));
+        _setupAllowLists();
+
+        GenericERC20FixedSupply xTokenWithFee = new GenericERC20FixedSupply("Fee token", "FEE", 10e3 * ERC20_DECIMALS);
+        if (_tbcType == TBCType.ALTBC) {
+            poolRet = PoolBase(
+                altbcFactory.createPool(
+                    address(xTokenWithFee),
+                    _yTokenAddress,
+                    0,
+                    ALTBCInput(ERC20_DECIMALS, 1e20, 10e3 * ERC20_DECIMALS, 1e15),
+                    true
+                )
+            );
+        } else {
+            urqtbcInput._maxXTokenSupply = 10e3 * ERC20_DECIMALS;
+            poolRet = PoolBase(
+                urqtbcFactory.createPool(address(xTokenWithFee), _yTokenAddress, 0, urqtbcInput, true)
+            );
+        }
+        vm.startPrank(admin);
+        poolRet.enableSwaps(true);
+        _approvePool(poolRet, usdt);
+        _addInitialLiquidity(poolRet, _tbcType, 10e3 * ERC20_DECIMALS);
+
+        (owner, fee);
+    }
+
+    function _setupStressTestPool(bool withStableCoin, TBCType _tbcType) internal endWithStopPrank returns (PoolBase poolRet) {
+        // the token supply is the same value used in the stress test simulation and must match
+        uint256 maxX = 10e3 * ERC20_DECIMALS;
+        _setUpTokens(maxX);
+        _loadAdminAndAlice();
+        _deployFactoriesAndAllowLists();
+        _setupFactory(_tbcType == TBCType.ALTBC ? address(altbcFactory) : address(urqtbcFactory));
+        _setupAllowLists();
+   
+        if (_tbcType == TBCType.ALTBC) {
+            // the pool config values are the same config values used in the stress test simulation and must match
+            /// fee: 0.0%, supply: 10K tokens, y-intersect: 10, minPrice: 1, maxPrice: 100
+            poolRet = PoolBase(
+                _deployPool(0, ALTBCInput(ERC20_DECIMALS, 1e20, 10e3 * ERC20_DECIMALS, 1e15), withStableCoin)
+            );
+        } else {
+            urqtbcInput._maxXTokenSupply = maxX;
+            // the pool config values are the same config values used in the stress test simulation and must match
+            /// fee: 0.0%, supply: 10K tokens, lowerPrice: .1
+            poolRet = PoolBase(
+                _deployPool(0, urqtbcInput, withStableCoin)
+            );
+        }
+        vm.startPrank(admin);
+        poolRet.enableSwaps(true);
+        _approvePool(poolRet, false);
+        _addInitialLiquidity(poolRet, _tbcType, 10e3 * ERC20_DECIMALS);
+    }
+
+    function _setupPrecisionPools(
+        uint256 maxSupply,
+        uint16 fee,
+        TBCType _tbcType
+    ) internal endWithStopPrank returns (PoolBase wadPool, PoolBase sixDecimalPool) {
+        _setUpTokens(maxSupply);
+        _loadAdminAndAlice();
+        _deployFactoriesAndAllowLists();
+        _setupFactory(_tbcType == TBCType.ALTBC ? address(altbcFactory) : address(urqtbcFactory));
+        _setupAllowLists();
+        urqtbcInput._maxXTokenSupply = maxSupply;
+        wadPool = _tbcType == TBCType.ALTBC
+            ? PoolBase(_deployPool(fee, ALTBCInput(ERC20_DECIMALS, 1e20, maxSupply, 1e15), false))
+            : PoolBase(_deployPool(fee, urqtbcInput, false));
+
+        vm.startPrank(admin);
+        wadPool.enableSwaps(true);
+        _approvePool(wadPool, false);
+        _addInitialLiquidity(wadPool, _tbcType, maxSupply);
+        vm.stopPrank();
+
+        _setUpTokens(maxSupply);
+        vm.startPrank(admin);
+        yTokenAllowList.addToAllowList(address(stableCoin));
+        sixDecimalPool = _tbcType == TBCType.ALTBC
+            ? PoolBase(_deployPool(fee, ALTBCInput(ERC20_DECIMALS, 1e20, maxSupply, 1e15), true))
+            : PoolBase(_deployPool(fee, urqtbcInput, true));
+
+        _loadAdminAndAlice();
+        vm.startPrank(admin);
+
+        sixDecimalPool.enableSwaps(true);
+        _approvePool(sixDecimalPool, false);
+        _addInitialLiquidity(sixDecimalPool, _tbcType, maxSupply);
+    }
+
+    function _setupPoolPartialFunding(bool withStableCoin, TBCType _tbcType) internal endWithStopPrank returns (PoolBase poolRet) {
+        _setUpTokens(X_TOKEN_MAX_SUPPLY);
+        _loadAdminAndAlice();
+        _deployFactoriesAndAllowLists();
+        _setupFactory(_tbcType == TBCType.ALTBC ? address(altbcFactory) : address(urqtbcFactory));
+        _setupAllowLists();
+        poolRet = _deployPool(30, withStableCoin, _tbcType);
+        vm.startPrank(admin);
+        poolRet.enableSwaps(true);
+        _approvePool(poolRet, false);
+        _addInitialLiquidity(poolRet, TBCType.ALTBC, X_TOKEN_MAX_SUPPLY / 2);
+    }
+
+    function _setupFOTPool(bool withStableCoin, TBCType _tbcType) internal endWithStopPrank returns (PoolBase poolRet) {
+        _setUpTokens(X_TOKEN_MAX_SUPPLY);
+        _loadAdminAndAlice();
+        _deployFactoriesAndAllowLists();
+        _setupFactory(_tbcType == TBCType.ALTBC ? address(altbcFactory) : address(urqtbcFactory));
+        _setupAllowLists();
+        poolRet = _deployPool(address(fotCoin), 30, withStableCoin, _tbcType);
+        vm.startPrank(admin);
+        poolRet.enableSwaps(true);
+        _approvePool(poolRet, false);
+        _addInitialLiquidity(poolRet, _tbcType, X_TOKEN_MAX_SUPPLY);
+    }
+}

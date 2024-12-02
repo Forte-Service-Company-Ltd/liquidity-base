@@ -1,0 +1,70 @@
+/// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.24;
+
+import {IERC20} from "forge-std/interfaces/IERC20.sol";
+import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
+import {PoolBase} from "src/amm/base/PoolBase.sol";
+import {TBCType} from "src/common/TBC.sol";
+
+/**
+ * @title Test to verify the invatiant that Total Supply or either token should never change from AMM transactions.
+ * @dev unit test
+ * @author @oscarsernarosero @mpetersoCode55 @cirsteve
+ */
+abstract contract LiquidityCeilingInvariants is TestCommonSetup {
+    uint256 _xTotal;
+    uint256 _yTotal;
+
+    function _setUp(TBCType _tbcType) internal endWithStopPrank {
+        pool = _setupPool(false, _tbcType);
+
+        IERC20 tokenX = IERC20(pool.xToken());
+        _xTotal = tokenX.totalSupply();
+
+        IERC20 tokenY = IERC20(pool.yToken());
+        _yTotal = tokenY.totalSupply();
+
+        bytes4[] memory selectors = new bytes4[](13);
+        selectors[0] = pool.collectLPFees.selector;
+        selectors[1] = pool.swap.selector;
+        selectors[2] = pool.simSwap.selector;
+        selectors[3] = pool.simSwapReversed.selector;
+        selectors[4] = pool.xToken.selector;
+        selectors[5] = pool.yToken.selector;
+        selectors[6] = pool.enableSwaps.selector;
+        selectors[7] = PoolBase(address(pool)).addXSupply.selector;
+        selectors[8] = pool.closePool.selector;
+        selectors[9] = pool.setLPFee.selector;
+        selectors[10] = pool.collectLPFees.selector;
+        selectors[11] = pool.xTokenLiquidity.selector;
+        selectors[12] = pool.yTokenLiquidity.selector;
+
+        targetContract(address(pool));
+        targetSelector(FuzzSelector({addr: address(pool), selectors: selectors}));
+        targetSender(admin);
+    }
+
+    function invariant_TotalSupplyOfXShouldNeverChange() public view {
+        IERC20 tokenX = IERC20(pool.xToken());
+        uint256 updatedXTotal = tokenX.totalSupply();
+        assertEq(_xTotal, updatedXTotal);
+    }
+
+    function invariant_TotalSupplyOfYShouldNeverChange() public view {
+        IERC20 tokenY = IERC20(pool.yToken());
+        uint256 updatedYTotal = tokenY.totalSupply();
+        assertEq(_yTotal, updatedYTotal);
+    }
+}
+
+contract LiquidityCeilingInvariants_ALTBC is LiquidityCeilingInvariants {
+    function setUp() public {
+        _setUp(TBCType.ALTBC);
+    }
+}
+
+contract LiquidityCeilingInvariants_URQTBC is LiquidityCeilingInvariants {
+    function setUp() public {
+        _setUp(TBCType.URQTBC);
+    }
+}

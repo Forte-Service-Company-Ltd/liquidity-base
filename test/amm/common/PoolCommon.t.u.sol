@@ -1,0 +1,32 @@
+/// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.24;
+
+import {IERC20} from "forge-std/interfaces/IERC20.sol";
+import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
+import {TBCType} from "src/common/TBC.sol";
+
+/**
+ * @title Test Pool functionality
+ * @dev unit test
+ * @author @oscarsernarosero @mpetersoCode55 @cirsteve
+ */
+abstract contract PoolCommonUnitTest is TestCommonSetup {
+    IERC20 _yToken;
+    bool withStableCoin;
+    bool wEth;
+    bool wMatic;
+    uint fullToken;
+
+    function _setUp(bool _withStableCoin) internal {
+        /// MAKE TBCType DYNAMIC ONCE WE START MAKING TESTS FOR URQTBC. FOR INSTANCE, MAKE THIS TEST COMMON, AND SET THIS VARIABLE IN THE CHILD CONTRACTS
+        _setUp(_withStableCoin, TBCType.ALTBC);
+    }
+
+    function _setUp(bool _withStableCoin, TBCType _tbcType) internal endWithStopPrank {
+        pool = _setupStressTestPool(_withStableCoin, _tbcType);
+        withStableCoin = _withStableCoin;
+        _yToken = IERC20(pool.yToken());
+        fullToken = address(_yToken) == address(stableCoin) ? STABLECOIN_DEC : ERC20_DECIMALS;
+    }
+
+}

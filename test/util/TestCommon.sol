@@ -1,0 +1,114 @@
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.24;
+
+import {IERC20} from "forge-std/interfaces/IERC20.sol";
+import {ALTBCPool} from "src/amm/altbc/ALTBCPool.sol";
+import {ALTBCFactory} from "src/factory/altbc/ALTBCFactory.sol";
+import {AllowList} from "src/allowList/AllowList.sol";
+import {URQTBCFactory} from "src/factory/urqtbc/URQTBCFactory.sol";
+import {IPool} from "src/amm/base/IPool.sol";
+import {GenericERC20} from "src/example/ERC20/GenericERC20.sol";
+import {GenericERC20FixedSupply} from "src/example/ERC20/GenericERC20FixedSupply.sol";
+import {TwentyTwoDecimalERC20} from "src/example/ERC20/TwentyTwoDecimalERC20.sol";
+import {SixDecimalERC20} from "src/example/ERC20/SixDecimalERC20.sol";
+import {TwentyTwoDecimalERC20} from "src/example/ERC20/TwentyTwoDecimalERC20.sol";
+import {FeeOnTransferERC20} from "src/example/ERC20/FeeOnTransferERC20.sol";
+import {PoolBase} from "src/amm/base/PoolBase.sol";
+import {PythonUtils} from "test/util/PythonUtils.sol";
+import {ALTBCDef, ALTBCInput, URQTBCDef, URQTBCInput, TBCType} from "src/common/TBC.sol";
+
+/**
+ * @title Test Common
+ * @dev This contract is an abstract template to be reused by all the tests. NOTE: function prefixes and their usages are as follows:
+ * setup = set to proper user, deploy contracts, set global variables, reset user
+ * create = set to proper user, deploy contracts, reset user, return the contract
+ * _create = deploy contract, return the contract
+ */
+abstract contract TestCommon is PythonUtils {
+    uint256 MAX_SQUAREABLE = 340_282_366_920_938_463_463_374607431768211455;
+    uint256 constant STABLECOIN_DEC = 1e6;
+    uint256 constant ERC20_DECIMALS = 1e18;
+    uint256 constant X_TOKEN_MAX_SUPPLY = 100_000_000_000 * ERC20_DECIMALS;
+    address admin = address(0xad);
+    address alice = address(0xa11ce);
+    address bob = address(0xB0b);
+    address[] ADDRESSES = [
+        address(0xace),
+        address(0xb0b),
+        address(0xcade),
+        address(0xda1e),
+        address(0xe1f),
+        address(0xf1ea),
+        address(0x1ea),
+        address(0x0af)
+    ];
+
+    ALTBCInput altbcInput = ALTBCInput(1e17, 1e19, X_TOKEN_MAX_SUPPLY, 1e15); /// minPrice: 0.00001, lowerPrice: 0.1, upperPrice: 10
+    URQTBCInput urqtbcInput = URQTBCInput(1e17, X_TOKEN_MAX_SUPPLY, 1e18); /// lowerPrice: 0.1, V: 1
+
+    GenericERC20FixedSupply public xToken;
+    GenericERC20 public yToken;
+    SixDecimalERC20 public stableCoin;
+    TwentyTwoDecimalERC20 public highDecimalCoin;
+    FeeOnTransferERC20 public fotCoin;
+    ALTBCFactory altbcFactory;
+    URQTBCFactory urqtbcFactory;
+    AllowList deployerAllowList;
+    AllowList yTokenAllowList;
+
+    uint256 amountMinBound;
+    uint16 protocolFee = 0;
+    uint16 transferFee = 0;
+    uint16 totalBasisPoints = 10000;
+    PoolBase pool;
+
+    // Check if an address exists in the list
+    function exists(address _address, address[] memory _addressList) public pure returns (bool) {
+        for (uint256 i = 0; i < _addressList.length; i++) {
+            if (_address == _addressList[i]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @dev this function ensures that unique addresses can be randomly retrieved from the address array.
+     */
+    function getUniqueAddresses(uint256 _seed, uint8 _number) public view returns (address[] memory _addressList) {
+        _addressList = new address[](ADDRESSES.length);
+        // first one will simply be the seed
+        _addressList[0] = ADDRESSES[_seed];
+        uint256 j;
+        if (_number > 1) {
+            // loop until all unique addresses are returned
+            for (uint256 i = 1; i < _number; i++) {
+                // find the next unique address
+                j = _seed;
+                do {
+                    j++;
+                    // if end of list reached, start from the beginning
+                    if (j == ADDRESSES.length) {
+                        j = 0;
+                    }
+                    if (!exists(ADDRESSES[j], _addressList)) {
+                        _addressList[i] = ADDRESSES[j];
+                        break;
+                    }
+                } while (0 == 0);
+            }
+        }
+        return _addressList;
+    }
+
+    /**
+     * @dev Deploy and set up an ERC20
+     * @param _name token name
+     * @param _symbol token symbol
+     * @return _token token
+     */
+    function _createERC20(string memory _name, string memory _symbol) internal returns (GenericERC20 _token) {
+        return new GenericERC20(_name, _symbol);
+    }
+    
+}
