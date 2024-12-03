@@ -17,9 +17,9 @@ contract CumulativePrice {
      */
     function _updateCumulativePrice(uint256 _price, uint256 _timestamp) internal {
         uint256 timeElapsed = _timestamp  - lastBlockTimestamp;
-        if (timeElapsed >= 0 ) {
+        if (timeElapsed > 0 ) {
             cumulativePrice += _price * timeElapsed;
+            lastBlockTimestamp = block.timestamp;
         }
-        lastBlockTimestamp = block.timestamp;
     }
 }
