@@ -3,23 +3,19 @@ pragma solidity ^0.8.24;
 
 import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
-import {TBCType} from "src/common/TBC.sol";
-import {ALTBCCalculator} from "src/amm/altbc/ALTBCCalculator.sol";
-import {URQTBCCalculator} from "src/amm/urqtbc/URQTBCCalculator.sol";
+
 
 /**
  * @title Test all invariants in relation to adding liquidity to the pool.
  * @dev unit test
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve
  */
-abstract contract AddingLiquidityInvariants is TestCommonSetup {
+contract AddingLiquidityInvariants is TestCommonSetup {
     uint xTokenLiquidity;
     uint yTokenLiquidity;
-    TBCType tbcType;
 
-    function _setUp(TBCType _tbcType) internal endWithStopPrank {
-        tbcType = _tbcType;
-        pool = _setupPool(false, _tbcType);
+    function setUp() internal endWithStopPrank {
+        pool = _setupPool(false);
         uint amountToTrade = 50_000 * ERC20_DECIMALS;
 
         vm.startPrank(admin);
@@ -44,24 +40,7 @@ abstract contract AddingLiquidityInvariants is TestCommonSetup {
     }
 
     function invariant_liquidityCanNeverIncreasePastMaxSupply() public view {
-        if (tbcType == TBCType.ALTBC) {
-            (uint maxTokenSupply, , , , , , , , ) = ALTBCCalculator(address(pool)).tbc();
-            assertLe(pool.xTokenLiquidity(), maxTokenSupply);
-        } else {
-            (, , , , , uint maxTokenSupply) = URQTBCCalculator(address(pool)).tbc();
-            assertLe(pool.xTokenLiquidity(), maxTokenSupply);
-        }
-    }
-}
-
-contract AddingLiquidityInvariants_ALTBC is AddingLiquidityInvariants {
-    function setUp() public {
-        _setUp(TBCType.ALTBC);
-    }
-}
-
-contract AddingLiquidityInvariants_URQTBC is AddingLiquidityInvariants {
-    function setUp() public {
-        _setUp(TBCType.URQTBC);
+        uint maxTokenSupply = _getMaxXTokenSupply();
+        assertLe(pool.xTokenLiquidity(), maxTokenSupply);
     }
 }

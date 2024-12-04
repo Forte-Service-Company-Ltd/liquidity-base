@@ -4,19 +4,18 @@ pragma solidity ^0.8.24;
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
 import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
-import {TBCType} from "src/common/TBC.sol";
 
 /**
  * @title Test to verify the invatiant that Total Supply or either token should never change from AMM transactions.
  * @dev unit test
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve
  */
-abstract contract LiquidityCeilingInvariants is TestCommonSetup {
+contract LiquidityCeilingInvariants is TestCommonSetup {
     uint256 _xTotal;
     uint256 _yTotal;
 
-    function _setUp(TBCType _tbcType) internal endWithStopPrank {
-        pool = _setupPool(false, _tbcType);
+    function _setUp() internal endWithStopPrank {
+        pool = _setupPool(false);
 
         IERC20 tokenX = IERC20(pool.xToken());
         _xTotal = tokenX.totalSupply();
@@ -54,17 +53,5 @@ abstract contract LiquidityCeilingInvariants is TestCommonSetup {
         IERC20 tokenY = IERC20(pool.yToken());
         uint256 updatedYTotal = tokenY.totalSupply();
         assertEq(_yTotal, updatedYTotal);
-    }
-}
-
-contract LiquidityCeilingInvariants_ALTBC is LiquidityCeilingInvariants {
-    function setUp() public {
-        _setUp(TBCType.ALTBC);
-    }
-}
-
-contract LiquidityCeilingInvariants_URQTBC is LiquidityCeilingInvariants {
-    function setUp() public {
-        _setUp(TBCType.URQTBC);
     }
 }

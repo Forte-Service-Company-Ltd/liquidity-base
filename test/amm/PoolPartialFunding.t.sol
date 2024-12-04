@@ -7,7 +7,6 @@ import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {ALTBCCalculator} from "src/amm/altbc/ALTBCCalculator.sol";
 import {IPoolEvents} from "src/common/IEvents.sol";
 import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
-import {TBCType} from "src/common/TBC.sol";
 import {GenericERC20} from "src/example/ERC20/GenericERC20.sol";
 
 /**
@@ -17,11 +16,12 @@ import {GenericERC20} from "src/example/ERC20/GenericERC20.sol";
  */
 contract PoolPartialFundingTest is TestCommonSetup {
     function setUp() public endWithStopPrank {
-        pool = _setupPoolPartialFunding(false, TBCType.ALTBC);
+        pool = _setupPoolPartialFunding(false);
     }
 
     function testLiquidity_Pool_initializePartialXSupply_Positive() public view {
-        (uint maxSupply,,,,,,,,) = ALTBCCalculator(address(pool)).tbc();
+        uint maxSupply = _getMaxXTokenSupply();
+        
         uint poolBalance = xToken.balanceOf(address(pool));
 
         assertGt(maxSupply, poolBalance);

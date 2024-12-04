@@ -3,18 +3,17 @@ pragma solidity ^0.8.24;
 
 import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
 import {InitialSwapHandler} from "test/amm/invariants/InitialSwapHandler.sol";
-import {TBCType} from "src/common/TBC.sol";
 
 /**
  * @title Test the invariant that swaps selling token X will fail until the initial swap selling token Y
  * @dev invariant test
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve
  */
-abstract contract InitialSwapInvariant is TestCommonSetup {
+contract InitialSwapInvariant is TestCommonSetup {
     InitialSwapHandler _handler;
 
-    function _setUp(TBCType _tbcType) internal endWithStopPrank {
-        pool = _setupPool(false, _tbcType);
+    function _setUp() internal endWithStopPrank {
+        pool = _setupPool(false);
         _handler = new InitialSwapHandler(pool);
         bytes4[] memory selectors = new bytes4[](1);
         selectors[0] = _handler.swap.selector;
@@ -25,17 +24,5 @@ abstract contract InitialSwapInvariant is TestCommonSetup {
 
     function invariant_initialSwapsOfXFail() public view {
         assertEq(_handler.trackedAmountOutX(), 0);
-    }
-}
-
-contract InitialSwapInvariant_ALTBC is InitialSwapInvariant {
-    function setUp() public {
-        _setUp(TBCType.ALTBC);
-    }
-}
-
-contract InitialSwapInvariant_URQTBC is InitialSwapInvariant {
-    function setUp() public {
-        _setUp(TBCType.URQTBC);
     }
 }

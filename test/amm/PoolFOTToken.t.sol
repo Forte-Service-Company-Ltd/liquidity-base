@@ -3,7 +3,6 @@ pragma solidity ^0.8.24;
 
 import {PoolCommonTest} from "test/amm/common/PoolCommon.t.sol";
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
-import {TBCType} from "src/common/TBC.sol";
 import {FeeOnTransferERC20} from "src/example/ERC20/FeeOnTransferERC20.sol";
 
 /**
@@ -14,7 +13,7 @@ import {FeeOnTransferERC20} from "src/example/ERC20/FeeOnTransferERC20.sol";
 contract PoolFOTTokenTest is PoolCommonTest {
     function setUp() public endWithStopPrank {
         transferFee = 1000;
-        pool = _setupFOTPool(false, TBCType.ALTBC);
+        pool = _setupFOTPool(false);
         _setupCollateralToken();
     }
 

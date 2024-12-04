@@ -4,7 +4,6 @@ pragma solidity ^0.8.24;
 import {SwapHandler} from "test/amm/invariants/SwapHandler.sol";
 import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
 import "forge-std/console2.sol";
-import {TBCType} from "src/common/TBC.sol";
 import {CumulativePrice} from "src/amm/base/CumulativePrice.sol";
 
 
@@ -19,8 +18,8 @@ abstract contract SwapInvariants is TestCommonSetup {
     uint lastCumulativePrice;
     uint lastBlockTimestamp;
 
-    function _setUp(TBCType _tbcType) internal endWithStopPrank {
-        pool = _setupPool(false, _tbcType);
+    function _setUp() internal endWithStopPrank {
+        pool = _setupPool(false);
         _handler = new SwapHandler(pool);
         bytes4[] memory selectors = new bytes4[](1);
         selectors[0] = _handler.swap.selector;
@@ -54,17 +53,5 @@ abstract contract SwapInvariants is TestCommonSetup {
         lastCumulativePrice = cumulativePrice;
         lastBlockTimestamp = blockTimestamp;
 
-    }
-}
-
-contract SwapInvariants_ALTBC is SwapInvariants {
-    function setUp() public {
-        _setUp(TBCType.ALTBC);
-    }
-}
-
-contract SwapInvariants_URQTBC is SwapInvariants {
-    function setUp() public {
-        _setUp(TBCType.URQTBC);
     }
 }

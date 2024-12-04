@@ -2,10 +2,8 @@
 pragma solidity ^0.8.24;
 
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
-import {ALTBCPool} from "src/amm/altbc/ALTBCPool.sol";
-import {ALTBCFactory} from "src/factory/altbc/ALTBCFactory.sol";
+
 import {AllowList} from "src/allowList/AllowList.sol";
-import {URQTBCFactory} from "src/factory/urqtbc/URQTBCFactory.sol";
 import {IPool} from "src/amm/base/IPool.sol";
 import {GenericERC20} from "src/example/ERC20/GenericERC20.sol";
 import {GenericERC20FixedSupply} from "src/example/ERC20/GenericERC20FixedSupply.sol";
@@ -15,7 +13,6 @@ import {TwentyTwoDecimalERC20} from "src/example/ERC20/TwentyTwoDecimalERC20.sol
 import {FeeOnTransferERC20} from "src/example/ERC20/FeeOnTransferERC20.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {PythonUtils} from "test/util/PythonUtils.sol";
-import {ALTBCDef, ALTBCInput, URQTBCDef, URQTBCInput, TBCType} from "src/common/TBC.sol";
 
 /**
  * @title Test Common
@@ -43,16 +40,13 @@ abstract contract TestCommon is PythonUtils {
         address(0x0af)
     ];
 
-    ALTBCInput altbcInput = ALTBCInput(1e17, 1e19, X_TOKEN_MAX_SUPPLY, 1e15); /// minPrice: 0.00001, lowerPrice: 0.1, upperPrice: 10
-    URQTBCInput urqtbcInput = URQTBCInput(1e17, X_TOKEN_MAX_SUPPLY, 1e18); /// lowerPrice: 0.1, V: 1
 
     GenericERC20FixedSupply public xToken;
     GenericERC20 public yToken;
     SixDecimalERC20 public stableCoin;
     TwentyTwoDecimalERC20 public highDecimalCoin;
     FeeOnTransferERC20 public fotCoin;
-    ALTBCFactory altbcFactory;
-    URQTBCFactory urqtbcFactory;
+
     AllowList deployerAllowList;
     AllowList yTokenAllowList;
 
