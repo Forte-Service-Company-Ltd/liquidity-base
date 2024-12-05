@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 import {AllowList} from "src/allowList/AllowList.sol";
 import {GenericERC20FixedSupply} from "src/example/ERC20/GenericERC20FixedSupply.sol";
-import "src/example/ERC20/GenericERC20.sol";
+import {GenericERC20} from "src/example/ERC20/GenericERC20.sol";
 import {IFactory} from "src/factory/base/IFactory.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {PythonUtils} from "./pythonUtils.s.sol";

@@ -9,7 +9,7 @@ import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
  * @dev unit test
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve
  */
-abstract contract PoolCommonUnitTest is TestCommonSetup {
+contract PoolCommonUnitTest is TestCommonSetup {
     IERC20 _yToken;
     bool withStableCoin;
     bool wEth;
