@@ -17,7 +17,6 @@ import {Test} from "forge-std/Test.sol";
 
 abstract contract GasReport is GasHelpers, FactoryBase, Test {
     IPool[] _pools;
-    TBCType _tbcType;
 
     using Strings for uint256;
 
@@ -32,7 +31,7 @@ abstract contract GasReport is GasHelpers, FactoryBase, Test {
     uint constant YTOKEN_SUPPLY = 100_000_000_000 * 1e18;
     uint AMOUNT_TO_SWAP;
 
-    function getTBCString() internal view  virtual returns (string memory name)
+    function getTBCString() internal view  virtual returns (string memory name) {}
     
     // this is to warm the slot so that the gas report is more accurate
     function warmSlot(uint i) internal {

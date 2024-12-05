@@ -58,7 +58,7 @@ abstract contract USDCForkTest is ForkTestBase {
 }
 
 /**
- * @title USDC Mainnet Fork Testing ALTBC
+ * @title USDC Mainnet Fork Testing
  * @dev unit test
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve @palmerg4
  */
@@ -69,7 +69,7 @@ contract USDCMainnetForkTest is USDCForkTest {
 }
 
 /**
- * @title USDC Polygon Fork Testing ALTBC
+ * @title USDC Polygon Fork Testing
  * @dev unit test
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve @palmerg4
  */

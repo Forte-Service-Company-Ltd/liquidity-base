@@ -27,10 +27,11 @@ abstract contract TestCommonSetup is TestCommon, TestModifiers {
     function _getFactoryAddress() internal virtual returns (address) {}
     function _deployPool(address,address,uint16,bool,TBCInputOption) internal virtual returns (PoolBase) {}
     function _getMaxXTokenSupply() internal virtual returns (uint) {}
-    function _getMinMaxX() internal view virtual returns (uint,uint) {}
-    function _checlClosePoolState() internal virtual {}
+    function _getMinMaxX() internal virtual returns (uint,uint) {}
+    function _checkClosePoolState() internal virtual {}
     function _checkLiquidityExcessState() internal virtual {}
     function _checkWithdrawRevenueState() internal virtual {}
+    function _checkBackAndForthSwapsState() internal virtual {}
 
     function _setUpTokens(uint256 _xTokenSupply) internal startAsAdmin endWithStopPrank {
         xToken = new GenericERC20FixedSupply("x token", "GAME", _xTokenSupply + 1);
@@ -98,7 +99,7 @@ abstract contract TestCommonSetup is TestCommon, TestModifiers {
     function _setupPool(bool withStableCoin) internal endWithStopPrank returns (PoolBase poolRet) {
         _setUpTokensAndFactories(X_TOKEN_MAX_SUPPLY);
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
-        poolRet = _deployPool(_xTokenAddress, yTokenAddress, 30, true, TBCInputOption.BASE);
+        poolRet = _deployPool(address(xToken), yTokenAddress, 30, true, TBCInputOption.BASE);
         vm.startPrank(admin);
         poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
@@ -136,11 +137,10 @@ abstract contract TestCommonSetup is TestCommon, TestModifiers {
 
         GenericERC20FixedSupply xTokenWithFee = new GenericERC20FixedSupply("Fee token", "FEE", 10e3 * ERC20_DECIMALS);
 
-        address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
         poolRet = PoolBase(
             _deployPool(
                 address(xTokenWithFee),
-                yTokenAddress,
+                _yTokenAddress,
                 0,
                 true,
                 TBCInputOption.FORK
@@ -163,7 +163,7 @@ abstract contract TestCommonSetup is TestCommon, TestModifiers {
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
         // the pool config values are the same config values used in the stress test simulation and must match
         /// fee: 0.0%, supply: 10K tokens, y-intersect: 10, minPrice: 1, maxPrice: 100
-        poolRet = _deployPool(_xTokenAddress, yTokenAddress, 0, true, TBCInputOption.FORK);
+        poolRet = _deployPool(address(xToken), yTokenAddress, 0, true, TBCInputOption.FORK);
 
         vm.startPrank(admin);
         poolRet.enableSwaps(true);
@@ -177,7 +177,7 @@ abstract contract TestCommonSetup is TestCommon, TestModifiers {
     ) internal endWithStopPrank returns (PoolBase wadPool, PoolBase sixDecimalPool) {
         _setUpTokensAndFactories(maxSupply);
 
-        wadPool = _deployPool(_xTokenAddress, _yTokenAddress,fee, true, TBCInputOption.PRECISION);
+        wadPool = _deployPool(address(xToken), address(yToken),fee, true, TBCInputOption.PRECISION);
 
         vm.startPrank(admin);
         wadPool.enableSwaps(true);
@@ -188,7 +188,7 @@ abstract contract TestCommonSetup is TestCommon, TestModifiers {
         _setUpTokens(maxSupply);
         vm.startPrank(admin);
         yTokenAllowList.addToAllowList(address(stableCoin));
-        sixDecimalPool = _deployPool(_xTokenAddress, address(stableCoin),fee, true, TBCInputOption.PRECISION);
+        sixDecimalPool = _deployPool(address(xToken), address(stableCoin),fee, true, TBCInputOption.PRECISION);
 
         _loadAdminAndAlice();
         vm.startPrank(admin);
@@ -201,7 +201,7 @@ abstract contract TestCommonSetup is TestCommon, TestModifiers {
     function _setupPoolPartialFunding(bool withStableCoin) internal endWithStopPrank returns (PoolBase poolRet) {
         _setUpTokensAndFactories(X_TOKEN_MAX_SUPPLY);
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
-        poolRet = _deployPool(_xTokenAddress, yTokenAddress, 30, true, TBCInputOption.BASE);
+        poolRet = _deployPool(address(xToken), yTokenAddress, 30, true, TBCInputOption.BASE);
         vm.startPrank(admin);
         poolRet.enableSwaps(true);
         _approvePool(poolRet, false);

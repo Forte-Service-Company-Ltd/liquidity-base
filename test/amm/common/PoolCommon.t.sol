@@ -183,7 +183,7 @@ abstract contract PoolCommonTest is TestCommonSetup {
     function _buildAddLiquidityGameToken() internal startAsAdmin endWithStopPrank returns (uint256 initialBalance, uint updatedBalance) {
         GenericERC20FixedSupply _xToken = new GenericERC20FixedSupply("X token", "X", X_TOKEN_MAX_SUPPLY);
         vm.stopPrank();
-        PoolBase _pool = PoolBase(_deployPool(address(_xToken), address(_yToken), 30, false, InputOption.BASE));
+        PoolBase _pool = PoolBase(_deployPool(address(_xToken), address(_yToken), 30, false, TBCInputOption.BASE));
         _approvePool(_pool, false);
         vm.startPrank(admin);
         uint amount = X_TOKEN_MAX_SUPPLY;
@@ -202,7 +202,7 @@ abstract contract PoolCommonTest is TestCommonSetup {
     function testLiquidity_Pool_initializeXSupply_NotOwner() public {
         GenericERC20FixedSupply _xToken = new GenericERC20FixedSupply("X token", "X", X_TOKEN_MAX_SUPPLY);
         vm.stopPrank();
-        PoolBase _pool = PoolBase(_deployPool(address(_xToken), address(_yToken), 30, false, InputOption.BASE));
+        PoolBase _pool = PoolBase(_deployPool(address(_xToken), address(_yToken), 30, false, TBCInputOption.BASE));
         _approvePool(_pool, false);
         vm.expectRevert(abi.encodeWithSignature("OwnableUnauthorizedAccount(address)", alice));
         vm.prank(alice);
@@ -212,7 +212,7 @@ abstract contract PoolCommonTest is TestCommonSetup {
     function _buildLiquidityRemovalNotAllowed() internal startAsAdmin returns (PoolBase _pool) {
         GenericERC20FixedSupply _xToken = new GenericERC20FixedSupply("X token", "X", X_TOKEN_MAX_SUPPLY);
         vm.stopPrank();
-        _pool = _deployPool(address(_xToken), address(_yToken), 30, false, InputOption.BASE);
+        _pool = _deployPool(address(_xToken), address(_yToken), 30, false, TBCInputOption.BASE);
         _approvePool(_pool, false);
         vm.startPrank(admin);
         _pool.enableSwaps(true);
@@ -222,7 +222,6 @@ abstract contract PoolCommonTest is TestCommonSetup {
         uint amountToTrade = 50_000 * fullToken;
         (uint _expected, , ) = pool.simSwap(address(_yToken), amountToTrade);
         pool.swap(address(_yToken), amountToTrade, _expected);
-        uint initialLiquidityX = pool.xTokenLiquidity();
         uint initialLiquidityY = pool.yTokenLiquidity();
         uint fees = pool.collectedLPFees();
         uint protocolFees = pool.collectedProtocolFees();
@@ -258,7 +257,7 @@ abstract contract PoolCommonTest is TestCommonSetup {
 
     function testLiquidity_PoolwithNoZeroTransferToken_closePool_Positive() public {
         NoZeroTransferERC20 _xToken = new NoZeroTransferERC20("X token", "X");
-        PoolBase _pool = _deployPool(address(_xToken), address(_yToken), 30, true, InputOption.BASE);
+        PoolBase _pool = _deployPool(address(_xToken), address(_yToken), 30, true, TBCInputOption.BASE);
         vm.startPrank(admin);
         _pool.closePool();
     }

@@ -3,7 +3,6 @@ pragma solidity ^0.8.24;
 
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
 import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
-import {TBCType} from "src/common/TBC.sol";
 
 /**
  * @title Test Pool functionality

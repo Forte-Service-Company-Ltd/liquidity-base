@@ -39,7 +39,7 @@ contract AddingLiquidityInvariants is TestCommonSetup {
         assertGe(pool.yTokenLiquidity(), yTokenLiquidity);
     }
 
-    function invariant_liquidityCanNeverIncreasePastMaxSupply() public view {
+    function invariant_liquidityCanNeverIncreasePastMaxSupply() public {
         uint maxTokenSupply = _getMaxXTokenSupply();
         assertLe(pool.xTokenLiquidity(), maxTokenSupply);
     }

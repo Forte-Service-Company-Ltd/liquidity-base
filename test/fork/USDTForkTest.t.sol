@@ -5,7 +5,6 @@ import {IERC20} from "forge-std/interfaces/IERC20.sol";
 import {GenericERC20} from "src/example/ERC20/GenericERC20.sol";
 import {GenericERC20FixedSupply} from "src/example/ERC20/GenericERC20FixedSupply.sol";
 import {ForkTestBase} from "test/fork/ForkTestBase.t.sol";
-import {TBCType} from "src/common/TBC.sol";
 
 // Interface for interacting with USDT
 interface IUSDT {
@@ -94,7 +93,7 @@ abstract contract USDTForkTest is ForkTestBase {
 }
 
 /**
- * @title USDT Mainnet Fork Testing ALTBC
+ * @title USDT Mainnet Fork Testing
  * @dev unit test
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve
  */
@@ -105,7 +104,7 @@ contract USDTMainnetForkTest is USDTForkTest {
 }
 
 /**
- * @title USDT Polygon Fork Testing ALTBC
+ * @title USDT Polygon Fork Testing
  * @dev unit test
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve
  */

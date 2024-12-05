@@ -8,13 +8,14 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import {AllowList} from "src/allowList/AllowList.sol";
 import {GenericERC20FixedSupply} from "src/example/ERC20/GenericERC20FixedSupply.sol";
 import "src/example/ERC20/GenericERC20.sol";
-import {TBCType} from "src/common/TBC.sol";
 import {IFactory} from "src/factory/base/IFactory.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {PythonUtils} from "./pythonUtils.s.sol";
 import {SixDecimalERC20} from "src/example/ERC20/SixDecimalERC20.sol";
 
 contract CommonDeployment is Script, PythonUtils {
+    function _deployFactory() internal virtual returns (IFactory) {}
+
     function deployAllowLists() internal returns (AllowList yTokenAllowList, AllowList deployerAllowList) {
         yTokenAllowList = new AllowList();
         deployerAllowList = new AllowList();
@@ -23,7 +24,6 @@ contract CommonDeployment is Script, PythonUtils {
         console2.log("Y_TOKEN_ALLOWLIST", vm.toString(address(yTokenAllowList)));
         console2.log("DEPLOYER_ALLOWLIST", vm.toString(address(deployerAllowList)));
     }
-
 
     // used for deploying a fresh batch of tokens
     function deployTokens(uint supply) internal returns (GenericERC20FixedSupply xToken, GenericERC20 yToken) {
@@ -67,11 +67,11 @@ contract CommonDeployment is Script, PythonUtils {
         console2.log("Stable Coin (STC):", address(stableCoin));
     }
 
-    function setProtocolFeeCollector(address factory, address _protocolFeeCollector, uint feeCollectorFee) internal {
-        IFactory(factory).proposeProtocolFeeCollector(_protocolFeeCollector);
+    function setProtocolFeeCollector(IFactory factory, address _protocolFeeCollector, uint feeCollectorFee) internal {
+        factory.proposeProtocolFeeCollector(_protocolFeeCollector);
         vm.stopBroadcast();
         vm.startBroadcast(feeCollectorFee);
-        IFactory(factory).confirmProtocolFeeCollector();
+        factory.confirmProtocolFeeCollector();
         vm.stopBroadcast();
     }
 }
@@ -89,15 +89,15 @@ contract CommonConfigDeployment is CommonDeployment {
 
     IFactory _factory;
 
-    function prepareForDeployment(TBCType _tbcType) internal returns (address factory) {
-        factory = address(_factory);
-        if (factory == address(0)) {
-            factory = _tbcType == TBCType.ALTBC ? address(vm.envAddress("ALTBC_FACTORY")) : address(vm.envAddress("URQTBC_FACTORY"));
+    function prepareForDeployment() internal {
+        if (address(_factory) == address(0)) {
+            _factory = _deployFactory();
         }
         vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
         uint size;
+        address factoryAddress = address(_factory);
         assembly {
-            size := extcodesize(factory)
+            size := extcodesize(factoryAddress)
         }
         require(size > 0, "FACTORY is not a deployed contract, try deploying the factory with deploy.s.sol:ALTBCFactoryDeployment or deploy.s.sol:URQTBCFactoryDeployment");
         {
@@ -120,15 +120,15 @@ contract CommonConfigDeployment is CommonDeployment {
             AllowList(deployerAllowList).addToAllowList(vm.envAddress("DEPLOYMENT_OWNER"));
         }
         {
-            IFactory(factory).setYTokenAllowList(vm.envAddress("Y_TOKEN_ALLOWLIST"));
-            IFactory(factory).setDeployerAllowList(vm.envAddress("DEPLOYER_ALLOWLIST"));
+            _factory.setYTokenAllowList(vm.envAddress("Y_TOKEN_ALLOWLIST"));
+            _factory.setDeployerAllowList(vm.envAddress("DEPLOYER_ALLOWLIST"));
         }
         {
-            IFactory(factory).proposeProtocolFeeCollector(vm.envAddress("FEE_COLLECTOR"));
-            IFactory(factory).setProtocolFee(uint16(vm.envUint("PROTOCOL_FEE_AMOUNT")));
+            _factory.proposeProtocolFeeCollector(vm.envAddress("FEE_COLLECTOR"));
+            _factory.setProtocolFee(uint16(vm.envUint("PROTOCOL_FEE_AMOUNT")));
         }
         {
-            setProtocolFeeCollector(factory, vm.envAddress("FEE_COLLECTOR"), uint256(vm.envUint("FEE_COLLECTOR_KEY")));
+            setProtocolFeeCollector(_factory, vm.envAddress("FEE_COLLECTOR"), uint256(vm.envUint("FEE_COLLECTOR_KEY")));
             vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
         }
     }
@@ -166,13 +166,16 @@ contract XTokenDeployment is CommonDeployment {
     }
 }
 
-contract Recorder is Script {
+abstract contract Recorder is Script {
     using Strings for uint256;
     using Strings for address;
-    function recordDeployment(address factory, address tokenX, address tokenY, address poolAddress, TBCType _tbctype) internal {
+
+    function _getTBCString() internal view virtual returns (string memory) {}
+
+    function recordDeployment(address factory, address tokenX, address tokenY, address poolAddress) internal {
         string memory record = "deployment";
         {
-            vm.serializeString(record, "poolType", uint(_tbctype).toString());
+            vm.serializeString(record, "poolType", _getTBCString());
             vm.serializeString(record, "factory", factory.toHexString());
             vm.serializeString(record, "issuanceToken", tokenX.toHexString());
             vm.serializeString(record, "collateralToken", tokenY.toHexString());
@@ -188,7 +191,7 @@ contract Recorder is Script {
                 "_deploymentRecord.json"
             );
             console.log(firstMsg);
-            console.log("poolType:", uint(_tbctype).toString());
+            console.log("poolType:", _getTBCString());
             console.log("factory:", factory.toHexString());
             console.log("issuanceToken:", tokenX.toHexString());
             console.log("collateralToken:", tokenY.toHexString());
@@ -213,22 +216,20 @@ contract Recorder is Script {
 }
 
 contract PoolDeploymentCommon is CommonDeployment, Recorder {
-    function prepareForDeployment(
-        TBCType _tbcType
-    ) internal returns (address factory, GenericERC20FixedSupply xToken, GenericERC20 yToken) {
+    function prepareForDeployment() internal returns (IFactory factory, GenericERC20FixedSupply xToken, GenericERC20 yToken) {
         vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
         (xToken, yToken) = deployTokens(10e21);
         (AllowList yTokenAllowList, AllowList deployerAllowList) = deployAllowLists();
-        factory = _tbcType == TBCType.ALTBC ? address(deployALTBCFactory()) : address(deployURQTBCFactory());
+        factory = _deployFactory();
         // TODO fix this hack for getting deployer account
         address deployerAddress = vm.envAddress("DEPLOYMENT_OWNER");
         console.log(deployerAddress);
         {
             yTokenAllowList.addToAllowList(address(yToken));
             deployerAllowList.addToAllowList(deployerAddress);
-            IFactory(factory).setYTokenAllowList(address(yTokenAllowList));
-            IFactory(factory).setDeployerAllowList(address(deployerAllowList));
-            IFactory(factory).setProtocolFee(uint16(vm.envUint("PROTOCOL_FEE_AMOUNT")));
+            factory.setYTokenAllowList(address(yTokenAllowList));
+            factory.setDeployerAllowList(address(deployerAllowList));
+            factory.setProtocolFee(uint16(vm.envUint("PROTOCOL_FEE_AMOUNT")));
             setProtocolFeeCollector(factory, vm.envAddress("FEE_COLLECTOR"), uint256(vm.envUint("FEE_COLLECTOR_KEY")));
         }
         vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));

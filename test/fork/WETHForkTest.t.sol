@@ -19,7 +19,6 @@ contract WETHForkTest is ForkTestBase {
     IERC20 weth;
     bool ethMainnet;
 
-// This is a placeholder setUp function and resembles that of WETHMainnetForkTestALTBC. This is done to mitigate failed tests due to no setUp in the inhertited contract WETHForkTest.
     function setUp() public virtual {
         _setUp(address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2), "ETHEREUM_RPC_KEY");
     }

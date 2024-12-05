@@ -18,7 +18,7 @@ contract PoolPartialFundingTest is TestCommonSetup {
         pool = _setupPoolPartialFunding(false);
     }
 
-    function testLiquidity_Pool_initializePartialXSupply_Positive() public view {
+    function testLiquidity_Pool_initializePartialXSupply_Positive() public {
         uint maxSupply = _getMaxXTokenSupply();
         
         uint poolBalance = xToken.balanceOf(address(pool));
