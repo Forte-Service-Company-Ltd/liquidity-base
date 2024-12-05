@@ -2,7 +2,6 @@
 pragma solidity ^0.8.24;
 
 import {IFactoryEvents} from "src/common/IEvents.sol";
-import {ALTBCInput, URQTBCInput} from "src/common/TBC.sol";
 
 /**
  * @title Pool Factory Interface

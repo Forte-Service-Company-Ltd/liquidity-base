@@ -4,7 +4,6 @@ pragma solidity ^0.8.24;
 import "forge-std/console2.sol";
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
-import {ALTBCCalculator} from "src/amm/altbc/ALTBCCalculator.sol";
 import {IPoolEvents} from "src/common/IEvents.sol";
 import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
 import {GenericERC20} from "src/example/ERC20/GenericERC20.sol";

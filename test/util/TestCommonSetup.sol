@@ -22,10 +22,15 @@ import {TestModifiers} from "test/util/TestModifiers.sol";
  * _create = deploy contract, return the contract
  */
 abstract contract TestCommonSetup is TestCommon, TestModifiers {
-    enum ALTBCInputOption { BASE, FORK, PRECISION }
+    enum TBCInputOption { BASE, FORK, PRECISION }
     function _deployFactory() internal virtual {}
     function _getFactoryAddress() internal virtual returns (address) {}
-    function _deployPool(address,address,uint16,bool,ALTBCInputOption) internal virtual returns (PoolBase) {}
+    function _deployPool(address,address,uint16,bool,TBCInputOption) internal virtual returns (PoolBase) {}
+    function _getMaxXTokenSupply() internal virtual returns (uint) {}
+    function _getMinMaxX() internal view virtual returns (uint,uint) {}
+    function _checlClosePoolState() internal virtual {}
+    function _checkLiquidityExcessState() internal virtual {}
+    function _checkWithdrawRevenueState() internal virtual {}
 
     function _setUpTokens(uint256 _xTokenSupply) internal startAsAdmin endWithStopPrank {
         xToken = new GenericERC20FixedSupply("x token", "GAME", _xTokenSupply + 1);
@@ -81,15 +86,19 @@ abstract contract TestCommonSetup is TestCommon, TestModifiers {
         PoolBase(address(poolRet)).addXSupply(_amount);
     }
 
-    function _setupPool(bool withStableCoin) internal endWithStopPrank returns (PoolBase poolRet) {
-        _setUpTokens(X_TOKEN_MAX_SUPPLY);
+    function _setUpTokensAndFactories(uint _tokenSupply) internal {
+        _setUpTokens(_tokenSupply);
         _loadAdminAndAlice();
         _deployFactory();
         _deployAllowLists();
         _setupFactory(_getFactoryAddress());
         _setupAllowLists();
+    }
+
+    function _setupPool(bool withStableCoin) internal endWithStopPrank returns (PoolBase poolRet) {
+        _setUpTokensAndFactories(X_TOKEN_MAX_SUPPLY);
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
-        poolRet = _deployPool(_xTokenAddress, yTokenAddress, 30, true, ALTBCInputOption.BASE);
+        poolRet = _deployPool(_xTokenAddress, yTokenAddress, 30, true, TBCInputOption.BASE);
         vm.startPrank(admin);
         poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
@@ -107,7 +116,7 @@ abstract contract TestCommonSetup is TestCommon, TestModifiers {
         uint16 fee
     ) internal endWithStopPrank returns (PoolBase poolRet) {
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
-        poolRet = _deployPool(_xTokenAddress, yTokenAddress,  fee, true, ALTBCInputOption.BASE);
+        poolRet = _deployPool(_xTokenAddress, yTokenAddress,  fee, true, TBCInputOption.BASE);
         vm.startPrank(admin);
         poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
@@ -134,14 +143,14 @@ abstract contract TestCommonSetup is TestCommon, TestModifiers {
                 yTokenAddress,
                 0,
                 true,
-                ALTBCInputOption.FORK
+                TBCInputOption.FORK
             )
         );
 
         vm.startPrank(admin);
         poolRet.enableSwaps(true);
         _approvePool(poolRet, usdt);
-        _addInitialLiquidity(poolRet, _tbcType, 10e3 * ERC20_DECIMALS);
+        _addInitialLiquidity(poolRet, 10e3 * ERC20_DECIMALS);
 
         (owner, fee);
     }
@@ -149,48 +158,37 @@ abstract contract TestCommonSetup is TestCommon, TestModifiers {
     function _setupStressTestPool(bool withStableCoin) internal endWithStopPrank returns (PoolBase poolRet) {
         // the token supply is the same value used in the stress test simulation and must match
         uint256 maxX = 10e3 * ERC20_DECIMALS;
-        _setUpTokens(maxX);
-        _loadAdminAndAlice();
-        _deployFactory();
-        _deployAllowLists();
-        _setupFactory(_getFactoryAddress());
-        _setupAllowLists();
+        _setUpTokensAndFactories(maxX);
    
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
         // the pool config values are the same config values used in the stress test simulation and must match
         /// fee: 0.0%, supply: 10K tokens, y-intersect: 10, minPrice: 1, maxPrice: 100
-        poolRet = _deployPool(_xTokenAddress, yTokenAddress, 0, true, ALTBCInputOption.FORK);
+        poolRet = _deployPool(_xTokenAddress, yTokenAddress, 0, true, TBCInputOption.FORK);
 
         vm.startPrank(admin);
         poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
-        _addInitialLiquidity(poolRet, _tbcType, 10e3 * ERC20_DECIMALS);
+        _addInitialLiquidity(poolRet, 10e3 * ERC20_DECIMALS);
     }
 
     function _setupPrecisionPools(
         uint256 maxSupply,
         uint16 fee
     ) internal endWithStopPrank returns (PoolBase wadPool, PoolBase sixDecimalPool) {
-        _setUpTokens(maxSupply);
-        _loadAdminAndAlice();
-        _deployFactory();
-        _deployAllowLists();
-        _setupFactory(_getFactoryAddress());
-        _setupAllowLists();
-        urqtbcInput._maxXTokenSupply = maxSupply;
+        _setUpTokensAndFactories(maxSupply);
 
-        wadPool = _deployPool(_xTokenAddress, _yTokenAddress,fee, true, ALTBCInputOption.PRECISION);
+        wadPool = _deployPool(_xTokenAddress, _yTokenAddress,fee, true, TBCInputOption.PRECISION);
 
         vm.startPrank(admin);
         wadPool.enableSwaps(true);
         _approvePool(wadPool, false);
-        _addInitialLiquidity(wadPool, _tbcType, maxSupply);
+        _addInitialLiquidity(wadPool, maxSupply);
         vm.stopPrank();
 
         _setUpTokens(maxSupply);
         vm.startPrank(admin);
         yTokenAllowList.addToAllowList(address(stableCoin));
-        sixDecimalPool = _deployPool(_xTokenAddress, address(stableCoin),fee, true, ALTBCInputOption.PRECISION);
+        sixDecimalPool = _deployPool(_xTokenAddress, address(stableCoin),fee, true, TBCInputOption.PRECISION);
 
         _loadAdminAndAlice();
         vm.startPrank(admin);
@@ -201,14 +199,9 @@ abstract contract TestCommonSetup is TestCommon, TestModifiers {
     }
 
     function _setupPoolPartialFunding(bool withStableCoin) internal endWithStopPrank returns (PoolBase poolRet) {
-        _setUpTokens(X_TOKEN_MAX_SUPPLY);
-        _loadAdminAndAlice();
-        _deployFactory();
-        _deployAllowLists();
-        _setupFactory(_getFactoryAddress());
-        _setupAllowLists();
+        _setUpTokensAndFactories(X_TOKEN_MAX_SUPPLY);
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
-        poolRet = _deployPool(_xTokenAddress, yTokenAddress, 30, true, ALTBCInputOption.BASE);
+        poolRet = _deployPool(_xTokenAddress, yTokenAddress, 30, true, TBCInputOption.BASE);
         vm.startPrank(admin);
         poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
@@ -216,17 +209,26 @@ abstract contract TestCommonSetup is TestCommon, TestModifiers {
     }
 
     function _setupFOTPool(bool withStableCoin) internal endWithStopPrank returns (PoolBase poolRet) {
-        _setUpTokens(X_TOKEN_MAX_SUPPLY);
-        _loadAdminAndAlice();
-        _deployFactory();
-        _deployAllowLists();
-        _setupFactory(_getFactoryAddress());
-        _setupAllowLists();
+        _setUpTokensAndFactories(X_TOKEN_MAX_SUPPLY);
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
-        poolRet = _deployPool(address(fotCoin), yTokenAddress, 30, true, ALTBCInputOption.BASE);
+        poolRet = _deployPool(address(fotCoin), yTokenAddress, 30, true, TBCInputOption.BASE);
         vm.startPrank(admin);
         poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
         _addInitialLiquidity(poolRet, X_TOKEN_MAX_SUPPLY);
     }
+
+    function _setupParallelTokensAndPoolsForFees()
+        internal
+        startAsAdmin
+        returns (GenericERC20FixedSupply xTokenWithFee, GenericERC20FixedSupply xTokenWoutFee, PoolBase poolWFee, PoolBase poolWOutFee)
+    {
+        bool withStableCoin = pool.yToken() == address(stableCoin);
+        xTokenWithFee = new GenericERC20FixedSupply("Fee token", "FEE", X_TOKEN_MAX_SUPPLY);
+        xTokenWoutFee = new GenericERC20FixedSupply("No Fee token", "NOFEE", X_TOKEN_MAX_SUPPLY);
+        vm.stopPrank();
+        poolWFee = _setupPoolWithFee(withStableCoin, address(xTokenWithFee), 30);
+        poolWOutFee = _setupPoolWithFee(withStableCoin, address(xTokenWoutFee), 0);
+    }
+
 }

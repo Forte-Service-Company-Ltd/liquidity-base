@@ -8,15 +8,14 @@ pragma solidity ^0.8.24;
  */
 import {pausedAuthorizationHandler} from "test/authorization/invariants/pausedAuthorizationHandler.sol";
 import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
-import {TBCType} from "src/common/TBC.sol";
 
-abstract contract pausedAuthorizationInvariants is TestCommonSetup {
+contract pausedAuthorizationInvariants is TestCommonSetup {
     uint256 _startingXLiquidity;
     uint256 _startingYLiquidity;
     pausedAuthorizationHandler handler;
 
-    function _setUp(TBCType _tbcType) internal endWithStopPrank {
-        pool = _setupPool(false, _tbcType);
+    function setUp() internal endWithStopPrank {
+        pool = _setupPool(false);
         handler = new pausedAuthorizationHandler(pool);
         bytes4[] memory selectors = new bytes4[](1);
         selectors[0] = handler.swap.selector;
@@ -37,17 +36,5 @@ abstract contract pausedAuthorizationInvariants is TestCommonSetup {
 
     function invariant_verifyRevertsWhilePaused_removeLiquidityYToken() public view {
         assertEq(pool.yTokenLiquidity(), _startingYLiquidity);
-    }
-}
-
-contract pausedAuthorizationInvariants_ALTBC is pausedAuthorizationInvariants {
-    function setUp() public {
-        _setUp(TBCType.ALTBC);
-    }
-}
-
-contract pausedAuthorizationInvariants_URQTBC is pausedAuthorizationInvariants {
-    function setUp() public {
-        _setUp(TBCType.URQTBC);
     }
 }

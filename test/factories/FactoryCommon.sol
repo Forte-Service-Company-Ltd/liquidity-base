@@ -8,8 +8,6 @@ import {IFactoryEvents, CommonEvents} from "src/common/IEvents.sol";
 import {GenericERC20} from "src/example/ERC20/GenericERC20.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
-import {ALTBCInput} from "src/common/TBC.sol";
-import {TBCType} from "src/common/TBC.sol";
 import "forge-std/console2.sol";
 /**
  * @title Test PoolFactory contract
@@ -17,28 +15,27 @@ import "forge-std/console2.sol";
  * @author @oscarsernarosero @mpetersoCode55
  */
 abstract contract FactoryCommon is TestCommonSetup {
-    TBCType tbcType;
     FactoryBase factory;
 
     function _setUp() public {
         _setUpTokens(1e11 * 1e18);
     }
 
-    function testLiquidity_PoolFactory_version() public {
-        _deployFactoriesAndAllowLists();
-        factory = tbcType == TBCType.ALTBC ? FactoryBase(address(altbcFactory)) : FactoryBase(address(urqtbcFactory));
-        assertEq(factory.VERSION(), "v0.2.0");
+    function _buildDeployment() internal {
+        _deployFactory();
+        _deployAllowLists();
+        factory = FactoryBase(_getFactoryAddress());
     }
 
-    function _buildDeployment() internal {
-        _deployFactoriesAndAllowLists();
-        factory = tbcType == TBCType.ALTBC ? FactoryBase(address(altbcFactory)) : FactoryBase(address(urqtbcFactory));
+    function testLiquidity_PoolFactory_version() public {
+        _buildDeployment();
+        assertEq(factory.VERSION(), "v0.2.0");
     }
 
     function testLiquidity_PoolFactory_deployment() public {
         _buildDeployment();
-        assertNotEq(address(altbcFactory), address(0));
-        assertNotEq(address(urqtbcFactory), address(0));
+        assertNotEq(_getFactoryAddress(), address(0));
+        assertNotEq(_getFactoryAddress(), address(0));
     }
 
     function testLiquidity_PoolFactory_owner() public {
@@ -77,14 +74,12 @@ abstract contract FactoryCommon is TestCommonSetup {
     }
 
     function _deployAndSetupFactory() internal {
-        _deployFactoriesAndAllowLists();
-        factory = tbcType == TBCType.ALTBC ? FactoryBase(address(altbcFactory)) : FactoryBase(address(urqtbcFactory));
+        _buildDeployment();
         _setupFactory(address(factory));
     }
 
     function _build_proposeNewProtocolFeeCollector() public {
         _deployAndSetupFactory();
-        factory = tbcType == TBCType.ALTBC ? FactoryBase(address(altbcFactory)) : FactoryBase(address(urqtbcFactory));
         vm.startPrank(admin);
         factory.proposeProtocolFeeCollector(address(0xbabe));
     }

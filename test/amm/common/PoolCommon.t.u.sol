@@ -17,13 +17,8 @@ abstract contract PoolCommonUnitTest is TestCommonSetup {
     bool wMatic;
     uint fullToken;
 
-    function _setUp(bool _withStableCoin) internal {
-        /// MAKE TBCType DYNAMIC ONCE WE START MAKING TESTS FOR URQTBC. FOR INSTANCE, MAKE THIS TEST COMMON, AND SET THIS VARIABLE IN THE CHILD CONTRACTS
-        _setUp(_withStableCoin, TBCType.ALTBC);
-    }
-
-    function _setUp(bool _withStableCoin, TBCType _tbcType) internal endWithStopPrank {
-        pool = _setupStressTestPool(_withStableCoin, _tbcType);
+    function _setUp(bool _withStableCoin) internal endWithStopPrank {
+        pool = _setupStressTestPool(_withStableCoin);
         withStableCoin = _withStableCoin;
         _yToken = IERC20(pool.yToken());
         fullToken = address(_yToken) == address(stableCoin) ? STABLECOIN_DEC : ERC20_DECIMALS;

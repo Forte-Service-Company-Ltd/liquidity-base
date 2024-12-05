@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/utils/Pausable.sol";
 import "forge-std/console2.sol";
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
 import {Ownable} from "openzeppelin-contracts/contracts/access/Ownable.sol";
-import {ALTBCPool} from "src/amm/altbc/ALTBCPool.sol";
 import "src/common/IEvents.sol";
 import {GenericERC20FixedSupply} from "src/example/ERC20/GenericERC20FixedSupply.sol";
 import {NoZeroTransferERC20} from "src/example/ERC20/NoZeroTransferERC20.sol";
@@ -13,12 +12,7 @@ import {SimplePriceOracle} from "src/example/SimplePriceOracle.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {CumulativePrice} from "src/amm/base/CumulativePrice.sol";
 import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
-import {ALTBCInput} from "src/common/TBC.sol";
-import {TBCType} from "src/common/TBC.sol";
-import {ALTBCEquations} from "src/amm/altbc/ALTBCEquations.sol";
-import {ALTBCDef} from "src/common/TBC.sol";
-import {ALTBCCalculator} from "src/amm/altbc/ALTBCCalculator.sol";
-import {URQTBCCalculator} from "src/amm/urqtbc/URQTBCCalculator.sol";
+
 /**
  * @title Test Pool functionality
  * @dev unit test
@@ -27,98 +21,19 @@ import {URQTBCCalculator} from "src/amm/urqtbc/URQTBCCalculator.sol";
 abstract contract PoolCommonTest is TestCommonSetup {
     IERC20 _yToken;
     uint fullToken;
-    TBCType tbcType;
-    ALTBCDef altbc;
 
     function _setupCollateralToken() internal {
         _yToken = IERC20(pool.yToken());
         fullToken = address(_yToken) == address(stableCoin) ? STABLECOIN_DEC : ERC20_DECIMALS;
     }
 
-    function testLiquidity_Pool_XSquareNeverOverflows() public view {
-        // Verifying this doesn't revert due to an overflow
-        ALTBCPool(address(pool)).TOTAL_SUPPLY_LIMIT() * ALTBCPool(address(pool)).TOTAL_SUPPLY_LIMIT();
-    }
-
     function testLiquidity_Pool_version() public view {
         assertEq(pool.VERSION(), "v0.2.0");
     }
 
-    function testLiquidity_Pool_SDenomNeverOverflows() public view {
-        ALTBCPool(address(pool)).TOTAL_SUPPLY_LIMIT() + ALTBCPool(address(pool)).C_MAX();
-    }
-
-    function testLiquidity_Pool_deploymentEvent() public startAsAdmin {
-        if (tbcType == TBCType.ALTBC) {
-            vm.expectEmit(true, true, true, true);
-            emit ALTBCPoolDeployed(
-                address(xToken),
-                address(yToken),
-                "v0.2.0",
-                0,
-                0,
-                address(0xB0b),
-                X_TOKEN_MAX_SUPPLY,
-                altbcInput,
-                true,
-                admin
-            );
-            altbcFactory.createPool(address(xToken), address(yToken), 0, altbcInput, true);
-        } else {
-            vm.expectEmit(true, true, true, true);
-            emit URQTBCPoolDeployed(
-                address(xToken),
-                address(yToken),
-                "v0.2.0",
-                0,
-                0,
-                address(0xB0b),
-                X_TOKEN_MAX_SUPPLY,
-                urqtbcInput,
-                true,
-                admin
-            );
-            urqtbcFactory.createPool(address(xToken), address(yToken), 0, urqtbcInput, true);
-        }
-    }
-
-    function testLiquidity_Pool_HighDecimalYToken() public {
-        _setUpTokens(X_TOKEN_MAX_SUPPLY);
-        _loadAdminAndAlice();
-        _deployFactoriesAndAllowLists();
-        _setupFactory(tbcType == TBCType.ALTBC ? address(altbcFactory) : address(urqtbcFactory));
-        _setupAllowLists();
-        vm.startPrank(admin);
-        vm.expectRevert(abi.encodeWithSignature("YTokenDecimalsGT18()"));
-        if (tbcType == TBCType.ALTBC) {
-            altbcFactory.createPool(address(xToken), address(highDecimalCoin), 30, altbcInput, true);
-        } else {
-            urqtbcFactory.createPool(address(xToken), address(highDecimalCoin), 30, urqtbcInput, true);
-        }
-    }
-
-    function testLiquidity_Pool_HighDecimalXToken() public {
-        _setUpTokens(X_TOKEN_MAX_SUPPLY);
-        _loadAdminAndAlice();
-        _deployFactoriesAndAllowLists();
-        _setupFactory(tbcType == TBCType.ALTBC ? address(altbcFactory) : address(urqtbcFactory));
-        _setupAllowLists();
-        vm.startPrank(admin);
-        vm.expectRevert(abi.encodeWithSignature("XTokenDecimalsIsNot18()"));
-        if (tbcType == TBCType.ALTBC) {
-            altbcFactory.createPool(address(highDecimalCoin), address(stableCoin), 30, altbcInput, true);
-        } else {
-            urqtbcFactory.createPool(address(highDecimalCoin), address(stableCoin), 30, urqtbcInput, true);
-        }
-    }
-
     function testLiquidity_Pool_TokensMustNotBeTheSame() public startAsAdmin {
         vm.expectRevert(abi.encodeWithSignature("XandYTokensAreTheSame()"));
-        if (tbcType == TBCType.ALTBC) {
-            altbcFactory.createPool(address(yToken), address(yToken), 0, altbcInput, true);
-        } else {
-            urqtbcFactory.createPool(address(yToken), address(yToken), 0, urqtbcInput, true);
-        }
+        _deployPool(address(yToken), address(yToken), 0, true, TBCInputOption.BASE);
     }
 
     function testLiquidity_Pool_enableSwaps_Positive() public startAsAdmin {
@@ -268,7 +183,7 @@ abstract contract PoolCommonTest is TestCommonSetup {
     function _buildAddLiquidityGameToken() internal startAsAdmin endWithStopPrank returns (uint256 initialBalance, uint updatedBalance) {
         GenericERC20FixedSupply _xToken = new GenericERC20FixedSupply("X token", "X", X_TOKEN_MAX_SUPPLY);
         vm.stopPrank();
-        PoolBase _pool = PoolBase(_deployPool(address(_xToken), 30, false, tbcType));
+        PoolBase _pool = PoolBase(_deployPool(address(_xToken), address(_yToken), 30, false, InputOption.BASE));
         _approvePool(_pool, false);
         vm.startPrank(admin);
         uint amount = X_TOKEN_MAX_SUPPLY;
@@ -287,7 +202,7 @@ abstract contract PoolCommonTest is TestCommonSetup {
     function testLiquidity_Pool_initializeXSupply_NotOwner() public {
         GenericERC20FixedSupply _xToken = new GenericERC20FixedSupply("X token", "X", X_TOKEN_MAX_SUPPLY);
         vm.stopPrank();
-        PoolBase _pool = PoolBase(_deployPool(address(_xToken), 30, false, tbcType));
+        PoolBase _pool = PoolBase(_deployPool(address(_xToken), address(_yToken), 30, false, InputOption.BASE));
         _approvePool(_pool, false);
         vm.expectRevert(abi.encodeWithSignature("OwnableUnauthorizedAccount(address)", alice));
         vm.prank(alice);
@@ -297,7 +212,7 @@ abstract contract PoolCommonTest is TestCommonSetup {
     function _buildLiquidityRemovalNotAllowed() internal startAsAdmin returns (PoolBase _pool) {
         GenericERC20FixedSupply _xToken = new GenericERC20FixedSupply("X token", "X", X_TOKEN_MAX_SUPPLY);
         vm.stopPrank();
-        _pool = _deployPool(address(_xToken), 30, false, false, tbcType);
+        _pool = _deployPool(address(_xToken), address(_yToken), 30, false, InputOption.BASE);
         _approvePool(_pool, false);
         vm.startPrank(admin);
         _pool.enableSwaps(true);
@@ -315,28 +230,7 @@ abstract contract PoolCommonTest is TestCommonSetup {
         uint ownerBalance = _yToken.balanceOf(admin);
         uint protocolFeeCollectorBalance = _yToken.balanceOf(protocolFeeCollector);
         uint RMax;
-        if (tbcType == TBCType.ALTBC) {
-            (, , , , uint b, uint c, uint C, uint Dv, uint xMin) = ALTBCCalculator(address(pool)).tbc();
-            altbc.b = b;
-            altbc.c = c;
-            altbc.C = C;
-            altbc.Dv = Dv;
-            altbc.xMin = xMin;
-            RMax = ALTBCEquations.calculateRMax(altbc, pool.x(), 0);
-            if (pool.yDecimalDiff() > 0) RMax /= 10 ** pool.yDecimalDiff();
-            console2.log(initialLiquidityY + fees + RMax);
-
-            vm.expectEmit(true, false, true, true, address(pool));
-            emit IPoolEvents.PoolClosed(initialLiquidityX, initialLiquidityY + fees + RMax);
-            if (RMax > 0) {
-                vm.expectEmit(true, false, true, true, address(pool));
-                emit IPoolEvents.RevenueWithdrawn(admin, RMax);
-            }
-            if (protocolFees > 0) {
-                vm.expectEmit(true, false, true, true, address(pool));
-                emit IPoolEvents.ProtocolFeesCollected(protocolFeeCollector, protocolFees);
-            }
-        }
+        _checkClosePoolState();
         pool.closePool();
         uint ownerBalanceClosed = _yToken.balanceOf(admin);
         uint protocolFeeCollectorBalanceClosed = _yToken.balanceOf(protocolFeeCollector);
@@ -364,7 +258,7 @@ abstract contract PoolCommonTest is TestCommonSetup {
 
     function testLiquidity_PoolwithNoZeroTransferToken_closePool_Positive() public {
         NoZeroTransferERC20 _xToken = new NoZeroTransferERC20("X token", "X");
-        PoolBase _pool = _deployPool(address(_xToken), 30, true, tbcType);
+        PoolBase _pool = _deployPool(address(_xToken), address(_yToken), 30, true, InputOption.BASE);
         vm.startPrank(admin);
         _pool.closePool();
     }
@@ -476,23 +370,8 @@ abstract contract PoolCommonTest is TestCommonSetup {
         assertTrue(counter > minimumSwapCount, "Minimum swap count not reached");
     }
 
-    function getMinMaxXURQTBC() private view returns (uint min, uint max) {
-        (, , , , , max) = URQTBCCalculator(address(pool)).tbc();
-        min = 1e18;
-        max = max + min;
-    }
-
-    function getMinMaxXALTBC() private view returns (uint min, uint max) {
-        (max, , , , , , , , min) = ALTBCCalculator(address(pool)).tbc();
-        max = max + min;
-    }
-
-    function getMinMaxX() private view returns (uint min, uint max) {
-        (min, max) = tbcType == TBCType.ALTBC ? getMinMaxXALTBC() : getMinMaxXURQTBC();
-    }
-
     function testLiquidity_Pool_buyGameToken_ExcessX() public startAsAdmin endWithStopPrank {
-        (uint xMin, uint256 maxX) = getMinMaxX(); // to avoid stack too deep
+        (uint xMin, uint maxX) = _getMinMaxX(); // to avoid stack too deep
         address _yTokenAddress = address(pool.yToken());
         uint targetAmount = 1e18;
         address _xToken = pool.xToken();
@@ -504,19 +383,6 @@ abstract contract PoolCommonTest is TestCommonSetup {
         uint outOfBoundAmount = maxX + 1 - xMin - actual;
         vm.expectRevert(abi.encodeWithSignature("XOutOfBounds(uint256)", 1)); // XOutOfBounds is impossible to be triggered in this scenario
         pool.simSwapReversed(_xToken, outOfBoundAmount);
-    }
-
-    function _setupParallelTokensAndPoolsForFees()
-        internal
-        startAsAdmin
-        returns (GenericERC20FixedSupply xTokenWithFee, GenericERC20FixedSupply xTokenWoutFee, PoolBase poolWFee, PoolBase poolWOutFee)
-    {
-        bool withStableCoin = pool.yToken() == address(stableCoin);
-        xTokenWithFee = new GenericERC20FixedSupply("Fee token", "FEE", X_TOKEN_MAX_SUPPLY);
-        xTokenWoutFee = new GenericERC20FixedSupply("No Fee token", "NOFEE", X_TOKEN_MAX_SUPPLY);
-        vm.stopPrank();
-        poolWFee = _setupPoolWithFee(withStableCoin, address(xTokenWithFee), 30, tbcType);
-        poolWOutFee = _setupPoolWithFee(withStableCoin, address(xTokenWoutFee), 0, tbcType);
     }
 
     function testLiquidity_Pool_Fees_SellingTokenY() public endWithStopPrank {
@@ -786,18 +652,7 @@ abstract contract PoolCommonTest is TestCommonSetup {
         uint yliq = pool.yTokenLiquidity();
         console2.log("yliq", yliq);
         console2.log("yBalance - fees:", yBalance - fees);
-        if (tbcType == TBCType.ALTBC) {
-            (, , , , uint b, uint c, uint C, uint Dv, uint xMin) = ALTBCCalculator(address(pool)).tbc();
-            altbc.b = b;
-            altbc.c = c;
-            altbc.C = C;
-            altbc.Dv = Dv;
-            altbc.xMin = xMin;
-            uint256 RMax = ALTBCEquations.calculateRMax(altbc, pool.x(), 0);
-            if (pool.yDecimalDiff() > 0) RMax /= 10 ** pool.yDecimalDiff();
-            /// we check that liquidity is exactly the same as the balance minus the fees (no liquidity excess)
-            assertEq(yBalance - fees - RMax, yliq, "not enough liquidity to buy back x tokens");
-        }
+        _checkLiquidityExcessState();
     }
 
     function testLiquidity_Pool_Fees_SellingTokenX() public endWithStopPrank {
@@ -879,19 +734,7 @@ abstract contract PoolCommonTest is TestCommonSetup {
         uint yliq = pool.yTokenLiquidity();
         console2.log("yliq", yliq);
         console2.log("yBalance - fees", yBalance - fees);
-        if (tbcType == TBCType.ALTBC) {
-            (, , , , uint b, uint c, uint C, uint Dv, uint xMin) = ALTBCCalculator(address(pool)).tbc();
-            altbc.b = b;
-            altbc.c = c;
-            altbc.C = C;
-            altbc.Dv = Dv;
-            altbc.xMin = xMin;
-
-            uint256 RMax = ALTBCEquations.calculateRMax(altbc, pool.x(), 0);
-            if (pool.yDecimalDiff() > 0) RMax /= 10 ** pool.yDecimalDiff();
-            assertEq(yBalance - fees - RMax, yliq, "not enough liquidity to buy back x tokens");
-            /// we check that liquidity is exactly the same as the balance minus the fees (no liquidity excess)
-        }
+        _checkBackAndForthSwapsState();
     }
 
     function testLiquidity_Pool_buyCollateralToken_Positive() public endWithStopPrank {
@@ -959,7 +802,6 @@ abstract contract PoolCommonTest is TestCommonSetup {
     }
 
     function testLiquidity_Pool_priceAlwaysGoesUpToTheRight(uint256 amount) public startAsAdmin {
-        if (tbcType == TBCType.URQTBC) vm.skip(true);
         amount = bound(amount, address(_yToken) == address(stableCoin) ? amountMinBound : 10, 1_000 * fullToken);
 
         _yToken.approve(address(pool), amount);
@@ -998,7 +840,6 @@ abstract contract PoolCommonTest is TestCommonSetup {
     }
 
     function testLiquidity_PoolToB_priceAlwaysGoesUpToTheRight_A(uint256 amountA, uint256 amountB) public {
-        if (tbcType == TBCType.URQTBC) vm.skip(true);
         amountA = bound(amountA, 1e6 * fullToken, 1e9 * fullToken); // big initial number
         amountB = bound(amountB, address(_yToken) == address(stableCoin) ? amountMinBound : 10, 1 * fullToken); // small number
         swapAndVerifyPriceChange(amountA);
@@ -1006,7 +847,6 @@ abstract contract PoolCommonTest is TestCommonSetup {
     }
 
     function testLiquidity_Pool_priceImpactAlwaysDecreases(uint256 amount) public startAsAdmin {
-        if (tbcType == TBCType.URQTBC) vm.skip(true);
         amount = bound(amount, address(_yToken) == address(stableCoin) ? amountMinBound : 10, 1e3 * fullToken);
         _yToken.approve(address(pool), amount * 2);
 
@@ -1032,7 +872,6 @@ abstract contract PoolCommonTest is TestCommonSetup {
     }
 
     function testLiquidity_Pool_priceAlwaysIncreasesForSameX(uint256 amount, uint256 initialAmount) public startAsAdmin {
-        if (tbcType == TBCType.URQTBC) vm.skip(true);
         amount = bound(amount, address(_yToken) == address(stableCoin) ? amountMinBound : 10, 1_000 * fullToken);
         initialAmount = bound(amount, address(_yToken) == address(stableCoin) ? amountMinBound : 10, 1_000 * fullToken);
         console2.log("amount", amount);
@@ -1097,41 +936,9 @@ abstract contract PoolCommonTest is TestCommonSetup {
         pool.withdrawRevenue();
     }
 
-    function testLiquidity_Pool_WithdrawRevenueAccrued_Possitive() public startAsAdmin endWithStopPrank {
+    function testLiquidity_Pool_WithdrawRevenueAccrued_Positive() public startAsAdmin endWithStopPrank {
         _pool_BackAndForthSwaps();
-        if (tbcType == TBCType.ALTBC) {
-            uint256 balanceBefore = IERC20(pool.yToken()).balanceOf(admin);
-            uint256 RBefore = pool.R();
-            assertEq(RBefore, 0);
-
-            uint256 x = pool.x();
-            uint256 b;
-            uint256 xMin;
-            uint256 c;
-            uint256 C;
-            uint256 Dv;
-            uint256 R = pool.R();
-
-            (, , , , b, c, C, Dv, xMin) = ALTBCCalculator(address(pool)).tbc();
-
-            altbc.b = b;
-            altbc.c = c;
-            altbc.C = C;
-            altbc.Dv = Dv;
-            altbc.xMin = xMin;
-            uint256 RMax = ALTBCEquations.calculateRMax(altbc, x, R);
-
-            if (pool.yDecimalDiff() > 0) RMax /= 10 ** pool.yDecimalDiff();
-            vm.expectEmit(true, true, true, true, address(pool));
-            emit IPoolEvents.RevenueWithdrawn(admin, RMax);
-            pool.withdrawRevenue();
-
-            uint256 balanceAfter = IERC20(pool.yToken()).balanceOf(admin);
-            uint RAfter = pool.R();
-
-            assertGt(RAfter, 0);
-            assertEq((balanceBefore + RAfter), balanceAfter);
-        }
+        _checkWithdrawRevenueState();
     }
 
     function testLiquidity_Pool_CumulativePrice() public startAsAdmin endWithStopPrank {

@@ -12,7 +12,7 @@ import {CumulativePrice} from "src/amm/base/CumulativePrice.sol";
  * @dev invariant test
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve
  */
-abstract contract SwapInvariants is TestCommonSetup {
+contract SwapInvariants is TestCommonSetup {
     SwapHandler _handler;
     uint256 lastFees;
     uint lastCumulativePrice;

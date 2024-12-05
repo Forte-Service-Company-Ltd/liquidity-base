@@ -5,7 +5,6 @@ import {IERC20} from "forge-std/interfaces/IERC20.sol";
 import {GenericERC20} from "src/example/ERC20/GenericERC20.sol";
 import {GenericERC20FixedSupply} from "src/example/ERC20/GenericERC20FixedSupply.sol";
 import {ForkTestBase} from "test/fork/ForkTestBase.t.sol";
-import {TBCType} from "src/common/TBC.sol";
 
 // Interface for interacting with USDC
 interface IUSDC {
@@ -22,7 +21,7 @@ interface IUSDC {
  */
 abstract contract USDCForkTest is ForkTestBase {
 
-    function _setUp(address usdcAddress, string memory key, TBCType _tbcType) internal {
+    function _setUp(address usdcAddress, string memory key) internal {
         IUSDC usdc = IUSDC(usdcAddress);
         uint256 fork = vm.createFork(vm.envString(key));
         vm.selectFork(fork);
@@ -32,7 +31,7 @@ abstract contract USDCForkTest is ForkTestBase {
 
         admin = address(this);
         yToken = GenericERC20(address(usdc));
-        pool = _setupPoolForkTest(address(this), address(usdc), 0, false, _tbcType);
+        pool = _setupPoolForkTest(address(this), address(usdc), 0, false);
         _yToken = IERC20(pool.yToken());
         xToken = GenericERC20FixedSupply(address(pool.xToken()));
         withStableCoin = true;
@@ -63,9 +62,9 @@ abstract contract USDCForkTest is ForkTestBase {
  * @dev unit test
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve @palmerg4
  */
-contract USDCMainnetForkTestALTBC is USDCForkTest {
+contract USDCMainnetForkTest is USDCForkTest {
     function setUp() public {
-        _setUp(address(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48), "ETHEREUM_RPC_KEY", TBCType.ALTBC);
+        _setUp(address(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48), "ETHEREUM_RPC_KEY");
     }
 }
 
@@ -74,30 +73,8 @@ contract USDCMainnetForkTestALTBC is USDCForkTest {
  * @dev unit test
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve @palmerg4
  */
-contract USDCPolygonForkTestALTBC is USDCForkTest {
+contract USDCPolygonForkTest is USDCForkTest {
     function setUp() public {
-        _setUp(address(0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359), "POLYGON_RPC_KEY", TBCType.ALTBC);
-    }
-}
-
-/**
- * @title USDC Mainnet Fork Testing URQTBC
- * @dev unit test
- * @author @oscarsernarosero @mpetersoCode55 @cirsteve @palmerg4
- */
-contract USDCMainnetForkTestURQTBC is USDCForkTest {
-    function setUp() public {
-        _setUp(address(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48), "ETHEREUM_RPC_KEY", TBCType.URQTBC);
-    }
-}
-
-/**
- * @title USDC Polygon Fork Testing URQTBC
- * @dev unit test
- * @author @oscarsernarosero @mpetersoCode55 @cirsteve @palmerg4
- */
-contract USDCPolygonForkTestURQTBC is USDCForkTest {
-    function setUp() public {
-        _setUp(address(0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359), "POLYGON_RPC_KEY", TBCType.URQTBC);
+        _setUp(address(0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359), "POLYGON_RPC_KEY");
     }
 }

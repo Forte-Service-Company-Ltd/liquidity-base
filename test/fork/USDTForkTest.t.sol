@@ -27,7 +27,7 @@ abstract contract USDTForkTest is ForkTestBase {
     IUSDT _usdt;
     bool ethMainnet;
 
-    function _setUp(address usdtAddress, string memory key, TBCType _tbcType) internal {
+    function _setUp(address usdtAddress, string memory key) internal {
         _usdt = IUSDT(usdtAddress);
         uint256 fork = vm.createFork(vm.envString(key));
         vm.selectFork(fork);
@@ -46,7 +46,7 @@ abstract contract USDTForkTest is ForkTestBase {
 
         admin = address(this);
         yToken = GenericERC20(address(_usdt));
-        pool = _setupPoolForkTest(address(this), address(_usdt), 0, true, _tbcType);
+        pool = _setupPoolForkTest(address(this), address(_usdt), 0, true);
         _usdt.approve(address(this), 1e9 * STABLECOIN_DEC);
         _usdt.approve(address(pool), 1e9 * STABLECOIN_DEC);
         _yToken = IERC20(pool.yToken());
@@ -98,9 +98,9 @@ abstract contract USDTForkTest is ForkTestBase {
  * @dev unit test
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve
  */
-contract USDTMainnetForkTestALTBC is USDTForkTest {
+contract USDTMainnetForkTest is USDTForkTest {
     function setUp() public {
-        _setUp(address(0xdAC17F958D2ee523a2206206994597C13D831ec7), "ETHEREUM_RPC_KEY", TBCType.ALTBC);
+        _setUp(address(0xdAC17F958D2ee523a2206206994597C13D831ec7), "ETHEREUM_RPC_KEY");
     }
 }
 
@@ -109,30 +109,8 @@ contract USDTMainnetForkTestALTBC is USDTForkTest {
  * @dev unit test
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve
  */
-contract USDTPolygonForkTestALTBC is USDTForkTest {
+contract USDTPolygonForkTest is USDTForkTest {
     function setUp() public {
-        _setUp(address(0xc2132D05D31c914a87C6611C10748AEb04B58e8F), "POLYGON_RPC_KEY", TBCType.ALTBC);
-    }
-}
-
-/**
- * @title USDT Mainnet Fork Testing URQTBC
- * @dev unit test
- * @author @oscarsernarosero @mpetersoCode55 @cirsteve
- */
-contract USDTMainnetForkTestURQTBC is USDTForkTest {
-    function setUp() public {
-        _setUp(address(0xdAC17F958D2ee523a2206206994597C13D831ec7), "ETHEREUM_RPC_KEY", TBCType.URQTBC);
-    }
-}
-
-/**
- * @title USDT Polygon Fork Testing URQTBC
- * @dev unit test
- * @author @oscarsernarosero @mpetersoCode55 @cirsteve
- */
-contract USDTPolygonForkTestURQTBC is USDTForkTest {
-    function setUp() public {
-        _setUp(address(0xc2132D05D31c914a87C6611C10748AEb04B58e8F), "POLYGON_RPC_KEY", TBCType.URQTBC);
+        _setUp(address(0xc2132D05D31c914a87C6611C10748AEb04B58e8F), "POLYGON_RPC_KEY");
     }
 }

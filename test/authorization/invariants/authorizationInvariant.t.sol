@@ -3,7 +3,6 @@ pragma solidity ^0.8.24;
 
 import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
-import {TBCType} from "src/common/TBC.sol";
 
 /**
  * @title Test all invariants in relation to authorization requirements for AMM transactions.
@@ -14,8 +13,8 @@ abstract contract authorizationInvariants is TestCommonSetup {
     uint256 _startingXLiquidity;
     uint256 _startingYLiquidity;
 
-    function _setUp(TBCType _tbcType) internal endWithStopPrank {
-        pool = _setupPool(false, _tbcType);
+    function setUp() internal endWithStopPrank {
+        pool = _setupPool(false);
 
         bytes4[] memory selectors = new bytes4[](5);
         selectors[0] = pool.collectLPFees.selector;
@@ -52,17 +51,5 @@ abstract contract authorizationInvariants is TestCommonSetup {
 
     function invariant_verifyRevertsForNotOwner_addLiquidityYToken_removeLiquidityYToken() public view {
         assertEq(pool.yTokenLiquidity(), _startingYLiquidity);
-    }
-}
-
-contract authorizationInvariants_ALTBC is authorizationInvariants {
-    function setUp() public {
-        _setUp(TBCType.ALTBC);
-    }
-}
-
-contract authorizationInvariants_URQTBC is authorizationInvariants {
-    function setUp() public {
-        _setUp(TBCType.URQTBC);
     }
 }

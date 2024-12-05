@@ -5,7 +5,6 @@ import {IERC20} from "forge-std/interfaces/IERC20.sol";
 import {GenericERC20} from "src/example/ERC20/GenericERC20.sol";
 import {GenericERC20FixedSupply} from "src/example/ERC20/GenericERC20FixedSupply.sol";
 import {ForkTestBase} from "test/fork/ForkTestBase.t.sol";
-import {TBCType} from "src/common/TBC.sol";
 
 interface IWETH {
     function deposit() external payable;
@@ -22,10 +21,10 @@ contract WETHForkTest is ForkTestBase {
 
 // This is a placeholder setUp function and resembles that of WETHMainnetForkTestALTBC. This is done to mitigate failed tests due to no setUp in the inhertited contract WETHForkTest.
     function setUp() public virtual {
-        _setUp(address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2), "ETHEREUM_RPC_KEY", TBCType.ALTBC);
+        _setUp(address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2), "ETHEREUM_RPC_KEY");
     }
 
-    function _setUp(address wethAddress, string memory key, TBCType _tbcType) internal {
+    function _setUp(address wethAddress, string memory key) internal {
         uint256 fork = vm.createFork(vm.envString(key));
         vm.selectFork(fork);
 
@@ -44,7 +43,7 @@ contract WETHForkTest is ForkTestBase {
 
         admin = address(this);
         yToken = GenericERC20(address(weth));
-        pool = _setupPoolForkTest(address(this), address(weth), 0, false, _tbcType);
+        pool = _setupPoolForkTest(address(this), address(weth), 0, false);
 
         weth.approve(address(pool), 1e5 * ERC20_DECIMALS);
         _yToken = IERC20(pool.yToken());
@@ -85,45 +84,22 @@ contract WETHForkTest is ForkTestBase {
 }
 
 /**
- * @title WETH Mainnet Fork Testing ALTBC
+ * @title WETH Mainnet Fork Testing
  * @dev unit test
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve @palmerg4
  */
-contract WETHMainnetForkTestALTBC is WETHForkTest {
+contract WETHMainnetForkTest is WETHForkTest {
     function setUp() public override {
-        _setUp(address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2), "ETHEREUM_RPC_KEY", TBCType.ALTBC);
+        _setUp(address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2), "ETHEREUM_RPC_KEY");
     }
 }
 
 /**
- * @title WETH Polygon Fork Testing ALTBC
- * @dev unit test
+ * @title WETH Polygon Fork Testing
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve @palmerg4
  */
-contract WETHPolygonForkTestALTBC is WETHForkTest {
+contract WETHPolygonForkTest is WETHForkTest {
     function setUp() public override {
-        _setUp(address(0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619), "POLYGON_RPC_KEY", TBCType.ALTBC);
-    }
-}
-
-/**
- * @title WETH Mainnet Fork Testing URQTBC
- * @dev unit test
- * @author @oscarsernarosero @mpetersoCode55 @cirsteve @palmerg4
- */
-contract WETHMainnetForkTestURQTBC is WETHForkTest {
-    function setUp() public override {
-        _setUp(address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2), "ETHEREUM_RPC_KEY", TBCType.URQTBC);
-    }
-}
-
-/**
- * @title WETH Polygon Fork Testing URQTBC
- * @dev unit test
- * @author @oscarsernarosero @mpetersoCode55 @cirsteve @palmerg4
- */
-contract WETHPolygonForkTestURQTBC is WETHForkTest {
-    function setUp() public override {
-        _setUp(address(0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619), "POLYGON_RPC_KEY", TBCType.URQTBC);
+        _setUp(address(0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619), "POLYGON_RPC_KEY");
     }
 }

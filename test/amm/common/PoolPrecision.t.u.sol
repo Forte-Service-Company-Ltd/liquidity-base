@@ -5,19 +5,16 @@ import "forge-std/console2.sol";
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
-import {ALTBCInput} from "src/common/TBC.sol";
-import {TBCType} from "src/common/TBC.sol";
 
 /**
  * @title Test Pool functionality
  * @dev unit test
  * @author @oscarsernarosero @mpetersoCode55
  */
-abstract contract PoolPrecisionUnitTest is TestCommonSetup {
+contract PoolPrecisionUnitTest is TestCommonSetup {
     uint8 constant MAX_TOLERANCE_X = 12;
     uint8 constant TOLERANCE_PRECISION_X = 12;
     uint256 constant TOLERANCE_DEN_X = 10 ** TOLERANCE_PRECISION_X;
-    TBCType tbcType; // WHEN CREATING TEST FOR URQTBC, MAKE THIS TEST A COMMON ONE, AND SET THIS VARIABLE IN THE CHILD CONTRACTS
 
     uint MAX_SUPPLY = 10e4 * ERC20_DECIMALS;
     PoolBase wadPool;
@@ -60,13 +57,13 @@ abstract contract PoolPrecisionUnitTest is TestCommonSetup {
     }
 
     function testLiquidity_PoolUnit_PrecisionComparison() public endWithStopPrank {
-        (wadPool, sdPool) = _setupPrecisionPools(MAX_SUPPLY, 0, tbcType);
+        (wadPool, sdPool) = _setupPrecisionPools(MAX_SUPPLY, 0);
         _assignTokens();
         _runSwaps();
     }
 
     function testLiquidity_PoolUnit_PrecisionComparisonWithFee() public endWithStopPrank {
-        (wadPool, sdPool) = _setupPrecisionPools(MAX_SUPPLY, 30, tbcType);
+        (wadPool, sdPool) = _setupPrecisionPools(MAX_SUPPLY, 30);
         _assignTokens();
         _runSwaps();
     }
@@ -126,26 +123,3 @@ abstract contract PoolPrecisionUnitTest is TestCommonSetup {
         }
     }
 }
-
-/**
- * @title Test ALTC Pool functionality
- * @dev unit test
- * @author @oscarsernarosero @mpetersoCode55 @cirsteve @palmerg4
- */
-contract ALTBCPoolPrecisionUnitTest is PoolPrecisionUnitTest {
-    function setUp() public {
-        tbcType = TBCType.ALTBC;
-    }
-}
-
-/**
- * @title Test ALTC Pool functionality
- * @dev unit test
- * @author @oscarsernarosero @mpetersoCode55 @cirsteve @palmerg4
- */
-// todo: Fix this test and make sure it works for URQTBC
-// contract URQTBCPoolPrecisionUnitTest is PoolPrecisionUnitTest {
-//     function setUp() public {
-//         tbcType = TBCType.URQTBC;
-//     }
-//  }

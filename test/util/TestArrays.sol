@@ -7,7 +7,6 @@ pragma solidity ^0.8.24;
  * @dev This contract is an abstract template to be reused by all the tests.
  * This contract holds the functions for setting up arrays for each type. Functions create various sized array for each type.
  */
-import {URQTBCDef} from "src/common/TBC.sol";
 
 abstract contract TestArrays {
     /****************** UINT256 ARRAY CREATION ******************
@@ -147,13 +146,4 @@ abstract contract TestArrays {
         array[8] = arg9;
     }
 
-    function createUint256ArrayFromURQTBC(
-        URQTBCDef memory urqtbc
-    ) internal pure returns (uint256[] memory array) {
-        array = new uint256[](4);
-        array[1] = urqtbc.l;
-        array[2] = urqtbc.c;
-        array[4] = urqtbc.Cconstant;
-        array[5] = urqtbc.v;
-    }
 }

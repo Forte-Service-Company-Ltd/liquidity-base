@@ -3,9 +3,6 @@ pragma solidity ^0.8.24;
 
 import {MathLibs} from "src/amm/mathLibs/MathLibs.sol";
 import {console2} from "forge-std/console2.sol";
-import {URQTBCTesterPool} from "test/util/EquationTesterPool.sol";
-import {URQTBCDef} from "src/common/TBC.sol";
-import {URQTBCEquations} from "src/amm/urqtbc/URQTBCEquations.sol";
 import {PythonUtils} from "test/util/PythonUtils.sol";
 
 contract PrecisionLoggerBase is PythonUtils {

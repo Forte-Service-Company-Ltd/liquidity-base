@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
-import {ALTBCInput, URQTBCInput} from "./TBC.sol";
-
 /**
  * @dev File that contains all the events for the project
  * @author  @oscarsernarosero @mpetersoCode55 @cirsteve
@@ -46,36 +44,9 @@ interface IFactoryEvents is CommonEvents {
     event SetDeployerAllowList(address indexed _allowedList);
 }
 
-event ALTBCFactoryDeployed(string _version);
-event URQTBCFactoryDeployed(string _version);
 
 interface IAllowListEvents {
     event AllowListDeployed();
     event AddressAllowed(address indexed _address, bool indexed _allowed);
 }
 
-event ALTBCPoolDeployed(
-    address indexed _xToken,
-    address indexed _yToken,
-    string _version,
-    uint16 _lpFee,
-    uint16 _protocolFee,
-    address _protocolFeeCollector,
-    uint256 _maxXTokenSupply,
-    ALTBCInput _tbcInput,
-    bool _liquidityRemovalAllowed,
-    address sender
-);
-
-event URQTBCPoolDeployed(
-    address indexed _xToken,
-    address indexed _yToken,
-    string _version,
-    uint16 _lpFee,
-    uint16 _protocolFee,
-    address _protocolFeeCollector,
-    uint256 _maxXTokenSupply,
-    URQTBCInput _tbcInput,
-    bool _liquidityRemovalAllowed,
-    address sender
-);
