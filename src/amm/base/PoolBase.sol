@@ -488,4 +488,8 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable, Pausable, Constant
         Rmax = _normalizeTokenDecimals(false, Q);
         // note: Rmax should be pulled out to ensure correctness of the Rmax equation, always take the max
     }
+
+    function _safeTransfer(address _yToken, address _to, uint256 _amount) internal {
+        IERC20(_yToken).safeTransfer(_to, amount);
+    }
 }

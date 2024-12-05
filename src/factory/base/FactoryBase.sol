@@ -22,6 +22,9 @@ abstract contract FactoryBase is Ownable, IFactory {
     address public proposedProtocolFeeCollector;
     uint16 public protocolFee;
 
+    constructor() Ownable(_msgSender()) {
+    }
+
     modifier onlyAllowedDeployers() {
         if (!IAllowList(deployerAllowList).isAllowed(_msgSender())) revert NotAnAllowedDeployer();
         _;
