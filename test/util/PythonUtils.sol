@@ -1,7 +1,7 @@
 /// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
-import "@openzeppelin/contracts/utils/Strings.sol";
+import "lib/openzeppelin-contracts/contracts/utils/Strings.sol";
 import "forge-std/console2.sol";
 import "forge-std/Test.sol";
 import {MathLibs} from "src/amm/mathLibs/MathLibs.sol";
