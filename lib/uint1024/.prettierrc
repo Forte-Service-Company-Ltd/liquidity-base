@@ -1,7 +1,0 @@
-{
-  "[solidity]": {
-    "editor.formatOnSave": true
-  },
-  "semi": false,
-  "printWidth": 140
-}
