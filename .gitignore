@@ -16,7 +16,7 @@ pyvenv.cfg
 **/__pycache__
 pyvenv.cfg
 lib/python3.*
-lib/solady
+lib/
 bin/
 share/
 etc/
