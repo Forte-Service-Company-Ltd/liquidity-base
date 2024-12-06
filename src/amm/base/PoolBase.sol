@@ -490,6 +490,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable, Pausable, Constant
     }
 
     function _safeTransfer(address _yToken, address _to, uint256 _amount) internal {
-        IERC20(_yToken).safeTransfer(_to, amount);
+        IERC20(_yToken).safeTransfer(_to, _amount);
     }
 }
