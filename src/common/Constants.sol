@@ -16,4 +16,5 @@ contract Constants {
     uint256 public constant PERCENTAGE_DENOM = 10_000;
     uint16 public constant MAX_LP_FEE = 5_000 - MAX_PROTOCOL_FEE;
     uint256 public constant PLOWER_MIN = 1_000;
+
 }

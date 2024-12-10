@@ -85,6 +85,39 @@ contract allowlistsDeployment is CommonDeployment {
     }
 }
 
+contract TokenDeployment is CommonDeployment {
+    function run() external {
+        vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
+        deployTokens(10e21);
+        vm.stopBroadcast();
+    }
+}
+
+contract WETHDeployment is CommonDeployment {
+    function run() external {
+        vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
+        deployWETH(10e18);
+        vm.stopBroadcast();
+    }
+}
+
+contract StableCoinDeployment is CommonDeployment {
+    function run() external {
+        vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
+        deployStableCoin(10e21);
+        vm.stopBroadcast();
+    }
+}
+
+contract XTokenDeployment is CommonDeployment {
+    function run() external {
+        vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
+        deployTokens(10e21);
+        vm.stopBroadcast();
+    }
+}
+
+
 contract CommonConfigDeployment is CommonDeployment {
 
     IFactory _factory;
@@ -131,38 +164,6 @@ contract CommonConfigDeployment is CommonDeployment {
             setProtocolFeeCollector(_factory, vm.envAddress("FEE_COLLECTOR"), uint256(vm.envUint("FEE_COLLECTOR_KEY")));
             vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
         }
-    }
-}
-
-contract TokenDeployment is CommonDeployment {
-    function run() external {
-        vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
-        deployTokens(10e21);
-        vm.stopBroadcast();
-    }
-}
-
-contract WETHDeployment is CommonDeployment {
-    function run() external {
-        vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
-        deployWETH(10e18);
-        vm.stopBroadcast();
-    }
-}
-
-contract StableCoinDeployment is CommonDeployment {
-    function run() external {
-        vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
-        deployStableCoin(10e21);
-        vm.stopBroadcast();
-    }
-}
-
-contract XTokenDeployment is CommonDeployment {
-    function run() external {
-        vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
-        deployTokens(10e21);
-        vm.stopBroadcast();
     }
 }
 
@@ -215,7 +216,7 @@ abstract contract Recorder is Script {
     }
 }
 
-contract PoolDeploymentCommon is CommonDeployment, Recorder {
+contract PoolDeploymentCommon is CommonDeployment {
     function prepareForDeployment() internal returns (IFactory factory, GenericERC20FixedSupply xToken, GenericERC20 yToken) {
         vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
         (xToken, yToken) = deployTokens(10e21);

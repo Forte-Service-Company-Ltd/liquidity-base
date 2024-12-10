@@ -22,6 +22,11 @@ abstract contract PoolCommonTest is TestCommonSetup {
     IERC20 _yToken;
     uint fullToken;
 
+    function _checkClosePoolState() internal virtual {}
+    function _checkLiquidityExcessState() internal virtual {}
+    function _checkWithdrawRevenueState() internal virtual {}
+    function _checkBackAndForthSwapsState() internal virtual {}
+
     function _setupCollateralToken() internal {
         _yToken = IERC20(pool.yToken());
         fullToken = address(_yToken) == address(stableCoin) ? STABLECOIN_DEC : ERC20_DECIMALS;

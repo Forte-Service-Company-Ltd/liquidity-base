@@ -28,10 +28,6 @@ abstract contract TestCommonSetup is TestCommon, TestModifiers {
     function _deployPool(address,address,uint16,bool,TBCInputOption) internal virtual returns (PoolBase) {}
     function _getMaxXTokenSupply() internal virtual returns (uint) {}
     function _getMinMaxX() internal virtual returns (uint,uint) {}
-    function _checkClosePoolState() internal virtual {}
-    function _checkLiquidityExcessState() internal virtual {}
-    function _checkWithdrawRevenueState() internal virtual {}
-    function _checkBackAndForthSwapsState() internal virtual {}
 
     function _setUpTokens(uint256 _xTokenSupply) internal startAsAdmin endWithStopPrank {
         xToken = new GenericERC20FixedSupply("x token", "GAME", _xTokenSupply + 1);
