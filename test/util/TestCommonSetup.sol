@@ -13,6 +13,8 @@ import {TwentyTwoDecimalERC20} from "src/example/ERC20/TwentyTwoDecimalERC20.sol
 import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {TestCommon} from "test/util/TestCommon.sol";
 import {TestModifiers} from "test/util/TestModifiers.sol";
+import {TestCommonSetupAbs} from "test/util/TestCommonSetupAbs.sol";
+import {TestConstants} from "test/util/TestConstants.sol";
 
 /**
  * @title Test Common Foundry
@@ -21,14 +23,8 @@ import {TestModifiers} from "test/util/TestModifiers.sol";
  * create = set to proper user, deploy contracts, reset user, return the contract
  * _create = deploy contract, return the contract
  */
-abstract contract TestCommonSetup is TestCommon, TestModifiers {
-    enum TBCInputOption { BASE, FORK, PRECISION }
-    function _deployFactory() internal virtual {}
-    function _getFactoryAddress() internal virtual returns (address) {}
-    function _deployPool(address,address,uint16,bool,TBCInputOption) internal virtual returns (PoolBase) {}
-    function _getMaxXTokenSupply() internal virtual returns (uint) {}
-    function _getMinMaxX() internal virtual returns (uint,uint) {}
-
+abstract contract TestCommonSetup is TestCommon, TestModifiers, TestCommonSetupAbs, TestConstants {
+    
     function _setUpTokens(uint256 _xTokenSupply) internal startAsAdmin endWithStopPrank {
         xToken = new GenericERC20FixedSupply("x token", "GAME", _xTokenSupply + 1);
         yToken = new GenericERC20("collateral token", "COLL");

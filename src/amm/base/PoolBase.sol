@@ -18,7 +18,7 @@ import "src/common/TBC.sol";
  * Any pool implementation must inherits this contract and implement all the functions from CalculatorBase.
  * @author  @oscarsernarosero @mpetersoCode55 @cirsteve
  */
-abstract contract PoolBase is IPool, CalculatorBase, Ownable, Pausable, Constants, CumulativePrice {
+abstract contract PoolBase is IPool, CalculatorBase, Ownable, Pausable, CumulativePrice {
     using SafeERC20 for IERC20;
 
     address public immutable xToken;

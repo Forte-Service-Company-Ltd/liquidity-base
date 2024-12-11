@@ -1,0 +1,16 @@
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.17;
+
+import {PoolBase} from "src/amm/base/PoolBase.sol";
+
+/**
+ * @title Test Common Foundry Setup Pure Abstract Functions
+ */
+abstract contract TestCommonSetupAbs {
+    enum TBCInputOption { BASE, FORK, PRECISION }
+    function _deployFactory() internal virtual {}
+    function _getFactoryAddress() internal virtual returns (address) {}
+    function _deployPool(address,address,uint16,bool,TBCInputOption) internal virtual returns (PoolBase) {}
+    function _getMaxXTokenSupply() internal virtual returns (uint) {}
+    function _getMinMaxX() internal virtual returns (uint,uint) {}
+}

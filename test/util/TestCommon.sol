@@ -22,10 +22,6 @@ import {PythonUtils} from "test/util/PythonUtils.sol";
  * _create = deploy contract, return the contract
  */
 abstract contract TestCommon is PythonUtils {
-    uint256 MAX_SQUAREABLE = 340_282_366_920_938_463_463_374607431768211455;
-    uint256 constant STABLECOIN_DEC = 1e6;
-    uint256 constant ERC20_DECIMALS = 1e18;
-    uint256 constant X_TOKEN_MAX_SUPPLY = 100_000_000_000 * ERC20_DECIMALS;
     address admin = address(0xad);
     address alice = address(0xa11ce);
     address bob = address(0xB0b);

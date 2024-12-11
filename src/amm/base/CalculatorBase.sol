@@ -2,6 +2,7 @@
 pragma solidity ^0.8.24;
 
 import "src/common/IErrors.sol";
+import {Constants} from "lib/liquidity-base/src/common/Constants.sol";
 
 /**
  * @title Calculator Base Abstract Contract
@@ -9,7 +10,7 @@ import "src/common/IErrors.sol";
  * @author  @oscarsernarosero @mpetersoCode55 @cirsteve
  */
 
-abstract contract CalculatorBase {
+abstract contract CalculatorBase is Constants {
     /**
      * @dev This is the function to retrieve the current spot price of the x token.
      * @param x tracker value for the net amount of xTokens sold to the public. Bare in mind that this value is offset by initial synthetic trade
