@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 import "src/common/IErrors.sol";
-import {Constants} from "lib/liquidity-base/src/common/Constants.sol";
+import {Constants} from "src/common/Constants.sol";
 
 /**
  * @title Calculator Base Abstract Contract

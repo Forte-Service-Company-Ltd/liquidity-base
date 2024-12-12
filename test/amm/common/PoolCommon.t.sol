@@ -12,6 +12,7 @@ import {SimplePriceOracle} from "src/example/SimplePriceOracle.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {CumulativePrice} from "src/amm/base/CumulativePrice.sol";
 import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
+import {TBCInputOption} from "test/util/TestConstants.sol";
 
 /**
  * @title Test Pool functionality

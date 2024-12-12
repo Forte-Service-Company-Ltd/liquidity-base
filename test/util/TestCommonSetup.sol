@@ -14,7 +14,7 @@ import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {TestCommon} from "test/util/TestCommon.sol";
 import {TestModifiers} from "test/util/TestModifiers.sol";
 import {TestCommonSetupAbs} from "test/util/TestCommonSetupAbs.sol";
-import {TestConstants} from "test/util/TestConstants.sol";
+import {TestConstants, TBCInputOption} from "test/util/TestConstants.sol";
 
 /**
  * @title Test Common Foundry

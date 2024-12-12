@@ -2,8 +2,7 @@
 pragma solidity ^0.8.17;
 
 import {PoolBase} from "src/amm/base/PoolBase.sol";
-
-enum TBCInputOption { BASE, FORK, PRECISION }
+import {TBCInputOption} from "test/util/TestConstants.sol";
 
 /**
  * @title Test Common Foundry Setup Pure Abstract Functions
