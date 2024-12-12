@@ -2,9 +2,7 @@
 pragma solidity ^0.8.24;
 
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
-import {GenericERC20} from "src/example/ERC20/GenericERC20.sol";
-import {GenericERC20FixedSupply} from "src/example/ERC20/GenericERC20FixedSupply.sol";
-import {ForkTestBase} from "test/fork/ForkTestBase.t.sol";
+import {ForkTestBase, GenericERC20FixedSupply, GenericERC20} from "test/fork/ForkTestBase.t.sol";
 
 // Interface for interacting with USDT
 interface IUSDT {

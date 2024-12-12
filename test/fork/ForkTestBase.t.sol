@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
-import {PoolCommonUnitTest} from "test/amm/common/PoolCommon.t.u.sol";
+import {PoolCommonUnitTest, GenericERC20FixedSupply, GenericERC20} from "test/amm/common/PoolCommon.t.u.sol";
 
 /**
  * @title Base for Fork Testing

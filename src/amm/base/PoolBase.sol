@@ -10,7 +10,7 @@ import "src/common/IErrors.sol";
 import {CalculatorBase} from "src/amm/base/CalculatorBase.sol";
 import {CumulativePrice} from "src/amm/base/CumulativePrice.sol";
 import {Constants} from "src/common/Constants.sol";
-import "src/common/TBC.sol";
+import {FeeInfo, TBCType} from "src/common/TBC.sol";
 
 /**
  * @title Pool Base
