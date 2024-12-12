@@ -3,11 +3,12 @@ pragma solidity ^0.8.17;
 
 import {PoolBase} from "src/amm/base/PoolBase.sol";
 
+enum TBCInputOption { BASE, FORK, PRECISION }
+
 /**
  * @title Test Common Foundry Setup Pure Abstract Functions
  */
-abstract contract TestCommonSetupAbs {
-    enum TBCInputOption { BASE, FORK, PRECISION }
+abstract contract TestCommonSetupAbs { 
     function _deployFactory() internal virtual {}
     function _getFactoryAddress() internal virtual returns (address) {}
     function _deployPool(address,address,uint16,bool,TBCInputOption) internal virtual returns (PoolBase) {}
