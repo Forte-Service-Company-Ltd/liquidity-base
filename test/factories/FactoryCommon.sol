@@ -6,8 +6,9 @@ import {IFactory} from "src/factory/base/IFactory.sol";
 import {IFactoryEvents, CommonEvents} from "src/common/IEvents.sol";
 import {GenericERC20} from "src/example/ERC20/GenericERC20.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
-import {TestCommonSetup, FactoryBase} from "test/util/TestCommonSetup.sol";
+import {TestCommonSetup, FactoryBase, TBCInputOption} from "test/util/TestCommonSetup.sol";
 import "forge-std/console2.sol";
+
 /**
  * @title Test PoolFactory contract
  * @dev unit test
