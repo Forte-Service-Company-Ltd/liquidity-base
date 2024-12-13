@@ -12,5 +12,4 @@ abstract contract TestCommonSetupAbs {
     function _getFactoryAddress() internal virtual returns (address) {}
     function _deployPool(address,address,uint16,bool,TBCInputOption) internal virtual returns (PoolBase) {}
     function _getMaxXTokenSupply() internal virtual returns (uint) {}
-    function _getMinMaxX() internal virtual returns (uint,uint) {}
 }

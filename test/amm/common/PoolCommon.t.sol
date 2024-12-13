@@ -27,6 +27,7 @@ abstract contract PoolCommonTest is TestCommonSetup {
     function _checkLiquidityExcessState() internal virtual {}
     function _checkWithdrawRevenueState() internal virtual {}
     function _checkBackAndForthSwapsState() internal virtual {}
+    function _getMinMaxX() internal virtual returns (uint,uint) {}
 
     function _setupCollateralToken() internal {
         _yToken = IERC20(pool.yToken());
