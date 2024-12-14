@@ -15,6 +15,7 @@ import {TestCommon} from "test/util/TestCommon.sol";
 import {TestModifiers} from "test/util/TestModifiers.sol";
 import {TestCommonSetupAbs} from "test/util/TestCommonSetupAbs.sol";
 import {TestConstants, TBCInputOption} from "test/util/TestConstants.sol";
+import "forge-std/console2.sol";
 
 /**
  * @title Test Common Foundry
@@ -23,7 +24,7 @@ import {TestConstants, TBCInputOption} from "test/util/TestConstants.sol";
  * create = set to proper user, deploy contracts, reset user, return the contract
  * _create = deploy contract, return the contract
  */
-abstract contract TestCommonSetup is TestCommon, TestModifiers, TestCommonSetupAbs, TestConstants {
+abstract contract TestCommonSetup is TestCommonSetupAbs {
     
     function _setUpTokens(uint256 _xTokenSupply) internal startAsAdmin endWithStopPrank {
         xToken = new GenericERC20FixedSupply("x token", "GAME", _xTokenSupply + 1);
@@ -151,12 +152,10 @@ abstract contract TestCommonSetup is TestCommon, TestModifiers, TestCommonSetupA
         // the token supply is the same value used in the stress test simulation and must match
         uint256 maxX = 10e3 * ERC20_DECIMALS;
         _setUpTokensAndFactories(maxX);
-   
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
         // the pool config values are the same config values used in the stress test simulation and must match
         /// fee: 0.0%, supply: 10K tokens, y-intersect: 10, minPrice: 1, maxPrice: 100
         poolRet = _deployPool(address(xToken), yTokenAddress, 0, true, TBCInputOption.FORK);
-
         vm.startPrank(admin);
         poolRet.enableSwaps(true);
         _approvePool(poolRet, false);

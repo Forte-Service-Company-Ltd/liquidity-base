@@ -3,7 +3,7 @@ pragma solidity ^0.8.24;
 
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
 import {TestCommonSetup, GenericERC20FixedSupply, GenericERC20} from "test/util/TestCommonSetup.sol";
-
+import "forge-std/console2.sol";
 /**
  * @title Test Pool functionality
  * @dev unit test

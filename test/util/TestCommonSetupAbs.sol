@@ -3,11 +3,12 @@ pragma solidity ^0.8.17;
 
 import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {TBCInputOption} from "test/util/TestConstants.sol";
-
+import {TestModifiers} from "test/util/TestModifiers.sol";
+import {TestConstants, TBCInputOption} from "test/util/TestConstants.sol";
 /**
  * @title Test Common Foundry Setup Pure Abstract Functions
  */
-abstract contract TestCommonSetupAbs { 
+abstract contract TestCommonSetupAbs is TestConstants, TestModifiers  { 
     function _deployFactory() internal virtual {}
     function _getFactoryAddress() internal virtual returns (address) {}
     function _deployPool(address,address,uint16,bool,TBCInputOption) internal virtual returns (PoolBase) {}
