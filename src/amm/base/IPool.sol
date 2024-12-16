@@ -182,6 +182,11 @@ interface IPool is IPoolEvents {
      * @return currently claimable protocol fee balance
      */
     function collectedProtocolFees() external returns (uint256);
+    
+    /**
+     * @dev This function allows to know the accrued revenue in the Pool.
+     */
+    function revenueAvailable() external view returns (uint256);
 
     /**
      * @dev if true, the pool could be closed effectively pulling out all of the liquidity

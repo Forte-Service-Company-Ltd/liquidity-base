@@ -386,6 +386,13 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable, Pausable, Cumulati
     }
 
     /**
+     * @dev This function allows to know the accrued revenue in the Pool.
+     */
+    function revenueAvailable() external view returns (uint256) {
+        return _getRevenueAvailable();
+    }
+
+    /**
      * @dev A helper function to validate most of constructor's inputs.
      * @param _xToken address of the X token (x axis)
      * @param _yToken address of the Y token (y axis)
