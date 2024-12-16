@@ -38,7 +38,7 @@ abstract contract PoolCommonTest is TestCommonSetup {
         assertEq(pool.VERSION(), "v0.2.0");
     }
 
-    function testLiquidity_Pool_TokensMustNotBeTheSame() public startAsAdmin {
+    function testLiquidity_Pool_TokensMustNotBeTheSame() public  {
         vm.expectRevert(abi.encodeWithSignature("XandYTokensAreTheSame()"));
         _deployPool(address(yToken), address(yToken), 0, true, TBCInputOption.BASE);
     }
