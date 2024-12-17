@@ -11,7 +11,7 @@ import {FeeOnTransferERC20} from "src/example/ERC20/FeeOnTransferERC20.sol";
  * @author @oscarsernarosero @mpetersoCode55
  */
 abstract contract PoolFOTTokenTest is PoolCommonTest {
-    function _setUp() internal endWithStopPrank {
+    function setUp() public endWithStopPrank {
         transferFee = 1000;
         pool = _setupFOTPool(false);
         _setupCollateralToken();
