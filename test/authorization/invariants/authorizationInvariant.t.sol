@@ -3,7 +3,6 @@ pragma solidity ^0.8.24;
 
 import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
-import "forge-std/console2.sol";
 
 /**
  * @title Test all invariants in relation to authorization requirements for AMM transactions.
@@ -15,9 +14,7 @@ abstract contract authorizationInvariants is TestCommonSetup {
     uint256 _startingYLiquidity;
 
     function _setUp() internal endWithStopPrank {
-        console2.log("pool");
         pool = _setupPool(false);
-        console2.log("pool", address(pool));
 
         bytes4[] memory selectors = new bytes4[](5);
         selectors[0] = pool.collectLPFees.selector;
