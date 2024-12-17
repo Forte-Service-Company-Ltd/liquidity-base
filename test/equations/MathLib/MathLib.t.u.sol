@@ -11,7 +11,7 @@ import {TestCommon} from "test/util/TestCommon.sol";
  * @dev tests the limits of the math library to better understand what can be done what cannot.
  * @author @oscarsernarosero @mpetersoCode55
  */
-contract MathLibTests is TestCommon {
+abstract contract MathLibTests is TestCommon {
     using MathLibs for uint256;
     uint one = 1;
     uint two = 2;

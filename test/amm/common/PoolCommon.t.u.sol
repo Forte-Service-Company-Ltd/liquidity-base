@@ -9,7 +9,7 @@ import "forge-std/console2.sol";
  * @dev unit test
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve
  */
-contract PoolCommonUnitTest is TestCommonSetup {
+abstract contract PoolCommonUnitTest is TestCommonSetup {
     IERC20 _yToken;
     bool withStableCoin;
     bool wEth;

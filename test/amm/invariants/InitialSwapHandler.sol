@@ -8,7 +8,7 @@ import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
  * @title Handler for the testing the invariant defined for the initial swap mechanics.
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve
  */
-contract InitialSwapHandler is TestCommonSetup {
+abstract contract InitialSwapHandler is TestCommonSetup {
     PoolBase public poolUnderTest;
     uint256 public trackedAmountOutX;
     uint256 public trackedAmountOutY;

@@ -8,7 +8,7 @@ import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
  * @dev invariant test
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve
  */
-contract RemovingLiquidityInvariants is TestCommonSetup {
+abstract contract RemovingLiquidityInvariants is TestCommonSetup {
     uint constant Y_TOKEN_LIQUIDITY = 1e5 * 1e18;
     uint xTokenLiquidity;
     function _setUp() internal endWithStopPrank {

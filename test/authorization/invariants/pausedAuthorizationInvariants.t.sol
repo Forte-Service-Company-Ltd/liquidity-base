@@ -9,7 +9,7 @@ pragma solidity ^0.8.24;
 import {pausedAuthorizationHandler} from "test/authorization/invariants/pausedAuthorizationHandler.sol";
 import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
 
-contract pausedAuthorizationInvariants is TestCommonSetup {
+abstract contract pausedAuthorizationInvariants is TestCommonSetup {
     uint256 _startingXLiquidity;
     uint256 _startingYLiquidity;
     pausedAuthorizationHandler handler;

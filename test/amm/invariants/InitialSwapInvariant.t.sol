@@ -9,7 +9,7 @@ import {InitialSwapHandler} from "test/amm/invariants/InitialSwapHandler.sol";
  * @dev invariant test
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve
  */
-contract InitialSwapInvariant is TestCommonSetup {
+abstract contract InitialSwapInvariant is TestCommonSetup {
     InitialSwapHandler _handler;
 
     function _setUp() internal endWithStopPrank {

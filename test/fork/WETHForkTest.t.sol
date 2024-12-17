@@ -13,7 +13,7 @@ interface IWETH {
  * @dev unit test
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve @palmerg4
  */
-contract WETHForkTest is ForkTestBase {
+abstract contract WETHForkTest is ForkTestBase {
     IERC20 weth;
     bool ethMainnet;
 
@@ -85,7 +85,7 @@ contract WETHForkTest is ForkTestBase {
  * @dev unit test
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve @palmerg4
  */
-contract WETHMainnetForkTest is WETHForkTest {
+abstract contract WETHMainnetForkTest is WETHForkTest {
     function setUp() public override {
         _setUp(address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2), "ETHEREUM_RPC_KEY");
     }
@@ -95,7 +95,7 @@ contract WETHMainnetForkTest is WETHForkTest {
  * @title WETH Polygon Fork Testing
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve @palmerg4
  */
-contract WETHPolygonForkTest is WETHForkTest {
+abstract contract WETHPolygonForkTest is WETHForkTest {
     function setUp() public override {
         _setUp(address(0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619), "POLYGON_RPC_KEY");
     }

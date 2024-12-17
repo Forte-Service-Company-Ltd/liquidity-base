@@ -5,7 +5,7 @@ import {MathLibs} from "src/amm/mathLibs/MathLibs.sol";
 import {console2} from "forge-std/console2.sol";
 import {PythonUtils} from "test/util/PythonUtils.sol";
 
-contract PrecisionLoggerBase is PythonUtils {
+abstract contract PrecisionLoggerBase is PythonUtils {
     using MathLibs for uint256;
 
     uint PRECISION_BASE = MathLibs.WAD ** 2; // all precision values will be WAD2 numbers

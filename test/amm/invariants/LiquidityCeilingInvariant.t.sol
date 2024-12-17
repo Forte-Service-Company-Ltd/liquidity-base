@@ -10,7 +10,7 @@ import {PoolBase} from "src/amm/base/PoolBase.sol";
  * @dev unit test
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve
  */
-contract LiquidityCeilingInvariants is TestCommonSetup {
+abstract contract LiquidityCeilingInvariants is TestCommonSetup {
     uint256 _xTotal;
     uint256 _yTotal;
 

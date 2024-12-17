@@ -10,7 +10,7 @@ import "forge-std/console2.sol";
  * @dev unit test
  * @author @oscarsernarosero @mpetersoCode55
  */
-contract AllowListTest is TestCommonSetup {
+abstract contract AllowListTest is TestCommonSetup {
     AllowList allowList;
     function testAllowList_AllowList_deployment() public endWithStopPrank startAsAdmin {
         vm.expectEmit(true, true, true, true);

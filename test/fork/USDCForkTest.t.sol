@@ -60,7 +60,7 @@ abstract contract USDCForkTest is ForkTestBase {
  * @dev unit test
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve @palmerg4
  */
-contract USDCMainnetForkTest is USDCForkTest {
+abstract contract USDCMainnetForkTest is USDCForkTest {
     function setUp() public {
         _setUp(address(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48), "ETHEREUM_RPC_KEY");
     }
@@ -71,7 +71,7 @@ contract USDCMainnetForkTest is USDCForkTest {
  * @dev unit test
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve @palmerg4
  */
-contract USDCPolygonForkTest is USDCForkTest {
+abstract contract USDCPolygonForkTest is USDCForkTest {
     function setUp() public {
         _setUp(address(0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359), "POLYGON_RPC_KEY");
     }

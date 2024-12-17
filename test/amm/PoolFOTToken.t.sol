@@ -10,7 +10,7 @@ import {FeeOnTransferERC20} from "src/example/ERC20/FeeOnTransferERC20.sol";
  * @dev unit test
  * @author @oscarsernarosero @mpetersoCode55
  */
-contract PoolFOTTokenTest is PoolCommonTest {
+abstract contract PoolFOTTokenTest is PoolCommonTest {
     function setUp() public endWithStopPrank {
         transferFee = 1000;
         pool = _setupFOTPool(false);

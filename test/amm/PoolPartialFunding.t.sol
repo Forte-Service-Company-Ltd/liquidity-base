@@ -13,7 +13,7 @@ import {GenericERC20} from "src/example/ERC20/GenericERC20.sol";
  * @dev unit test
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve
  */
-contract PoolPartialFundingTest is TestCommonSetup {
+abstract contract PoolPartialFundingTest is TestCommonSetup {
     function setUp() public endWithStopPrank {
         pool = _setupPoolPartialFunding(false);
     }

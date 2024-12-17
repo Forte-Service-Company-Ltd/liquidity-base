@@ -11,7 +11,7 @@ import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
  * @dev unit test
  * @author @oscarsernarosero @mpetersoCode55
  */
-contract PoolPrecisionUnitTest is TestCommonSetup {
+abstract contract PoolPrecisionUnitTest is TestCommonSetup {
     uint8 constant MAX_TOLERANCE_X = 12;
     uint8 constant TOLERANCE_PRECISION_X = 12;
     uint256 constant TOLERANCE_DEN_X = 10 ** TOLERANCE_PRECISION_X;

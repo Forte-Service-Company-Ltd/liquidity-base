@@ -10,11 +10,11 @@ import {diffGreaterThanUint256, bytesLargerThanUint256} from "src/common/IErrors
 /**
  * @title Utils for interacting with Python
  */
-contract PythonUtils is Test {
+abstract contract PythonUtils is Test {
     using Strings for uint256;
     using MathLibs for uint256;
     bytes slice;
-
+    
     function _buildFFIRecordVars(
         string memory vars,
         string memory fileName,
