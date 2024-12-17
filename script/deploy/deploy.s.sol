@@ -2,6 +2,7 @@
 pragma solidity ^0.8.24;
 
 import "forge-std/Script.sol";
+import "forge-std/console2.sol";
 import "lib/openzeppelin-contracts/contracts/utils/Strings.sol";
 import "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 import {IERC20} from "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
@@ -33,6 +34,8 @@ contract CommonDeployment is Script, PythonUtils {
         yToken.mint(_owner, supply);
         setENVAddress("XTOKEN_ADDRESS", vm.toString(address(xToken)));
         setENVAddress("YTOKEN_ADDRESS", vm.toString(address(yToken)));
+        console2.log("xToken", address(xToken));
+        console2.log("yToken", address(yToken));
         require(yToken.totalSupply() == supply, "yToken supply is not equal to the supply passed to the function");
         require(xToken.totalSupply() == supply, "xToken supply is not equal to the supply passed to the function");
         require(yToken.owner() == _owner, "yToken owner is not the owner passed to the function");
