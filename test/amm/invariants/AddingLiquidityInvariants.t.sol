@@ -14,7 +14,7 @@ abstract contract AddingLiquidityInvariants is TestCommonSetup {
     uint xTokenLiquidity;
     uint yTokenLiquidity;
 
-    function setUp() internal endWithStopPrank {
+    function _setUp() internal endWithStopPrank {
         pool = _setupPool(false);
         uint amountToTrade = 50_000 * ERC20_DECIMALS;
 
