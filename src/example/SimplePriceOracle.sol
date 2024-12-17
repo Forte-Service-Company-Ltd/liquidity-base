@@ -10,13 +10,14 @@ import {CumulativePrice} from "src/amm/base/CumulativePrice.sol";
  */
 contract SimplePriceOracle {
     uint public constant PERIOD = 1000; // minimum update interval in seconds
-    address public pool;
+    address public immutable pool;
 
     uint public priceCumulativeLast;
     uint public blockTimestampLast;
     uint public priceAverage;
 
     constructor(address _pool) {
+        require(_pool != address(0));
         pool = _pool;
     }
 
