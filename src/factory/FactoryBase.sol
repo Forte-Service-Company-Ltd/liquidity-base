@@ -3,7 +3,7 @@ pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "src/common/IErrors.sol";
-import {IFactory} from "src/factory/base/IFactory.sol";
+import {IFactory} from "src/factory/IFactory.sol";
 import {IAllowList} from "src/allowList/IAllowList.sol";
 
 /**

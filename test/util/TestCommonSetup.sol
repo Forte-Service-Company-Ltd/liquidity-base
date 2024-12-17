@@ -2,7 +2,7 @@
 pragma solidity ^0.8.17;
 
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
-import {FactoryBase} from "src/factory/base/FactoryBase.sol";
+import {FactoryBase} from "src/factory/FactoryBase.sol";
 import {AllowList} from "src/allowList/AllowList.sol";
 import {GenericERC20} from "src/example/ERC20/GenericERC20.sol";
 import {GenericERC20FixedSupply} from "src/example/ERC20/GenericERC20FixedSupply.sol";
