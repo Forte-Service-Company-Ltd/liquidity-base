@@ -9,7 +9,7 @@ pragma solidity ^0.8.24;
 /**** CofNErrors ****/
 error ResultBelowPMin();
 error XnCannotBeZero();
-error SnCannotBeZero();
+error BnCannotBeZero();
 error NegativeValue();
 error DnTooLarge();
 
@@ -46,6 +46,8 @@ error NotProposedProtocolFeeCollector();
 error NoProtocolFeeCollector();
 error KTooLow();
 error KTooHigh();
+error VTooLow();
+error VTooHigh();
 
 /**** URQTBCErrors ****/
 error VOutOfBounds();

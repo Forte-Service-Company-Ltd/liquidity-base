@@ -17,7 +17,7 @@ An online Keccak-256 hash digester can be found at https://emn178.github.io/onli
 | SELECTOR   | ERROR                                                  |
 | ---------- | ------------------------------------------------------ |
 | 0x058e826d | XnCannotBeZero()                                       |
-| 0x4ad4b9bb | SnCannotBeZero()                                       |
+| 0x3e060e90 | BnCannotBeZero()                                       |
 | 0xb1b3aff4 | bytesLargerThanUint256()                               |
 | 0x1ccfdd2f | diffGreaterThanUint256()                               |
 | 0x1de42a90 | DivideByZero()                                         |
@@ -50,3 +50,5 @@ An online Keccak-256 hash digester can be found at https://emn178.github.io/onli
 | 0x9d6b0927 | KTooLow()                                              |
 | 0x95d02cac | KTooHigh()                                             |
 | 0xac9c209c | VOutOfBounds()                                         |
+| 0xcc9d2d63 | VTooLow()                                              |
+| 0x2d281418 | VTooHigh()                                             |
