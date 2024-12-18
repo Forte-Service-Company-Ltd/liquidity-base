@@ -5,6 +5,7 @@ import "forge-std/console2.sol";
 import {MathLibs} from "src/amm/mathLibs/MathLibs.sol";
 import {NegativeValue} from "src/common/IErrors.sol";
 import {TestCommon} from "test/util/TestCommon.sol";
+import {QuadraticEquation} from "src/amm/mathLibs/localLibs/QuadraticEq.sol";
 
 /**
  * @title Test Math Library
@@ -190,6 +191,33 @@ abstract contract MathLibTests is TestCommon {
         }
     }
 
+    function testEquations_MathLibTests_QuadraticEquation(uint256 a, uint256 b, uint256 c, bool isCNegative) public {
+        a = bound(a, 2, 1 << 192 - 1);
+        b = bound(b, 0, 1 << 192 - 1);
+        c = bound(a, 0, 1 << 192 - 1);
+
+        string[] memory inputs = _buildFFIQuadraticEquation(a, b, c, isCNegative);
+        bytes memory res = vm.ffi(inputs);
+        (uint pyVal, uint flag) = abi.decode(res, (uint256, uint256));
+        console2.log("Res: ", pyVal, flag);
+
+        uint256 solVal;
+        if (flag == 1) {
+            vm.expectRevert("QuadraticEquation: Imaginary result");
+            solVal = QuadraticEquation.solveQuadraticEquation(a, b, c, isCNegative);
+            return;
+        }else if (flag == 2) {
+            vm.expectRevert("QuadraticEquation: negative result");
+            solVal = QuadraticEquation.solveQuadraticEquation(a, b, c, isCNegative);
+            return;
+        }
+        else solVal = QuadraticEquation.solveQuadraticEquation(a, b, c, isCNegative);
+        console2.log("returnVal: ", solVal);
+
+        // NOTE: perfect precision excluding the last 18 precision decimals out of the 36.
+        assertEq(pyVal/1e18, solVal/1e18);
+    }
+    
     function testEquation_MathLibTests_div512ByPowerOf2(uint a0, uint a1, uint8 n) public {
         a1 = a1 % (2 ** 254);
         n = (n % 254) + 1;
