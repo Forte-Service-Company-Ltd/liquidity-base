@@ -56,6 +56,7 @@ contract CommonDeployment is Script, PythonUtils {
         weth = new GenericERC20("Wrapped Ether", "WETH");
         weth.mint(vm.envAddress("DEPLOYMENT_OWNER"), supply);
         setENVAddress("YTOKEN_ADDRESS", vm.toString(address(weth)));
+        setENVAddress("WETH_ADDRESS", vm.toString(address(weth)));
         require(weth.totalSupply() == supply, "weth supply is not equal to the supply passed to the function");
         require(weth.balanceOf(vm.envAddress("DEPLOYMENT_OWNER")) == supply, "weth balance of the owner is not equal to the supply passed to the function");
         console2.log("Wrapped Ether (WETH):", address(weth));
@@ -65,6 +66,7 @@ contract CommonDeployment is Script, PythonUtils {
         stableCoin = new SixDecimalERC20("Stable Coin", "STC");
         stableCoin.mint(vm.envAddress("DEPLOYMENT_OWNER"), supply);
         setENVAddress("YTOKEN_ADDRESS", vm.toString(address(stableCoin)));
+        setENVAddress("STC_ADDRESS", vm.toString(address(stableCoin)));
         require(stableCoin.totalSupply() == supply, "stableCoin supply is not equal to the supply passed to the function");
         require(stableCoin.balanceOf(vm.envAddress("DEPLOYMENT_OWNER")) == supply, "stableCoin balance of the owner is not equal to the supply passed to the function");
         console2.log("Stable Coin (STC):", address(stableCoin));
