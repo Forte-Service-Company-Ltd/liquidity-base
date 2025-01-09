@@ -3,6 +3,7 @@ pragma solidity ^0.8.24;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {ERC721Enumerable} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
 /**
  * @title Liquidity provider token 
@@ -10,10 +11,11 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
  * @dev Revenue and liquidity position are stored in the LP Token metadata and updated by the pool contract.
  * @author @palmerg4 @oscarsernarosero @cirsteve
  */
-contract LPToken is ERC721, Ownable {
+contract LPToken is ERC721, Ownable, ERC721Enumerable {
 
     uint256 public w;
     uint256 public currentTokenId;
+    string public baseUri;
 
     mapping(address lp => mapping(uint256 tokenId => LPTokenS lpToken)) public lpToken;
 
@@ -26,10 +28,9 @@ contract LPToken is ERC721, Ownable {
         string memory _name, 
         string memory _symbol,
         address _poolAddress,
-        address _adminAddress,
-        uint256 w0
+        string memory _baseUri
     ) Ownable(_poolAddress) ERC721(_name, _symbol)  {
-        _mintTokenAndUpdate(_adminAddress, w0, 0);
+        baseUri = _baseUri;
     }
 
     /**
@@ -65,6 +66,13 @@ contract LPToken is ERC721, Ownable {
     }
 
     /**
+     * @dev See {IERC165-supportsInterface}.
+     */
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721Enumerable) returns (bool) {
+        return super.supportsInterface(interfaceId);
+    }
+
+    /**
      * @dev Mints a new lpToken to a liquidity provider and updated the value associated with this new lpToken
      * @notice The internal version of the mint method. Used in the constructor, in order to circumvent ownership transfers.
      * @param lp The address of the liquidity provider owning the lpToken being updated
@@ -72,8 +80,7 @@ contract LPToken is ERC721, Ownable {
      * @param hn The revenue parameter of the pool associated with the lpToken contract
      */
     function _mintTokenAndUpdate(address lp, uint256 liquidityAmount, uint256 hn) internal {
-        currentTokenId += 1;
-        _mint(lp, currentTokenId);
+        _mint(lp, ++currentTokenId);
         w += liquidityAmount;
         _updateLPTokenVarsDeposit(lp, currentTokenId, w, hn);
     }
@@ -120,5 +127,27 @@ contract LPToken is ERC721, Ownable {
             _burn(_tokenId);
             lpToken[_lp][_tokenId].wj = 0;
         }
+    }
+
+    /**
+     * @dev Function to return baseUri for contract
+     * @return baseUri URI link to NFT metadata
+     */
+    function _baseURI() internal view override returns (string memory) {
+        return baseUri;
+    }
+
+    /**
+     * @dev See {ERC721-_update}.
+     */
+    function _update(address to, uint256 tokenId, address auth) internal override(ERC721, ERC721Enumerable) returns (address) {
+        return super._update(to, tokenId, auth);
+    }
+
+    /**
+     * See {ERC721-_increaseBalance}. We need that to account tokens that were minted in batch
+     */
+    function _increaseBalance(address account, uint128 value) internal override(ERC721, ERC721Enumerable){
+        super._increaseBalance(account, value);
     }
 }
