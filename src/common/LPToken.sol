@@ -1,0 +1,153 @@
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.24;
+
+import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {ERC721Enumerable} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+
+/**
+ * @title Liquidity provider token 
+ * @dev This contract serves as the LP Token associated with a liquidity position. 
+ * @dev Revenue and liquidity position are stored in the LP Token metadata and updated by the pool contract.
+ * @author @palmerg4 @oscarsernarosero @cirsteve
+ */
+contract LPToken is ERC721, Ownable, ERC721Enumerable {
+
+    uint256 public w;
+    uint256 public currentTokenId;
+    string public baseUri;
+
+    mapping(address lp => mapping(uint256 tokenId => LPTokenS lpToken)) public lpToken;
+
+    struct LPTokenS {
+        uint256 rj;
+        uint256 wj;
+    }
+
+    constructor(
+        string memory _name, 
+        string memory _symbol,
+        address _poolAddress,
+        string memory _baseUri
+    ) Ownable(_poolAddress) ERC721(_name, _symbol)  {
+        baseUri = _baseUri;
+    }
+
+    /**
+     * @dev Updates the values wj and rj of tokenId
+     * @param lp The address of the liquidity provider owning the lpToken being updated
+     * @param tokenId The token id of the lpToken being updated
+     * @param wj The amount of liquidity associated with the lpToken being updated
+     * @param rj The amount of revenue associated with the lpToken being updated
+     */
+    function updateLPTokenDeposit(address lp, uint256 tokenId, uint256 wj, uint256 rj) external onlyOwner {
+        _updateLPTokenVarsDeposit(lp, tokenId, wj, rj);
+    }
+
+    /**
+     * @dev Updates the amount of liquidity associated with an LP Token. Used when withdrawing a full or partial liquidity position.
+     * @notice If an LP is withdrawing their entire position, the LP Token associated will be burned.
+     * @param lp The address of the liquidity provider owning the lpToken being updated
+     * @param tokenId The token id of the lpToken being updated
+     * @param uj The amount of liquidity the LP would like to withdraw
+     */
+    function updateLPTokenWithdrawal(address lp, uint256 tokenId, uint256 uj) external onlyOwner {
+        _updateLPTokenVarsWithdrawal(lp, tokenId, uj);
+    }
+
+    /**
+     * @dev Mints a new lpToken to a liquidity provider and updated the value associated with this new lpToken
+     * @param lp The address of the liquidity provider owning the lpToken being updated
+     * @param liquidityAmount The amount of liquidity provided by the liquidity provider
+     * @param hn The revenue parameter of the pool associated with the lpToken contract
+     */
+    function mint(address lp, uint256 liquidityAmount, uint256 hn) external onlyOwner {
+        _mintTokenAndUpdate(lp, liquidityAmount, hn);
+    }
+
+    /**
+     * @dev See {IERC165-supportsInterface}.
+     */
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721Enumerable) returns (bool) {
+        return super.supportsInterface(interfaceId);
+    }
+
+    /**
+     * @dev Mints a new lpToken to a liquidity provider and updated the value associated with this new lpToken
+     * @notice The internal version of the mint method. Used in the constructor, in order to circumvent ownership transfers.
+     * @param lp The address of the liquidity provider owning the lpToken being updated
+     * @param liquidityAmount The amount of liquidity provided by the liquidity provider
+     * @param hn The revenue parameter of the pool associated with the lpToken contract
+     */
+    function _mintTokenAndUpdate(address lp, uint256 liquidityAmount, uint256 hn) internal {
+        _mint(lp, ++currentTokenId);
+        w += liquidityAmount;
+        _updateLPTokenVarsDeposit(lp, currentTokenId, w, hn);
+    }
+
+    /**
+     * @dev Updates the values wj and rj of tokenId
+     * @notice The internal version of the updateLPToken method. Used in the constructor, in order to circumvent ownership transfers.
+     * @param lp The address of the liquidity provider owning the lpToken being updated
+     * @param tokenId The token id of the lpToken being updated
+     * @param wj The amount of liquidity associated with the lpToken being updated
+     * @param hn The amount of revenue associated with the lpToken being updated
+     */
+    function _updateLPTokenVarsDeposit(address lp, uint256 tokenId, uint256 wj, uint256 hn) internal {
+        tokenId == 0 ? lpToken[lp][tokenId].rj = hn :
+        lpToken[lp][tokenId].rj = _calculateRj(lp, tokenId, wj, hn);
+        lpToken[lp][tokenId].wj += wj;
+    }
+
+    /**
+     * @dev Calculates the value of rj for _tokenId. Used when updating a liquidity position.
+     * @param _lp The address of the liquidity provider owning the lpToken being updated
+     * @param _tokenId The token id of the lpToken being updated
+     * @param _hn The amount of revenue associated with the lpToken being updated
+     */
+    function _calculateRj(address _lp, uint256 _tokenId, uint256 _wj, uint256 _hn) internal view returns(uint256 result) {
+        uint256 w_hat = lpToken[_lp][_tokenId].wj;
+        uint256 r_hat = lpToken[_lp][_tokenId].rj;
+        r_hat == 0 ? 
+        result = (_hn * _wj) / (w_hat + _wj) :
+        result = ((_hn * _wj) + (r_hat * w_hat) / (w_hat + _wj));
+    }
+
+    /**
+     * @dev Updates the amount of liquidity associated with an LP Token. Used when withdrawing a full or partial liquidity position.
+     * @notice If an LP is withdrawing their entire position, the LP Token associated will be burned.
+     * @param _lp The address of the liquidity provider owning the lpToken being updated
+     * @param _tokenId The token id of the lpToken being updated
+     * @param _uj The amount of liquidity the LP would like to withdraw
+     */
+    function _updateLPTokenVarsWithdrawal(address _lp, uint256 _tokenId, uint256 _uj) internal {
+        if(lpToken[_lp][_tokenId].wj > _uj) {
+            lpToken[_lp][_tokenId].wj -= _uj;
+        } else {
+            _burn(_tokenId);
+            lpToken[_lp][_tokenId].wj = 0;
+        }
+    }
+
+    /**
+     * @dev Function to return baseUri for contract
+     * @return baseUri URI link to NFT metadata
+     */
+    function _baseURI() internal view override returns (string memory) {
+        return baseUri;
+    }
+
+    /**
+     * @dev See {ERC721-_update}.
+     */
+    function _update(address to, uint256 tokenId, address auth) internal override(ERC721, ERC721Enumerable) returns (address) {
+        return super._update(to, tokenId, auth);
+    }
+
+    /**
+     * See {ERC721-_increaseBalance}. We need that to account tokens that were minted in batch
+     */
+    function _increaseBalance(address account, uint128 value) internal override(ERC721, ERC721Enumerable){
+        super._increaseBalance(account, value);
+    }
+}

@@ -8,7 +8,7 @@ import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
  * @title Handler for testing to verify invariants related to transactions when the contract is paused.
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve
  */
-abstract contract pausedAuthorizationHandler is TestCommonSetup {
+contract pausedAuthorizationHandler is TestCommonSetup {
     PoolBase public poolUnderTest;
     bool previousSwapX = false;
 
