@@ -550,11 +550,11 @@ library MathLibs {
      * @param a The coefficient of x^2 expected with 36 decimals of precision
      * @param b The coefficient of x^1 expected with 36 decimals of precision
      * @param c The coefficient of x^0 expected with 36 decimals of precision
-     * @param isCNegative Only c is alllowed to be nagative. Pass true if it is.
+     * @param isBNegative Indicates sign of b. True if b is negative.
      * @return The solution of the equation whith the positive result of the square-root term with 36 decimals of precision
      */
-    function solveQuadraticEquation(uint a, uint b, uint c, bool isCNegative) internal pure returns (uint256) {
-        return a.solveQuadraticEquation(b, c, isCNegative);
+    function solveQuadraticEquation(uint a, uint b, uint c, bool isBNegative) internal pure returns (uint256) {
+        return a.solveQuadraticEquation(b, c, isBNegative);
     }
     
     /**

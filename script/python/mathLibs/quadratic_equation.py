@@ -7,7 +7,8 @@ def solve_quadratic_equation(args):
     a = Decimal(args.a) / Decimal(1e18) / Decimal(1e18)
     b = Decimal(args.b) / Decimal(1e18) / Decimal(1e18)
     c = Decimal(args.c) / Decimal(1e18) / Decimal(1e18)
-    if (args.c_negative > 0): c = -c
+    if (args.b_negative > 0): b = -b
+    c = -c
 
     flag = 0
     result = 0
@@ -24,6 +25,10 @@ def solve_quadratic_equation(args):
             result = 0
         else:
             result = int(result * Decimal(1e18) * Decimal(1e18))
+    if result > 2**256 - 1:
+        result = 0
+        flag = 3
+
     enc = encode(["(uint256,uint256)"], [(result, flag)])
     print("0x" + enc.hex(), end="")
 
@@ -32,7 +37,7 @@ def parse_args():
     parser.add_argument("a", type=int)
     parser.add_argument("b", type=int)
     parser.add_argument("c", type=int)
-    parser.add_argument("c_negative", type=int)
+    parser.add_argument("b_negative", type=int)
     return parser.parse_args()
 
 def main():
