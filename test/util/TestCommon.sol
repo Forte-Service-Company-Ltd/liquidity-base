@@ -13,6 +13,7 @@ import {TwentyTwoDecimalERC20} from "src/example/ERC20/TwentyTwoDecimalERC20.sol
 import {FeeOnTransferERC20} from "src/example/ERC20/FeeOnTransferERC20.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {PythonUtils} from "test/util/PythonUtils.sol";
+import {QuadraticEquation} from "src/amm/mathLibs/lib/QuadraticEq.sol";
 
 /**
  * @title Test Common
@@ -99,6 +100,24 @@ abstract contract TestCommon is PythonUtils {
      */
     function _createERC20(string memory _name, string memory _symbol) internal returns (GenericERC20 _token) {
         return new GenericERC20(_name, _symbol);
+    }
+
+    function getScriptQuadraticEquationValue( uint a, uint b, uint c, bool isBNegative, string memory locationPrefix) internal returns (uint scriptValue) {
+        string[] memory inputs = _buildFFIQuadraticEquation(a, b, c, isBNegative, locationPrefix);
+        bytes memory res = vm.ffi(inputs);
+        uint flag;
+        (scriptValue, flag) = abi.decode(res, (uint256, uint256));
+
+        if (flag == 1) {
+            vm.expectRevert("QuadraticEquation: Imaginary result");
+            QuadraticEquation.solveQuadraticEquation(a, b, c, isBNegative);
+        } else if (flag == 2) {
+            vm.expectRevert("QuadraticEquation: negative result");
+            QuadraticEquation.solveQuadraticEquation(a, b, c, isBNegative);
+        } else if (flag == 3) {
+            vm.expectRevert("Uint512: a1 >= b div512x256");
+            QuadraticEquation.solveQuadraticEquation(a, b, c, isBNegative);
+        }
     }
     
 }
