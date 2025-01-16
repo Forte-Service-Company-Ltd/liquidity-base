@@ -556,6 +556,19 @@ library MathLibs {
     function solveQuadraticEquation(uint a, uint b, uint c, bool isBNegative) internal pure returns (uint256) {
         return a.solveQuadraticEquation(b, c, isBNegative);
     }
+
+
+    /**
+     * @dev Solves a quadratic equation of the form ax^2 + bx + c = 0
+     * @param a The coefficient of x^2 expected with 36 decimals of precision
+     * @param b The coefficient of x^1 expected with 36 decimals of precision
+     * @param c The coefficient of x^0 expected with 36 decimals of precision
+     * @param isBNegative Indicates sign of b. True if b is negative.
+     * @return The solution of the equation whith the positive result of the square-root term with 36 decimals of precision
+     */
+    function solveMaxUintQuadraticEquation(uint a, uint b, uint c, bool isBNegative) internal pure returns (uint256) {
+        return a.solveMaxUintQuadraticEquation(b, c, isBNegative);
+    }
     
     /**
      * @dev this function tells how many WADs a number needs to be divided by to get to 0

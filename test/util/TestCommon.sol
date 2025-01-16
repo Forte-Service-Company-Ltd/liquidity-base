@@ -110,13 +110,13 @@ abstract contract TestCommon is PythonUtils {
 
         if (flag == 1) {
             vm.expectRevert("QuadraticEquation: Imaginary result");
-            QuadraticEquation.solveQuadraticEquation(a, b, c, isBNegative);
+            QuadraticEquation.solveMaxUintQuadraticEquation(a, b, c, isBNegative);
         } else if (flag == 2) {
             vm.expectRevert("QuadraticEquation: negative result");
-            QuadraticEquation.solveQuadraticEquation(a, b, c, isBNegative);
+            QuadraticEquation.solveMaxUintQuadraticEquation(a, b, c, isBNegative);
         } else if (flag == 3) {
             vm.expectRevert("Uint512: a1 >= b div512x256");
-            QuadraticEquation.solveQuadraticEquation(a, b, c, isBNegative);
+            QuadraticEquation.solveMaxUintQuadraticEquation(a, b, c, isBNegative);
         }
     }
     
