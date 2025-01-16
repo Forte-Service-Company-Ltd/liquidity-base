@@ -566,8 +566,8 @@ library MathLibs {
      * @param isBNegative Indicates sign of b. True if b is negative.
      * @return The solution of the equation whith the positive result of the square-root term with 36 decimals of precision
      */
-    function solveMaxUintQuadraticEquation(uint a, uint b, uint c, bool isBNegative) internal pure returns (uint256) {
-        return a.solveMaxUintQuadraticEquation(b, c, isBNegative);
+    function solveQuadraticEquationLargeInput(uint a, uint b, uint c, bool isBNegative) internal pure returns (uint256) {
+        return a.solveQuadraticEquationLargeInput(b, c, isBNegative);
     }
     
     /**

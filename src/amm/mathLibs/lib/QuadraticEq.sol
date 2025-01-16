@@ -102,8 +102,11 @@ library QuadraticEquation {
      * @return The solution of the equation whith the positive result of the square-root term with 36 decimals of
      * precision. The actual precision of the result is perfect up until the 2 least significant digits.
      */
-    function solveMaxUintQuadraticEquation(uint a, uint b, uint c, bool isBNegative) internal pure returns (uint256) {
-        if(a== 0) revert("a too small");
+    function solveQuadraticEquationLargeInput(uint a, uint b, uint c, bool isBNegative) internal pure returns (uint256) {
+        if(a == 0) revert("a too small");
+        if(a > 10000000000000000000001999999999999999998000000000000000000000000000000000000) revert("a too large");
+        if(b > 10000000000000000000001999999799999999997999999999980000000000000000000000000) revert("b too large");
+        if(c > 200000000000000000000019999999000000000000000000) revert("c too large");
 
         (uint sqrtTerm0, uint sqrtTerm1) = getSquareTerm(a, b, c);
         (uint numerator0, uint numerator1) = getNumerator(b, sqrtTerm0, sqrtTerm1, isBNegative);

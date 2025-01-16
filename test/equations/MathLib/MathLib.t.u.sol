@@ -225,7 +225,7 @@ abstract contract MathLibTests is TestCommon {
         c = bound(a, 0, 200000000000000000000019999999000000000000000000);
 
         uint pyVal = getScriptQuadraticEquationValue(a, b, c, isBNegative, "");
-        uint solVal = QuadraticEquation.solveMaxUintQuadraticEquation(a, b, c, isBNegative);
+        uint solVal = QuadraticEquation.solveQuadraticEquationLargeInput(a, b, c, isBNegative);
         console2.log("returnVal: ", solVal);
 
         // NOTE: perfect precision excluding the last 18 precision decimals out of the 36.
@@ -238,14 +238,14 @@ abstract contract MathLibTests is TestCommon {
         uint c = 200000000000000000000019999999000000000000000000;
 
         uint pyVal = getScriptQuadraticEquationValue(a, b, c, false, "");
-        uint solVal = QuadraticEquation.solveMaxUintQuadraticEquation(a, b, c, false);
+        uint solVal = QuadraticEquation.solveQuadraticEquationLargeInput(a, b, c, false);
         console2.log("returnVal: ", solVal);
 
         // NOTE: perfect precision excluding the last 18 precision decimals out of the 36.
         assertEq(pyVal/1e18, solVal/1e18);
 
         pyVal = getScriptQuadraticEquationValue(a, b, c, true, "");
-        solVal = QuadraticEquation.solveMaxUintQuadraticEquation(a, b, c, true);
+        solVal = QuadraticEquation.solveQuadraticEquationLargeInput(a, b, c, true);
         console2.log("returnVal: ", solVal);
 
         // NOTE: perfect precision excluding the last 18 precision decimals out of the 36.
