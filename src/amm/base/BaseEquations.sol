@@ -13,7 +13,7 @@ library BaseEquations {
      * @dev This function calculates the last revenue claim to be stored in the associated LPToken variable rj. The result will be a WAD value.
      * @notice The result for last revenue claim will be in WAD ** 2.
      * @param hn The revenue parameter. Expected to be in WAD ** 2.
-     * @param wj The share of the pools liquidity the associated LPToken represents. Expected to be a WAD value.
+     * @param wj The share of the pool's liquidity the associated LPToken represents. Expected to be a WAD value.
      * @param r_hat The current last revenue claim value of the associated LPToken. 
      * @param w_hat The current liquidity amount of the associated LPToken. Expected to be a WAD value.
      */
