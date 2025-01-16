@@ -12,7 +12,7 @@ import {QuadraticEquation} from "src/amm/mathLibs/lib/QuadraticEq.sol";
  * @dev tests the limits of the math library to better understand what can be done what cannot.
  * @author @oscarsernarosero @mpetersoCode55
  */
-abstract contract MathLibTests is TestCommon {
+contract MathLibTests is TestCommon {
     using MathLibs for uint256;
     uint one = 1;
     uint two = 2;
@@ -222,7 +222,7 @@ abstract contract MathLibTests is TestCommon {
     function testEquations_MathLibTests_QuadraticEquationMaxUint(uint256 a, uint256 b, uint256 c, bool isBNegative) public {
         a = bound(a, 2, 10000000000000000000001999999999999999998000000000000000000000000000000000000);
         b = bound(b, 0, 10000000000000000000001999999799999999997999999999980000000000000000000000000);
-        c = bound(a, 0, 200000000000000000000019999999000000000000000000);
+        c = bound(a, 0, 10000000000000000000002000000199999999999999999999979999999000000000000000000);
 
         uint pyVal = getScriptQuadraticEquationValue(a, b, c, isBNegative, "");
         uint solVal = QuadraticEquation.solveQuadraticEquationLargeInput(a, b, c, isBNegative);
@@ -232,10 +232,10 @@ abstract contract MathLibTests is TestCommon {
         assertEq(pyVal/1e18, solVal/1e18);
     }
 
-    function testEquations_MathLibTests_QuadraticEquationUnit() public {
+    function testEquations_MathLibTests_QuadraticEquationMaxUnit() public {
         uint a = 10000000000000000000001999999999999999998000000000000000000000000000000000000;
         uint b = 10000000000000000000001999999799999999997999999999980000000000000000000000000;
-        uint c = 200000000000000000000019999999000000000000000000;
+        uint c = 10000000000000000000002000000199999999999999999999979999999000000000000000000;
 
         uint pyVal = getScriptQuadraticEquationValue(a, b, c, false, "");
         uint solVal = QuadraticEquation.solveQuadraticEquationLargeInput(a, b, c, false);
