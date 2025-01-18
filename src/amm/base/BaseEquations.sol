@@ -32,3 +32,4 @@ library BaseEquations {
         result = firstTermLo.div512x256(firstTermHi, secondTerm * MathLibs.WAD); // WAD
     }
 }
+

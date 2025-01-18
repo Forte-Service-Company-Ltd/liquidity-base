@@ -12,6 +12,12 @@ import {CumulativePrice} from "src/amm/base/CumulativePrice.sol";
 import {Constants} from "src/common/Constants.sol";
 import {FeeInfo, TBCType} from "src/common/TBC.sol";
 
+interface ILPToken {
+    function updateLPTokenDeposit(address lp, uint256 tokenId, uint256 wj, uint256 rj) external;
+    function updateLPTokenWithdrawal(address lp, uint256 tokenId, uint256 uj) external;
+    function mint(address lp, uint256 liquidityAmount, uint256 hn) external;
+}
+
 /**
  * @title Pool Base
  * @dev This contract implements the core of the Pool interface and is meant to be an abstract base for all the pools.
@@ -77,6 +83,11 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable, Pausable, Cumulati
      * @dev currently claimable protocol fee balance
      */
     uint256 public collectedProtocolFees;
+
+    /**
+     * @dev The address of the pool-associated LPToken contract
+     */
+    address public LPTokenAddress;
 
     modifier ifLiquidityRemovalAllowed() {
         if (!liquidityRemovalAllowed) revert LiquidityRemovalForbidden();
@@ -390,6 +401,49 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable, Pausable, Cumulati
      */
     function revenueAvailable() external view returns (uint256) {
         return _getRevenueAvailable();
+    }
+
+    /**
+     * @dev This function is temporary. It allows the owner to set the LPToken address.
+     * @param _LPTokenAddress The address of the LPToken associated with the pool.
+     */
+    function setLPTokenAddress(address _LPTokenAddress) external onlyOwner {
+        if(LPTokenAddress == address(0)) {
+            LPTokenAddress = _LPTokenAddress;
+        } else {
+            revert ("LPToken address already set");
+        }
+    }
+
+    /**
+     * @dev A helper function to update a specified LPToken when a deposit is made
+     * @param lp address of the liquidity provider
+     * @param tokenId The ID of the LPToken being updated
+     * @param wj The amount being deposited by lp
+     * @param rj The last revenue claim of the provided tokenId
+     */
+    function _updateLPTokenDeposit(address lp, uint256 tokenId, uint256 wj, uint256 rj) internal {
+        ILPToken(LPTokenAddress).updateLPTokenDeposit(lp, tokenId, wj, rj);
+    }
+
+    /**
+     * @dev A helper function to update a specified LPToken when a withdrawal is made
+     * @param lp address of the liquidity provider
+     * @param tokenId The ID of the LPToken being updated
+     * @param uj The amount of liquidity lp would like to withdraw
+     */
+    function _updateLPTokenWithdrawal(address lp, uint256 tokenId, uint256 uj) internal {
+        ILPToken(LPTokenAddress).updateLPTokenWithdrawal(lp, tokenId, uj);
+    }
+
+    /**
+     * @dev Mints a new lpToken to a liquidity provider and updated the value associated with this new lpToken
+     * @param lp The address of the liquidity provider owning the lpToken being updated
+     * @param liquidityAmount The amount of liquidity provided by the liquidity provider
+     * @param hn The revenue parameter of the pool associated with the lpToken contract
+     */
+    function _mint(address lp, uint256 liquidityAmount, uint256 hn) internal {
+        ILPToken(LPTokenAddress).mint(lp, liquidityAmount, hn);
     }
 
     /**
