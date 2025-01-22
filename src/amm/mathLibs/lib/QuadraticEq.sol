@@ -18,15 +18,24 @@ library QuadraticEquation {
      * precision. The actual precision of the result is perfect up until the 2 least significant digits.
      */
     function getSquareTerm(uint a, uint b, uint c) internal pure returns (uint, uint) {
-        (uint bSq0, uint bSq1) = Uint512.mul256x256(b, b); // WAD ** 4
-        (uint fourAC0, uint fourAC1) = Uint512.mul256x256((a << 1), (c << 1)); // WAD ** 4
+        uint bSq0;
+        uint bSq1;
+        uint bSq2;
+        uint bSq3;
+        (bSq0, bSq1) = Uint512.mul256x256(b, b); // WAD ** 4
+        (bSq0, bSq1, bSq2, bSq3) = Uint1024.mul512x512In1024(bSq0, bSq1, WAD ** 2, 0); // WAD ** 6
+        uint fourAC0;
+        uint fourAC1;
+        uint fourAC2;
+        uint fourAC3;
+        (fourAC0, fourAC1) = Uint512.mul256x256(a, 2 * WAD); // WAD ** 3
+        (fourAC2, fourAC3) = Uint512.mul256x256(c, 2 * WAD); // WAD ** 3
 
-        (uint sqrtTerm0, uint sqrtTerm1)  = Uint512Extended.safeAdd512x512(bSq0, bSq1, fourAC0, fourAC1); // WAD ** 4
-        (uint wad20, uint wad21) = Uint512.mul256x256(WAD, WAD);
-        uint sqrtTerm2;
-        uint sqrtTerm3;
-        (sqrtTerm0, sqrtTerm1, sqrtTerm2, sqrtTerm3)  = Uint1024.mul512x512In1024(sqrtTerm0, sqrtTerm1, wad20, wad21); // WAD ** 6
-        return Uint1024.sqrt1024(sqrtTerm0, sqrtTerm1, sqrtTerm2, sqrtTerm3); // WAD ** 3
+        (fourAC0, fourAC1, fourAC2, fourAC3) = Uint1024.mul512x512In1024(fourAC0, fourAC1, fourAC2, fourAC3); // WAD ** 6
+
+        (bSq0, bSq1, bSq2, bSq3)  = Uint1024.add1024x1024(bSq0, bSq1, bSq2, bSq3, fourAC0, fourAC1, fourAC2, fourAC3); // WAD ** 6
+
+        return Uint1024.sqrt1024(bSq0, bSq1, bSq2, bSq3); // WAD ** 3
 
     }
 
@@ -67,8 +76,6 @@ library QuadraticEquation {
      */
     function solveQuadraticEquation(uint a, uint b, uint c, bool isBNegative) internal pure returns (uint256) {
         if(a == 0) revert("a too small");
-        if(b > 50000000000000000000001999999799999999997999999999980000000000000000000000000) revert("b too large");
-        if(c > 50000000000000000000002000000199999999999999999999979999999000000000000000000) revert("c too large");
 
         (uint sqrtTerm0, uint sqrtTerm1) = getSquareTerm(a, b, c);
         (uint numerator0, uint numerator1) = getNumerator(b, sqrtTerm0, sqrtTerm1, isBNegative);
