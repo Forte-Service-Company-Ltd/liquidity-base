@@ -108,11 +108,10 @@ abstract contract PythonUtils is Test {
         return inputs;
     }
 
-    function _buildFFIQuadraticEquation(uint a, uint b, uint c, bool isBNegative, string memory locationPrefix) internal pure returns (string[] memory) {
-        string memory location = string.concat(locationPrefix, "script/python/mathLibs/quadratic_equation.py");
+    function _buildFFIQuadraticEquation(uint a, uint b, uint c, bool isBNegative) internal pure returns (string[] memory) {
         string[] memory inputs = new string[](6);
         inputs[0] = "python3";
-        inputs[1] = location;
+        inputs[1] = "script/python/mathLibs/quadratic_equation.py";
         inputs[2] = vm.toString(a);
         inputs[3] = vm.toString(b);
         inputs[4] = vm.toString(c);

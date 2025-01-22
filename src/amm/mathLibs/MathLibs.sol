@@ -545,8 +545,6 @@ library MathLibs {
 
     /**
      * @dev Solves a quadratic equation of the form ax^2 + bx + c = 0
-     * @notice a and b parameters are bounded to a max value of type(uint256).max / 2. This means that the max value of  
-     * a and b is 57_896_044_618_658_097_711_785_492_504_343_953_926_634 without counting the decimals (36 decimals).
      * @param a The coefficient of x^2 expected with 36 decimals of precision
      * @param b The coefficient of x^1 expected with 36 decimals of precision
      * @param c The coefficient of x^0 expected with 36 decimals of precision
@@ -555,19 +553,6 @@ library MathLibs {
      */
     function solveQuadraticEquation(uint a, uint b, uint c, bool isBNegative) internal pure returns (uint256) {
         return a.solveQuadraticEquation(b, c, isBNegative);
-    }
-
-
-    /**
-     * @dev Solves a quadratic equation of the form ax^2 + bx + c = 0
-     * @param a The coefficient of x^2 expected with 36 decimals of precision
-     * @param b The coefficient of x^1 expected with 36 decimals of precision
-     * @param c The coefficient of x^0 expected with 36 decimals of precision
-     * @param isBNegative Indicates sign of b. True if b is negative.
-     * @return The solution of the equation whith the positive result of the square-root term with 36 decimals of precision
-     */
-    function solveQuadraticEquationLargeInput(uint a, uint b, uint c, bool isBNegative) internal pure returns (uint256) {
-        return a.solveQuadraticEquationLargeInput(b, c, isBNegative);
     }
     
     /**

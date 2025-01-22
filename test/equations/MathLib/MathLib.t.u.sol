@@ -12,7 +12,7 @@ import {QuadraticEquation} from "src/amm/mathLibs/lib/QuadraticEq.sol";
  * @dev tests the limits of the math library to better understand what can be done what cannot.
  * @author @oscarsernarosero @mpetersoCode55
  */
-abstract contract MathLibTests is TestCommon {
+contract MathLibTests is TestCommon {
     using MathLibs for uint256;
     uint one = 1;
     uint two = 2;
@@ -195,7 +195,7 @@ abstract contract MathLibTests is TestCommon {
         a = bound(a, 2, 1 << 192 - 1);
         b = bound(b, 0, 1 << 192 - 1);
         c = bound(a, 0, 1 << 192 - 1);
-        string[] memory inputs = _buildFFIQuadraticEquation(a, b, c, isBNegative, "");
+        string[] memory inputs = _buildFFIQuadraticEquation(a, b, c, isBNegative);
         bytes memory res = vm.ffi(inputs);
         uint flag;
         uint scriptValue;
@@ -220,33 +220,28 @@ abstract contract MathLibTests is TestCommon {
     }
 
     function testEquations_MathLibTests_QuadraticEquationMaxUint(uint256 a, uint256 b, uint256 c, bool isBNegative) public {
-        a = bound(a, 2, 10000000000000000000001999999999999999998000000000000000000000000000000000000);
+        a = bound(a, 2, 2**255-1);
         b = bound(b, 0, 10000000000000000000001999999799999999997999999999980000000000000000000000000);
-        c = bound(a, 0, 10000000000000000000002000000199999999999999999999979999999000000000000000000);
+        c = bound(c, 0, 10000000000000000000002000000199999999999999999999979999999000000000000000000);
 
-        uint pyVal = getScriptQuadraticEquationValue(a, b, c, isBNegative, "");
-        uint solVal = QuadraticEquation.solveQuadraticEquationLargeInput(a, b, c, isBNegative);
-        console2.log("returnVal: ", solVal);
+        string[] memory inputs = _buildFFIQuadraticEquation(a, b, c, isBNegative);
+        bytes memory res = vm.ffi(inputs);
+        uint flag;
+        uint pyVal;
+        (pyVal, flag) = abi.decode(res, (uint256, uint256));
 
-        // NOTE: perfect precision excluding the last 18 precision decimals out of the 36.
-        assertEq(pyVal/1e18, solVal/1e18);
-    }
-
-    function testEquations_MathLibTests_QuadraticEquationMaxUnit() public {
-        uint a = 50000000000000000000001999999999999999998000000000000000000000000000000000000;
-        uint b = 50000000000000000000001999999799999999997999999999980000000000000000000000000;
-        uint c = 50000000000000000000002000000199999999999999999999979999999000000000000000000;
-
-        uint pyVal = getScriptQuadraticEquationValue(a, b, c, false, "");
-        uint solVal = QuadraticEquation.solveQuadraticEquationLargeInput(a, b, c, false);
-        console2.log("returnVal: ", solVal);
-
-        // NOTE: perfect precision excluding the last 18 precision decimals out of the 36.
-        assertEq(pyVal/1e18, solVal/1e18);
-
-        pyVal = getScriptQuadraticEquationValue(a, b, c, true, "");
-        solVal = QuadraticEquation.solveQuadraticEquationLargeInput(a, b, c, true);
-        console2.log("returnVal: ", solVal);
+        if (flag == 1) {
+            vm.expectRevert("QuadraticEquation: Imaginary result");
+            QuadraticEquation.solveQuadraticEquation(a, b, c, isBNegative);
+        } else if (flag == 2) {
+            vm.expectRevert("QuadraticEquation: negative result");
+            QuadraticEquation.solveQuadraticEquation(a, b, c, isBNegative);
+        }  else if (flag == 3) {
+            vm.expectRevert("Uint512: a1 >= b div512x256");
+            QuadraticEquation.solveQuadraticEquation(a, b, c, isBNegative);
+        }
+        uint solVal = QuadraticEquation.solveQuadraticEquation(a, b, c, isBNegative);
+        console2.log("returnVal: ", solVal, pyVal, isBNegative);
 
         // NOTE: perfect precision excluding the last 18 precision decimals out of the 36.
         assertEq(pyVal/1e18, solVal/1e18);
