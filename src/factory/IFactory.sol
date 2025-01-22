@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
-import {IFactoryEvents} from "src/common/IEvents.sol";
+import {IFactoryEvents} from "../common/IEvents.sol";
 
 /**
  * @title Pool Factory Interface

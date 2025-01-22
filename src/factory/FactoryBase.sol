@@ -2,9 +2,9 @@
 pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "src/common/IErrors.sol";
-import {IFactory} from "src/factory/IFactory.sol";
-import {IAllowList} from "src/allowList/IAllowList.sol";
+import "../common/IErrors.sol";
+import {IFactory} from "../factory/IFactory.sol";
+import {IAllowList} from "../allowList/IAllowList.sol";
 
 /**
  * @title Pool Factory
