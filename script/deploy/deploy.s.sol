@@ -9,7 +9,7 @@ import {IERC20} from "../../lib/openzeppelin-contracts/contracts/token/ERC20/IER
 import {AllowList} from "src/allowList/AllowList.sol";
 import {GenericERC20FixedSupply} from "src/example/ERC20/GenericERC20FixedSupply.sol";
 import {GenericERC20} from "src/example/ERC20/GenericERC20.sol";
-import {IFactory} from "src/factory/IFactory.sol";
+import {IFactory} from "../../src/factory/IFactory.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {PythonUtils} from "./pythonUtils.s.sol";
 import {SixDecimalERC20} from "src/example/ERC20/SixDecimalERC20.sol";
