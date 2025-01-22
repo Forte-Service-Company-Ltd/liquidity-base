@@ -13,6 +13,7 @@ import {TwentyTwoDecimalERC20} from "src/example/ERC20/TwentyTwoDecimalERC20.sol
 import {FeeOnTransferERC20} from "src/example/ERC20/FeeOnTransferERC20.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {PythonUtils} from "test/util/PythonUtils.sol";
+import {QuadraticEquation} from "src/amm/mathLibs/lib/QuadraticEq.sol";
 
 /**
  * @title Test Common

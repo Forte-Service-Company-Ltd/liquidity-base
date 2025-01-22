@@ -12,7 +12,7 @@ import {QuadraticEquation} from "src/amm/mathLibs/lib/QuadraticEq.sol";
  * @dev tests the limits of the math library to better understand what can be done what cannot.
  * @author @oscarsernarosero @mpetersoCode55
  */
-abstract contract MathLibTests is TestCommon {
+contract MathLibTests is TestCommon {
     using MathLibs for uint256;
     uint one = 1;
     uint two = 2;
@@ -191,28 +191,29 @@ abstract contract MathLibTests is TestCommon {
         }
     }
 
-    function testEquations_MathLibTests_QuadraticEquation(uint256 a, uint256 b, uint256 c, bool isCNegative) public {
-        a = bound(a, 2, 1 << 192 - 1);
-        b = bound(b, 0, 1 << 192 - 1);
-        c = bound(a, 0, 1 << 192 - 1);
+    function testEquations_MathLibTests_QuadraticEquation(uint256 a, uint256 b, uint256 c, bool isBNegative) public {
+        a = bound(a, 2, 2**256-1);
+        b = bound(b, 0, 2**256-1);
+        c = bound(c, 0, 2**255-1);
 
-        string[] memory inputs = _buildFFIQuadraticEquation(a, b, c, isCNegative);
+        string[] memory inputs = _buildFFIQuadraticEquation(a, b, c, isBNegative);
         bytes memory res = vm.ffi(inputs);
-        (uint pyVal, uint flag) = abi.decode(res, (uint256, uint256));
-        console2.log("Res: ", pyVal, flag);
+        uint flag;
+        uint pyVal;
+        (pyVal, flag) = abi.decode(res, (uint256, uint256));
 
-        uint256 solVal;
         if (flag == 1) {
             vm.expectRevert("QuadraticEquation: Imaginary result");
-            solVal = QuadraticEquation.solveQuadraticEquation(a, b, c, isCNegative);
-            return;
-        }else if (flag == 2) {
+            QuadraticEquation.solveQuadraticEquation(a, b, c, isBNegative);
+        } else if (flag == 2) {
             vm.expectRevert("QuadraticEquation: negative result");
-            solVal = QuadraticEquation.solveQuadraticEquation(a, b, c, isCNegative);
-            return;
+            QuadraticEquation.solveQuadraticEquation(a, b, c, isBNegative);
+        }  else if (flag == 3) {
+            vm.expectRevert("Uint512: a1 >= b div512x256");
+            QuadraticEquation.solveQuadraticEquation(a, b, c, isBNegative);
         }
-        else solVal = QuadraticEquation.solveQuadraticEquation(a, b, c, isCNegative);
-        console2.log("returnVal: ", solVal);
+        uint solVal = QuadraticEquation.solveQuadraticEquation(a, b, c, isBNegative);
+        console2.log("returnVal: ", solVal, pyVal, isBNegative);
 
         // NOTE: perfect precision excluding the last 18 precision decimals out of the 36.
         assertEq(pyVal/1e18, solVal/1e18);
