@@ -9,8 +9,8 @@ import {TestConstants, TBCInputOption} from "test/util/TestConstants.sol";
  * @title Test Common Foundry Setup Pure Abstract Functions
  */
 abstract contract TestCommonSetupAbs is TestConstants, TestModifiers  { 
-    function _deployFactory() internal virtual {}
-    function _getFactoryAddress() internal virtual returns (address) {}
-    function _deployPool(address,address,uint16,bool,TBCInputOption) internal virtual returns (PoolBase) {}
-    function _getMaxXTokenSupply() internal virtual returns (uint) {}
+    function _deployFactory() internal virtual;
+    function _getFactoryAddress() internal virtual returns (address);
+    function _deployPool(address,address,uint16,bool,TBCInputOption) internal virtual returns (PoolBase);
+    function _getMaxXTokenSupply() internal virtual returns (uint);
 }
