@@ -11,7 +11,7 @@ import {NoZeroTransferERC20} from "src/example/ERC20/NoZeroTransferERC20.sol";
 import {SimplePriceOracle} from "src/example/SimplePriceOracle.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {CumulativePrice} from "src/amm/base/CumulativePrice.sol";
-import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
+import {TestCommonSetup, TestCommonSetupAbs} from "test/util/TestCommonSetup.sol";
 import {TBCInputOption} from "test/util/TestConstants.sol";
 
 /**
@@ -23,10 +23,10 @@ abstract contract PoolCommonTest is TestCommonSetup {
     IERC20 _yToken;
     uint fullToken;
 
-    function _checkClosePoolState() internal virtual;
-    function _checkLiquidityExcessState() internal virtual;
-    function _checkWithdrawRevenueState() internal virtual;
-    function _checkBackAndForthSwapsState() internal virtual;
+    function _checkClosePoolState() internal virtual{}
+    function _checkLiquidityExcessState() internal virtual{}
+    function _checkWithdrawRevenueState() internal virtual{}
+    function _checkBackAndForthSwapsState() internal virtual{}
     function _getMinMaxX() internal virtual returns (uint,uint);
 
     function _setupCollateralToken() internal {
