@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
-import {MathLibs} from "src/amm/mathLibs/MathLibs.sol";
+import {MathLibs} from "../mathLibs/MathLibs.sol";
 
 /**
  * @title Equations used by multiple TBC types
