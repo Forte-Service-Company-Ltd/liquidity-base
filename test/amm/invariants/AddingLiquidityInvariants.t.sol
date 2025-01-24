@@ -40,7 +40,7 @@ abstract contract AddingLiquidityInvariants is TestCommonSetup {
     }
 
     function invariant_liquidityCanNeverIncreasePastMaxSupply() public {
-        uint maxTokenSupply = _getMaxXTokenSupply();
+        uint maxTokenSupply = setupHelper.getMaxXTokenSupply();
         assertLe(pool.xTokenLiquidity(), maxTokenSupply);
     }
 }

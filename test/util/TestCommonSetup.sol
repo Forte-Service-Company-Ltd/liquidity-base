@@ -13,7 +13,7 @@ import {TwentyTwoDecimalERC20} from "src/example/ERC20/TwentyTwoDecimalERC20.sol
 import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {TestCommon} from "test/util/TestCommon.sol";
 import {TestModifiers} from "test/util/TestModifiers.sol";
-import {TestCommonSetupAbs} from "test/util/TestCommonSetupAbs.sol";
+import {ITestSetupHelper} from "test/util/ITestSetupHelper.sol";
 import {TestConstants, TBCInputOption} from "test/util/TestConstants.sol";
 import "forge-std/console2.sol";
 
@@ -24,7 +24,7 @@ import "forge-std/console2.sol";
  * create = set to proper user, deploy contracts, reset user, return the contract
  * _create = deploy contract, return the contract
  */
-abstract contract TestCommonSetup is TestCommonSetupAbs {
+abstract contract TestCommonSetup is TestConstants, TestModifiers {
     
     function _setUpTokens(uint256 _xTokenSupply) internal startAsAdmin endWithStopPrank {
         xToken = new GenericERC20FixedSupply("x token", "GAME", _xTokenSupply + 1);
@@ -83,16 +83,16 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
     function _setUpTokensAndFactories(uint _tokenSupply) internal {
         _setUpTokens(_tokenSupply);
         _loadAdminAndAlice();
-        _deployFactory();
+        setupHelper.deployFactory();
         _deployAllowLists();
-        _setupFactory(_getFactoryAddress());
+        _setupFactory(setupHelper.getFactoryAddress());
         _setupAllowLists();
     }
 
     function _setupPool(bool withStableCoin) internal endWithStopPrank returns (PoolBase poolRet) {
         _setUpTokensAndFactories(X_TOKEN_MAX_SUPPLY);
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
-        poolRet = _deployPool(address(xToken), yTokenAddress, 30, true, TBCInputOption.BASE);
+        poolRet = setupHelper.deployPool(address(xToken), yTokenAddress, 30, true, TBCInputOption.BASE);
         vm.startPrank(admin);
         poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
@@ -110,7 +110,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         uint16 fee
     ) internal endWithStopPrank returns (PoolBase poolRet) {
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
-        poolRet = _deployPool(_xTokenAddress, yTokenAddress,  fee, true, TBCInputOption.BASE);
+        poolRet = setupHelper.deployPool(_xTokenAddress, yTokenAddress,  fee, true, TBCInputOption.BASE);
         vm.startPrank(admin);
         poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
@@ -123,15 +123,15 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         uint16 fee,
         bool usdt
     ) internal endWithStopPrank returns (PoolBase poolRet) {
-        _deployFactory();
+        setupHelper.deployFactory();
         _deployAllowLists();
-        _setupFactory(_getFactoryAddress());
+        _setupFactory(setupHelper.getFactoryAddress());
         _setupAllowLists();
 
         GenericERC20FixedSupply xTokenWithFee = new GenericERC20FixedSupply("Fee token", "FEE", 10e3 * ERC20_DECIMALS);
 
         poolRet = PoolBase(
-            _deployPool(
+            setupHelper.deployPool(
                 address(xTokenWithFee),
                 _yTokenAddress,
                 0,
@@ -155,7 +155,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
         // the pool config values are the same config values used in the stress test simulation and must match
         /// fee: 0.0%, supply: 10K tokens, y-intersect: 10, minPrice: 1, maxPrice: 100
-        poolRet = _deployPool(address(xToken), yTokenAddress, 0, true, TBCInputOption.FORK);
+        poolRet = setupHelper.deployPool(address(xToken), yTokenAddress, 0, true, TBCInputOption.FORK);
         vm.startPrank(admin);
         poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
@@ -168,7 +168,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
     ) internal endWithStopPrank returns (PoolBase wadPool, PoolBase sixDecimalPool) {
         _setUpTokensAndFactories(maxSupply);
 
-        wadPool = _deployPool(address(xToken), address(yToken),fee, true, TBCInputOption.PRECISION);
+        wadPool = setupHelper.deployPool(address(xToken), address(yToken),fee, true, TBCInputOption.PRECISION);
 
         vm.startPrank(admin);
         wadPool.enableSwaps(true);
@@ -179,7 +179,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         _setUpTokens(maxSupply);
         vm.startPrank(admin);
         yTokenAllowList.addToAllowList(address(stableCoin));
-        sixDecimalPool = _deployPool(address(xToken), address(stableCoin),fee, true, TBCInputOption.PRECISION);
+        sixDecimalPool = setupHelper.deployPool(address(xToken), address(stableCoin),fee, true, TBCInputOption.PRECISION);
 
         _loadAdminAndAlice();
         vm.startPrank(admin);
@@ -192,7 +192,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
     function _setupPoolPartialFunding(bool withStableCoin) internal endWithStopPrank returns (PoolBase poolRet) {
         _setUpTokensAndFactories(X_TOKEN_MAX_SUPPLY);
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
-        poolRet = _deployPool(address(xToken), yTokenAddress, 30, true, TBCInputOption.BASE);
+        poolRet = setupHelper.deployPool(address(xToken), yTokenAddress, 30, true, TBCInputOption.BASE);
         vm.startPrank(admin);
         poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
@@ -202,7 +202,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
     function _setupFOTPool(bool withStableCoin) internal endWithStopPrank returns (PoolBase poolRet) {
         _setUpTokensAndFactories(X_TOKEN_MAX_SUPPLY);
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
-        poolRet = _deployPool(address(fotCoin), yTokenAddress, 30, true, TBCInputOption.BASE);
+        poolRet = setupHelper.deployPool(address(fotCoin), yTokenAddress, 30, true, TBCInputOption.BASE);
         vm.startPrank(admin);
         poolRet.enableSwaps(true);
         _approvePool(poolRet, false);

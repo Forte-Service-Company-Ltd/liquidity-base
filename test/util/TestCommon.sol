@@ -14,6 +14,7 @@ import {FeeOnTransferERC20} from "src/example/ERC20/FeeOnTransferERC20.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {PythonUtils} from "test/util/PythonUtils.sol";
 import {QuadraticEquation} from "src/amm/mathLibs/lib/QuadraticEq.sol";
+import {ITestSetupHelper} from "test/util/ITestSetupHelper.sol";
 
 /**
  * @title Test Common
@@ -46,6 +47,8 @@ abstract contract TestCommon is PythonUtils {
 
     AllowList deployerAllowList;
     AllowList yTokenAllowList;
+
+    ITestSetupHelper setupHelper;
 
     uint256 amountMinBound;
     uint16 protocolFee = 0;

@@ -22,9 +22,9 @@ abstract contract FactoryCommon is TestCommonSetup {
     }
 
     function _buildDeployment() internal {
-        _deployFactory();
+        setupHelper.deployFactory();
         _deployAllowLists();
-        factory = FactoryBase(_getFactoryAddress());
+        factory = FactoryBase(setupHelper.getFactoryAddress());
     }
 
     function testLiquidity_PoolFactory_version() public {
@@ -34,8 +34,8 @@ abstract contract FactoryCommon is TestCommonSetup {
 
     function testLiquidity_PoolFactory_deployment() public {
         _buildDeployment();
-        assertNotEq(_getFactoryAddress(), address(0));
-        assertNotEq(_getFactoryAddress(), address(0));
+        assertNotEq(setupHelper.getFactoryAddress(), address(0));
+        assertNotEq(setupHelper.getFactoryAddress(), address(0));
     }
 
     function testLiquidity_PoolFactory_owner() public {
