@@ -6,8 +6,9 @@ import "./lib/MathUtils.sol";
 import {Uint512} from "uint1024/Uint512.sol";
 import {Uint512Extended} from "uint1024/Uint512Extended.sol";
 import {Uint1024} from "uint1024/Uint1024.sol";
-import {LN} from "./lib/LN.sol";
-import {QuadraticEquation} from "./lib/QuadraticEq.sol";
+import {uint512, uint768, uint1024} from "uint1024/UintTypes.sol";
+import {LN} from "src/amm/mathLibs/lib/LN.sol";
+import {QuadraticEquation} from "src/amm/mathLibs/lib/QuadraticEq.sol";
 
 /**
  * @title Abstraction Layer between Equations and the underlying Math libraries
@@ -22,6 +23,9 @@ library MathLibs {
     using Uint512 for uint256;
     using Uint512Extended for uint256;
     using Uint1024 for uint256;
+    using Uint1024 for uint512;
+    using Uint1024 for uint768;
+    using Uint1024 for uint1024;
     using LN for uint256;
     using QuadraticEquation for uint256;
 
@@ -493,6 +497,16 @@ library MathLibs {
         uint8 n
     ) internal pure returns (uint256 r0, uint256 r1, uint r2, uint256 remainder) {
         (r0, r1, r2, remainder) = a0.div768ByPowerOf2(a1, a2, n);
+    }
+
+    /**
+     * @dev Calculates the division of a 768-bit dividend by a 512-bit divisor. The result will be a uint512.
+     * @param a A uint768 representing the numerator
+     * @param b A uint512 representing the denominator
+     * @return result uint512 value
+     */
+    function div768x512(uint768 memory a, uint512 memory b) internal pure returns (uint512 memory result) {
+        result = Uint1024.div768x512(a, b);
     }
 
     /**
