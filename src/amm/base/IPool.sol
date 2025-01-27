@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
-import {IPoolEvents} from "src/common/IEvents.sol";
+import {IPoolEvents} from "../../common/IEvents.sol";
 
 /**
  * @title IPool Interface

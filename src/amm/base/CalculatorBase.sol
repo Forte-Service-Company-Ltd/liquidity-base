@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
-import "src/common/IErrors.sol";
-import {Constants} from "src/common/Constants.sol";
+import "../../common/IErrors.sol";
+import {Constants} from "../../common/Constants.sol";
 
 /**
  * @title Calculator Base Abstract Contract

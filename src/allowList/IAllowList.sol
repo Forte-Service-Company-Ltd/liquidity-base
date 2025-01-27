@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
-import {IAllowListEvents} from "src/common/IEvents.sol";
+import {IAllowListEvents} from "../common/IEvents.sol";
 
 /**
  * @title Allowed List Interface

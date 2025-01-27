@@ -2,9 +2,9 @@
 pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "src/common/IErrors.sol";
-import {IAllowList} from "src/allowList/IAllowList.sol";
-import "src/common/TBC.sol";
+import "../common/IErrors.sol";
+import {IAllowList} from "./IAllowList.sol";
+import "../common/TBC.sol";
 
 /**
  * @title Allowed List

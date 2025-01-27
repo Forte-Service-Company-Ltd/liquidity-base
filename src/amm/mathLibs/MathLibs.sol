@@ -2,12 +2,12 @@
 pragma solidity ^0.8.24;
 
 import "solady/utils/FixedPointMathLib.sol";
-import "src/amm/mathLibs/lib/MathUtils.sol";
+import "./lib/MathUtils.sol";
 import {Uint512} from "uint1024/Uint512.sol";
 import {Uint512Extended} from "uint1024/Uint512Extended.sol";
 import {Uint1024} from "uint1024/Uint1024.sol";
-import {LN} from "src/amm/mathLibs/lib/LN.sol";
-import {QuadraticEquation} from "src/amm/mathLibs/lib/QuadraticEq.sol";
+import {LN} from "./lib/LN.sol";
+import {QuadraticEquation} from "./lib/QuadraticEq.sol";
 
 /**
  * @title Abstraction Layer between Equations and the underlying Math libraries

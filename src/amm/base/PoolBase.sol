@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
-import {Ownable} from "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
-import {Pausable} from "lib/openzeppelin-contracts/contracts/utils/Pausable.sol";
-import {IERC20Metadata} from "lib/openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol";
-import {IERC20} from "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
-import {SafeERC20} from "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
-import {IPool} from "src/amm/base/IPool.sol";
-import "src/common/IErrors.sol";
-import {CalculatorBase} from "src/amm/base/CalculatorBase.sol";
-import {CumulativePrice} from "src/amm/base/CumulativePrice.sol";
-import {Constants} from "src/common/Constants.sol";
-import {FeeInfo, TBCType} from "src/common/TBC.sol";
+import {Ownable} from "../../../lib/openzeppelin-contracts/contracts/access/Ownable.sol";
+import {Pausable} from "../../../lib/openzeppelin-contracts/contracts/utils/Pausable.sol";
+import {IERC20Metadata} from "../../../lib/openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import {IERC20} from "../../../lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import {SafeERC20} from "../../../lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
+import {IPool} from "./IPool.sol";
+import "../../common/IErrors.sol";
+import {CalculatorBase} from "./CalculatorBase.sol";
+import {CumulativePrice} from "./CumulativePrice.sol";
+import {Constants} from "../../common/Constants.sol";
+import {FeeInfo, TBCType} from "../../common/TBC.sol";
 
 interface ILPToken {
     function updateLPTokenDeposit(address lp, uint256 tokenId, uint256 wj, uint256 rj) external;
