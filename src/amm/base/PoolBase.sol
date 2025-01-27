@@ -16,6 +16,7 @@ interface ILPToken {
     function updateLPTokenDeposit(address lp, uint256 tokenId, uint256 wj, uint256 rj) external;
     function updateLPTokenWithdrawal(address lp, uint256 tokenId, uint256 uj) external;
     function mint(address lp, uint256 liquidityAmount, uint256 hn) external;
+    function ownerOf(uint256) external returns (address);
 }
 
 /**
