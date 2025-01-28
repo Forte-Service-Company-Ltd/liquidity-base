@@ -63,7 +63,7 @@ abstract contract CalculatorBase is Constants {
     function _clearState() internal virtual;
 
     /**
-     * @dev This function returns the avialable revenue for the given token
+     * @dev This function returns the available revenue for the given token
      * @param lp The address of the liquidity provider
      * @param tokenId The ID of the LPToken
      * @return uint256 amount of revenue available for the given token
