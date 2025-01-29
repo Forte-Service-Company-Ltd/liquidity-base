@@ -6,13 +6,12 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ERC721Enumerable} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
 /**
- * @title Liquidity provider token 
- * @dev This contract serves as the LP Token associated with a liquidity position. 
+ * @title Liquidity provider token
+ * @dev This contract serves as the LP Token associated with a liquidity position.
  * @dev Revenue and liquidity position are stored in the LP Token metadata and updated by the pool contract.
  * @author @palmerg4 @oscarsernarosero @cirsteve
  */
 contract LPToken is ERC721, Ownable, ERC721Enumerable {
-
     uint256 public w;
     uint256 public currentTokenId;
     string public baseUri;
@@ -25,11 +24,11 @@ contract LPToken is ERC721, Ownable, ERC721Enumerable {
     }
 
     constructor(
-        string memory _name, 
+        string memory _name,
         string memory _symbol,
         address _poolAddress,
         string memory _baseUri
-    ) Ownable(_poolAddress) ERC721(_name, _symbol)  {
+    ) Ownable(_poolAddress) ERC721(_name, _symbol) {
         baseUri = _baseUri;
     }
 
@@ -81,8 +80,7 @@ contract LPToken is ERC721, Ownable, ERC721Enumerable {
      */
     function _mintTokenAndUpdate(address lp, uint256 liquidityAmount, uint256 hn) internal {
         _mint(lp, ++currentTokenId);
-        w += liquidityAmount;
-        _updateLPTokenVarsDeposit(lp, currentTokenId, w, hn);
+        _updateLPTokenVarsDeposit(lp, currentTokenId, liquidityAmount, hn);
     }
 
     /**
@@ -94,7 +92,7 @@ contract LPToken is ERC721, Ownable, ERC721Enumerable {
      * @param hn The amount of revenue associated with the lpToken being updated
      */
     function _updateLPTokenVarsDeposit(address lp, uint256 tokenId, uint256 wj, uint256 hn) internal {
-        tokenId == 0 ? lpToken[lp][tokenId].rj = hn :
+        w += wj;
         lpToken[lp][tokenId].rj = _calculateRj(lp, tokenId, wj, hn);
         lpToken[lp][tokenId].wj += wj;
     }
@@ -105,12 +103,10 @@ contract LPToken is ERC721, Ownable, ERC721Enumerable {
      * @param _tokenId The token id of the lpToken being updated
      * @param _hn The amount of revenue associated with the lpToken being updated
      */
-    function _calculateRj(address _lp, uint256 _tokenId, uint256 _wj, uint256 _hn) internal view returns(uint256 result) {
+    function _calculateRj(address _lp, uint256 _tokenId, uint256 _wj, uint256 _hn) internal view returns (uint256 result) {
         uint256 w_hat = lpToken[_lp][_tokenId].wj;
         uint256 r_hat = lpToken[_lp][_tokenId].rj;
-        r_hat == 0 ? 
-        result = (_hn * _wj) / (w_hat + _wj) :
-        result = ((_hn * _wj) + (r_hat * w_hat) / (w_hat + _wj));
+        r_hat == 0 ? result = (_hn * _wj) / (w_hat + _wj) : result = ((_hn * _wj) + (r_hat * w_hat) / (w_hat + _wj));
     }
 
     /**
@@ -121,7 +117,7 @@ contract LPToken is ERC721, Ownable, ERC721Enumerable {
      * @param _uj The amount of liquidity the LP would like to withdraw
      */
     function _updateLPTokenVarsWithdrawal(address _lp, uint256 _tokenId, uint256 _uj) internal {
-        if(lpToken[_lp][_tokenId].wj > _uj) {
+        if (lpToken[_lp][_tokenId].wj > _uj) {
             lpToken[_lp][_tokenId].wj -= _uj;
         } else {
             _burn(_tokenId);
@@ -147,7 +143,7 @@ contract LPToken is ERC721, Ownable, ERC721Enumerable {
     /**
      * See {ERC721-_increaseBalance}. We need that to account tokens that were minted in batch
      */
-    function _increaseBalance(address account, uint128 value) internal override(ERC721, ERC721Enumerable){
+    function _increaseBalance(address account, uint128 value) internal override(ERC721, ERC721Enumerable) {
         super._increaseBalance(account, value);
     }
 }
