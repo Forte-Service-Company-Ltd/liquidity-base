@@ -71,12 +71,6 @@ abstract contract CalculatorBase is Constants {
     function _revenueAvailable(address lp, uint256 tokenId) internal virtual returns (uint256);
 
     /**
-     * @dev This function gets the revenue available in the pool
-     * @return uint256 amount of revenue available in thee pool
-     */
-    function _poolRevenueAvailable() internal virtual returns (uint256);
-
-    /**
      * @dev This function allows revenue to be withdrawn for the given token
      * @param lp The address of the liquidity provider
      * @param tokenId The ID of the LPToken being updated

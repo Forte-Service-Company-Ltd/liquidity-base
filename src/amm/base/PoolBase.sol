@@ -298,6 +298,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable, Pausable, Cumulati
         // slither-disable-end reentrancy-benign
         _amount = afterBalance - beforeBalance;
         _validateLiquidityAdd(x, afterBalance);
+        _mint(_msgSender(), _amount / 1e18, 0);
     }
 
     /**
@@ -386,6 +387,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable, Pausable, Cumulati
      * @return the liquidity in the pool for yToken in WAD
      */
     function yTokenLiquidity() external virtual returns (uint256) {
+        // TODO determine if yToken liquidity is applicable
         return IERC20(yToken).balanceOf(address(this)) - collectedLPFees - collectedProtocolFees;
     }
 
@@ -409,14 +411,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable, Pausable, Cumulati
     function revenueAvailable(address lp, uint256 tokenId) external returns (uint256 revenue) {
         revenue = _revenueAvailable(lp, tokenId);
         revenue = _normalizeTokenDecimals(false, revenue);
-    }
-
-    /**
-     * @dev This function calculates current revenue available for an lp and tokenId
-     * @return uint256 the amount of revenue available in the pool
-     */
-    function poolRevenueAvailable() external returns (uint256) {
-        return _poolRevenueAvailable();
     }
 
     /**
