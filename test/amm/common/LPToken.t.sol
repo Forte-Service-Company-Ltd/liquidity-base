@@ -8,9 +8,6 @@ import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IERC721Errors} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 contract LPTokenTests is TestCommon {
-
-    LPToken lpToken;
-    
     address _pool = address(0x9001); // We use this _pool instead of pool because pool is currently address(0), which cant be set to owner
     uint256 wj_input = 1_000; // Arbitrary value for qWn, used to update amount of liquidity of a position
     uint256 rj_input = 100; // Arbitrary value for last_revenue_claim, used to update last_revenue_claim of a position
@@ -115,7 +112,7 @@ contract LPTokenTests is TestCommon {
 
         vm.startPrank(address(_pool));
         lpToken.updateLPTokenWithdrawal(address(admin), 1, w0 / 2);
-        (,uint256 wjUpdated) = lpToken.lpToken(address(admin), 1);
+        (, uint256 wjUpdated) = lpToken.lpToken(address(admin), 1);
         assertEq(wjUpdated, w0 / 2);
     }
 
@@ -130,43 +127,35 @@ contract LPTokenTests is TestCommon {
         emit IERC721.Transfer(address(admin), address(0), 1);
 
         lpToken.updateLPTokenWithdrawal(address(admin), 1, w0);
-        (,uint256 wjUpdated) = lpToken.lpToken(address(admin), 1);
+        (, uint256 wjUpdated) = lpToken.lpToken(address(admin), 1);
 
         // Make sure the liquidity position is reset, and LPToken representing the position is burned
         assertEq(wjUpdated, 0);
         assertEq(lpToken.balanceOf(address(admin)), 0);
 
         // Expect revert when checking the burned token URI
-        vm.expectRevert(
-            abi.encodeWithSelector(IERC721Errors.ERC721NonexistentToken.selector, 1)
-        );
+        vm.expectRevert(abi.encodeWithSelector(IERC721Errors.ERC721NonexistentToken.selector, 1));
         lpToken.tokenURI(1);
     }
 
     function test_LPToken_RevertOnNonOwnerCalling_updateLPTokenDeposit() public {
         // Set caller to non-owner
         vm.startPrank(ADDRESSES[0]);
-        vm.expectRevert(
-            abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, ADDRESSES[0])
-        );
+        vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, ADDRESSES[0]));
         lpToken.updateLPTokenDeposit(address(admin), 1, wj_input, rj_input);
     }
 
     function test_LPToken_RevertOnNonOwnerCalling_updateLPTokenWithdrawal() public {
         // Set caller to non-owner
         vm.startPrank(ADDRESSES[0]);
-        vm.expectRevert(
-            abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, ADDRESSES[0])
-        );
+        vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, ADDRESSES[0]));
         lpToken.updateLPTokenWithdrawal(address(admin), 1, w0);
     }
 
     function test_LPToken_RevertOnNonOwnerCalling_mint() public {
         // Set caller to non-owner
         vm.startPrank(ADDRESSES[0]);
-        vm.expectRevert(
-            abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, ADDRESSES[0])
-        );
+        vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, ADDRESSES[0]));
         lpToken.mint(ADDRESSES[0], wj_input, rj_input);
     }
 }
