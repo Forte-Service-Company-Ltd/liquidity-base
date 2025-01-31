@@ -17,7 +17,7 @@ interface ILPToken {
     function updateLPTokenWithdrawal(address lp, uint256 tokenId, uint256 uj) external;
     function mint(address lp, uint256 liquidityAmount, uint256 hn) external;
     function ownerOf(uint256) external returns (address);
-    function lpToken(address lp, uint256 tokenId) external returns (uint256 wj, uint256 rj);
+    function lpToken(address lp, uint256 tokenId) external returns (uint256 rj, uint256 wj);
     function updateLPTokenLastRevenueClaim(address lp, uint256 tokenId, uint256 newRj) external;
     function w() external returns (uint256);
 }
@@ -431,7 +431,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable, Pausable, Cumulati
      * @param Q the amount of revenue to withdraw
      */
     function withdrawRevenue(uint256 tokenId, uint256 Q) external {
-        _withdrawRevenue(_msgSender(), tokenId, Q);
+        _withdrawRevenue(_msgSender(), tokenId, _normalizeTokenDecimals(true, Q));
     }
 
     /**
@@ -567,17 +567,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable, Pausable, Cumulati
      */
     function _checkSlippage(uint256 _amountOut, uint256 _minOut) internal pure {
         if (_amountOut < _minOut) revert("max slippage reached");
-    }
-
-    /**
-     * @dev This function calculates current revenue available to be pulled by the owner of the pool.
-     * @param lp The address of the lquidity provider
-     * @param tokenId The ID of the LPToken being updated
-     * @return revenue the amount of revenue available to be pulled in native yToken decimals
-     */
-    function _getRevenueAvailable(address lp, uint256 tokenId) internal returns (uint256 revenue) {
-        revenue = _revenueAvailable(lp, tokenId);
-        revenue = _normalizeTokenDecimals(false, revenue);
     }
 
     function _safeTransfer(address _yToken, address _to, uint256 _amount) internal {

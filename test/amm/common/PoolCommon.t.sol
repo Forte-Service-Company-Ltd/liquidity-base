@@ -961,8 +961,6 @@ abstract contract PoolCommonTest is TestCommonSetup {
     }
 
     function testLiquidity_Pool_WithdrawRevenueAccrued_Positive() public startAsAdmin endWithStopPrank {
-        // TODO determine how to test new lp mechanism revenue
-        vm.skip(true);
         _pool_BackAndForthSwaps();
         _checkWithdrawRevenueState();
     }
