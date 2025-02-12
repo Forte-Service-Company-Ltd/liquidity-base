@@ -455,14 +455,31 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable, Pausable, Cumulati
         ILPToken(LPTokenAddress).updateLPTokenWithdrawal(lp, tokenId, uj);
     }
 
+    /**
+     * @dev This is the function to retrieve the current spot price of the x token.
+     * @param lp address of the liquidity provider
+     * @param tokenId The ID of the LPToken being updated
+     * @return the rj for the specified  token
+     * @return the wj for the specified  token
+     */
     function _getLPToken(address lp, uint256 tokenId) internal returns (uint256, uint256) {
         return ILPToken(LPTokenAddress).lpToken(lp, tokenId);
     }
 
-    function _updateLPTokenLastRevenueClaim(address lp, uint256 tokenId, uint256 newRj) internal {
-        ILPToken(LPTokenAddress).updateLPTokenLastRevenueClaim(lp, tokenId, newRj);
+    /**
+     * @dev A helper function to update a specified LPToken's lastRevenueClaim field
+     * @param lp address of the liquidity provider
+     * @param tokenId The ID of the LPToken being updated
+     * @param addedRj The amount of revenue claimed to add to the lpToken being updated
+     */
+    function _updateLPTokenLastRevenueClaim(address lp, uint256 tokenId, uint256 addedRj) internal {
+        ILPToken(LPTokenAddress).updateLPTokenLastRevenueClaim(lp, tokenId, addedRj);
     }
 
+    /**
+     * @dev This function gets the w value for the LOPToken contract.
+     * @return the w value for the LPToken contract in WAD
+     */
     function _w() internal returns (uint256) {
         return ILPToken(LPTokenAddress).w();
     }
