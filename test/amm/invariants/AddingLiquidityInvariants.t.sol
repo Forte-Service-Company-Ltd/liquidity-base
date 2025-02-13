@@ -35,7 +35,7 @@ abstract contract AddingLiquidityInvariants is TestCommonSetup {
         assertGe(pool.xTokenLiquidity(), xTokenLiquidity);
     }
 
-    function invariant_liquidityCanNeverDecreaseCallingAddLiquidity_TokenY() public view {
+    function invariant_liquidityCanNeverDecreaseCallingAddLiquidity_TokenY() public {
         assertGe(pool.yTokenLiquidity(), yTokenLiquidity);
     }
 

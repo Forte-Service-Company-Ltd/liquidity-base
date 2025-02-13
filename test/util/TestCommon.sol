@@ -14,6 +14,7 @@ import {FeeOnTransferERC20} from "src/example/ERC20/FeeOnTransferERC20.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {PythonUtils} from "test/util/PythonUtils.sol";
 import {QuadraticEquation} from "src/amm/mathLibs/lib/QuadraticEq.sol";
+import {LPToken} from "src/common/LPToken.sol";
 
 /**
  * @title Test Common
@@ -37,12 +38,12 @@ abstract contract TestCommon is PythonUtils {
         address(0x0af)
     ];
 
-
     GenericERC20FixedSupply public xToken;
     GenericERC20 public yToken;
     SixDecimalERC20 public stableCoin;
     TwentyTwoDecimalERC20 public highDecimalCoin;
     FeeOnTransferERC20 public fotCoin;
+    LPToken public lpToken;
 
     AllowList deployerAllowList;
     AllowList yTokenAllowList;
@@ -101,5 +102,4 @@ abstract contract TestCommon is PythonUtils {
     function _createERC20(string memory _name, string memory _symbol) internal returns (GenericERC20 _token) {
         return new GenericERC20(_name, _symbol);
     }
-    
 }

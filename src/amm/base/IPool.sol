@@ -126,9 +126,11 @@ interface IPool is IPoolEvents {
     function collectLPFees() external;
 
     /**
-     * @dev This function allows the owner of the pool to pull accrued revenue from the Pool.
+     * @dev This function allows the owner of the lp token to pull accrued revenue from the Pool.
+     * @param tokenId the id of the LP token to withdraw revenue for
+     * @param Q the amount of revenue to withdraw
      */
-    function withdrawRevenue() external;
+    function withdrawRevenue(uint256 tokenId, uint256 Q) external;
 
     /**
      * @dev This function collects the protocol fees from the Pool.
@@ -183,10 +185,13 @@ interface IPool is IPoolEvents {
      */
     function collectedProtocolFees() external returns (uint256);
     
-    /**
-     * @dev This function allows to know the accrued revenue in the Pool.
+/**
+     * @dev This function returns the available revenue for the given token
+     * @param lp The address of the liquidity provider
+     * @param tokenId The ID of the LPToken
+     * @return uint256 amount of revenue available for the given token
      */
-    function revenueAvailable() external view returns (uint256);
+    function revenueAvailable(address lp, uint256 tokenId) external returns (uint256);
 
     /**
      * @dev if true, the pool could be closed effectively pulling out all of the liquidity

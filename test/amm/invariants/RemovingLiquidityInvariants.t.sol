@@ -26,7 +26,7 @@ abstract contract RemovingLiquidityInvariants is TestCommonSetup {
         assertLe(pool.xTokenLiquidity(), xTokenLiquidity);
     }
 
-    function invariant_liquidityCanNeverIncreaseCallingRemoveLiquidity_TokenY() public view {
+    function invariant_liquidityCanNeverIncreaseCallingRemoveLiquidity_TokenY() public {
         assertLe(pool.yTokenLiquidity(), Y_TOKEN_LIQUIDITY);
     }
 }
