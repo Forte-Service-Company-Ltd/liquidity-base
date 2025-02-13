@@ -2,14 +2,14 @@
 pragma solidity ^0.8.24;
 
 import "../../../lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
-import {Ownable} from "../../../lib/openzeppelin-contracts/contracts/access/Ownable.sol";
+import {Ownable2Step, Ownable} from "../../../lib/openzeppelin-contracts/contracts/access/Ownable2Step.sol";
 
 /**
  * @title Example ERC20 ApplicationERC20
  * @notice This is an example implementation to facilitate testing
  * @dev During deployment _tokenName and _tokenSymbol are set in constructor
  */
-contract GenericERC20 is ERC20, Ownable {
+contract GenericERC20 is ERC20, Ownable2Step {
     /**
      * @dev Constructor sets params
      * @param _name Name of the token

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import {Ownable2Step, Ownable} from "@openzeppelin/contracts/access/Ownable2Step.sol";
 import "../common/IErrors.sol";
 import {IAllowList} from "./IAllowList.sol";
 import "../common/TBC.sol";
@@ -12,7 +12,7 @@ import "../common/TBC.sol";
  * @author  @oscarsernarosero @mpetersoCode55 @cirsteve
  */
 
-contract AllowList is Ownable, IAllowList {
+contract AllowList is Ownable2Step, IAllowList {
     mapping(address _address => bool allowed) allowList;
 
     constructor() Ownable(_msgSender()) {

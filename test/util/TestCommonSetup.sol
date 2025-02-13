@@ -25,7 +25,6 @@ import "forge-std/console2.sol";
  * _create = deploy contract, return the contract
  */
 abstract contract TestCommonSetup is TestCommonSetupAbs {
-    
     function _setUpTokens(uint256 _xTokenSupply) internal startAsAdmin endWithStopPrank {
         xToken = new GenericERC20FixedSupply("x token", "GAME", _xTokenSupply + 1);
         yToken = new GenericERC20("collateral token", "COLL");
@@ -94,6 +93,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
         poolRet = _deployPool(address(xToken), yTokenAddress, 30, true, TBCInputOption.BASE);
         vm.startPrank(admin);
+        PoolBase(address(poolRet)).acceptOwnership();
         poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
         _addInitialLiquidity(poolRet, X_TOKEN_MAX_SUPPLY);
@@ -110,8 +110,9 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         uint16 fee
     ) internal endWithStopPrank returns (PoolBase poolRet) {
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
-        poolRet = _deployPool(_xTokenAddress, yTokenAddress,  fee, true, TBCInputOption.BASE);
+        poolRet = _deployPool(_xTokenAddress, yTokenAddress, fee, true, TBCInputOption.BASE);
         vm.startPrank(admin);
+        PoolBase(address(poolRet)).acceptOwnership();
         poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
         _addInitialLiquidity(poolRet, X_TOKEN_MAX_SUPPLY);
@@ -130,17 +131,10 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
 
         GenericERC20FixedSupply xTokenWithFee = new GenericERC20FixedSupply("Fee token", "FEE", 10e3 * ERC20_DECIMALS);
 
-        poolRet = PoolBase(
-            _deployPool(
-                address(xTokenWithFee),
-                _yTokenAddress,
-                0,
-                true,
-                TBCInputOption.FORK
-            )
-        );
+        poolRet = PoolBase(_deployPool(address(xTokenWithFee), _yTokenAddress, 0, true, TBCInputOption.FORK));
 
         vm.startPrank(admin);
+        PoolBase(address(poolRet)).acceptOwnership();
         poolRet.enableSwaps(true);
         _approvePool(poolRet, usdt);
         _addInitialLiquidity(poolRet, 10e3 * ERC20_DECIMALS);
@@ -157,6 +151,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         /// fee: 0.0%, supply: 10K tokens, y-intersect: 10, minPrice: 1, maxPrice: 100
         poolRet = _deployPool(address(xToken), yTokenAddress, 0, true, TBCInputOption.FORK);
         vm.startPrank(admin);
+        PoolBase(address(poolRet)).acceptOwnership();
         poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
         _addInitialLiquidity(poolRet, 10e3 * ERC20_DECIMALS);
@@ -168,9 +163,10 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
     ) internal endWithStopPrank returns (PoolBase wadPool, PoolBase sixDecimalPool) {
         _setUpTokensAndFactories(maxSupply);
 
-        wadPool = _deployPool(address(xToken), address(yToken),fee, true, TBCInputOption.PRECISION);
+        wadPool = _deployPool(address(xToken), address(yToken), fee, true, TBCInputOption.PRECISION);
 
         vm.startPrank(admin);
+        PoolBase(address(wadPool)).acceptOwnership();
         wadPool.enableSwaps(true);
         _approvePool(wadPool, false);
         _addInitialLiquidity(wadPool, maxSupply);
@@ -179,10 +175,11 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         _setUpTokens(maxSupply);
         vm.startPrank(admin);
         yTokenAllowList.addToAllowList(address(stableCoin));
-        sixDecimalPool = _deployPool(address(xToken), address(stableCoin),fee, true, TBCInputOption.PRECISION);
+        sixDecimalPool = _deployPool(address(xToken), address(stableCoin), fee, true, TBCInputOption.PRECISION);
 
         _loadAdminAndAlice();
         vm.startPrank(admin);
+        PoolBase(address(sixDecimalPool)).acceptOwnership();
 
         sixDecimalPool.enableSwaps(true);
         _approvePool(sixDecimalPool, false);
@@ -194,6 +191,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
         poolRet = _deployPool(address(xToken), yTokenAddress, 30, true, TBCInputOption.BASE);
         vm.startPrank(admin);
+        PoolBase(address(poolRet)).acceptOwnership();
         poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
         _addInitialLiquidity(poolRet, X_TOKEN_MAX_SUPPLY / 2);
@@ -202,9 +200,15 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
     function _setupFOTPool(bool withStableCoin) internal endWithStopPrank returns (PoolBase poolRet) {
         _setUpTokensAndFactories(X_TOKEN_MAX_SUPPLY);
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
+        //
         poolRet = _deployPool(address(fotCoin), yTokenAddress, 30, true, TBCInputOption.BASE);
+
         vm.startPrank(admin);
+        PoolBase(address(poolRet)).acceptOwnership();
+        console2.log(PoolBase(address(poolRet)).owner());
+        console2.log("Before enable");
         poolRet.enableSwaps(true);
+        console2.log("After enable");
         _approvePool(poolRet, false);
         _addInitialLiquidity(poolRet, X_TOKEN_MAX_SUPPLY);
     }
@@ -221,5 +225,4 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         poolWFee = _setupPoolWithFee(withStableCoin, address(xTokenWithFee), 30);
         poolWOutFee = _setupPoolWithFee(withStableCoin, address(xTokenWoutFee), 0);
     }
-
 }

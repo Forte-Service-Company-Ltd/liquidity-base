@@ -23,11 +23,11 @@ abstract contract PoolCommonTest is TestCommonSetup {
     IERC20 _yToken;
     uint fullToken;
 
-    function _checkClosePoolState() internal virtual{}
-    function _checkLiquidityExcessState() internal virtual{}
-    function _checkWithdrawRevenueState() internal virtual{}
-    function _checkBackAndForthSwapsState() internal virtual{}
-    function _getMinMaxX() internal virtual returns (uint,uint);
+    function _checkClosePoolState() internal virtual {}
+    function _checkLiquidityExcessState() internal virtual {}
+    function _checkWithdrawRevenueState() internal virtual {}
+    function _checkBackAndForthSwapsState() internal virtual {}
+    function _getMinMaxX() internal virtual returns (uint, uint);
 
     function _setupCollateralToken() internal {
         _yToken = IERC20(pool.yToken());
@@ -38,7 +38,7 @@ abstract contract PoolCommonTest is TestCommonSetup {
         assertEq(pool.VERSION(), "v0.2.0");
     }
 
-    function testLiquidity_Pool_TokensMustNotBeTheSame() public  {
+    function testLiquidity_Pool_TokensMustNotBeTheSame() public {
         vm.expectRevert(abi.encodeWithSignature("XandYTokensAreTheSame()"));
         _deployPool(address(yToken), address(yToken), 0, true, TBCInputOption.BASE);
     }
@@ -193,6 +193,7 @@ abstract contract PoolCommonTest is TestCommonSetup {
         PoolBase _pool = PoolBase(_deployPool(address(_xToken), address(_yToken), 30, false, TBCInputOption.BASE));
         _approvePool(_pool, false);
         vm.startPrank(admin);
+        PoolBase(address(_pool)).acceptOwnership();
         uint amount = X_TOKEN_MAX_SUPPLY;
         initialBalance = _xToken.balanceOf(address(_pool));
         vm.expectEmit(true, true, true, true, address(_pool));
@@ -222,6 +223,7 @@ abstract contract PoolCommonTest is TestCommonSetup {
         _pool = _deployPool(address(_xToken), address(_yToken), 30, false, TBCInputOption.BASE);
         _approvePool(_pool, false);
         vm.startPrank(admin);
+        PoolBase(address(_pool)).acceptOwnership();
         _pool.enableSwaps(true);
     }
 
@@ -272,6 +274,7 @@ abstract contract PoolCommonTest is TestCommonSetup {
         NoZeroTransferERC20 _xToken = new NoZeroTransferERC20("X token", "X");
         PoolBase _pool = _deployPool(address(_xToken), address(_yToken), 30, true, TBCInputOption.BASE);
         vm.startPrank(admin);
+        PoolBase(address(_pool)).acceptOwnership();
         _pool.closePool();
     }
 
@@ -963,49 +966,58 @@ abstract contract PoolCommonTest is TestCommonSetup {
         assertEq(lastBlockTimestamp, 0, "lastBlockTimestamp should initially be 0");
         assertGt(spotPrice, 0, "spotPrice should initially be 0");
 
-        (uint expected,,) = pool.simSwap(address(_yToken), fullToken);
+        (uint expected, , ) = pool.simSwap(address(_yToken), fullToken);
         vm.expectEmit(true, true, true, true, address(pool));
-        emit IPoolEvents.CumulativePriceUpdated(vm.getBlockTimestamp(), spotPrice * vm.getBlockTimestamp());  
+        emit IPoolEvents.CumulativePriceUpdated(vm.getBlockTimestamp(), spotPrice * vm.getBlockTimestamp());
         pool.swap(address(_yToken), fullToken, getAmountSubFee(expected));
 
         uint cumulativePrice1 = CumulativePrice(address(pool)).cumulativePrice();
         uint lastBlockTimestamp1 = CumulativePrice(address(pool)).lastBlockTimestamp();
 
         assertEq(
-            cumulativePrice1, vm.getBlockTimestamp() * spotPrice,
+            cumulativePrice1,
+            vm.getBlockTimestamp() * spotPrice,
             "cumulativePrice should equal spotPrice * block.timestamp after first trade"
         );
         assertEq(lastBlockTimestamp1, vm.getBlockTimestamp(), "lastBlockTimestamp should equal block.timestamp after first trade");
         vm.warp(warpSeconds);
         spotPrice = pool.spotPrice();
-        (expected,,) = pool.simSwap(address(_yToken), fullToken);
+        (expected, , ) = pool.simSwap(address(_yToken), fullToken);
 
         vm.expectEmit(true, true, true, true, address(pool));
-        emit IPoolEvents.CumulativePriceUpdated(vm.getBlockTimestamp(), spotPrice * (vm.getBlockTimestamp() - lastBlockTimestamp1) + cumulativePrice1);    
+        emit IPoolEvents.CumulativePriceUpdated(
+            vm.getBlockTimestamp(),
+            spotPrice * (vm.getBlockTimestamp() - lastBlockTimestamp1) + cumulativePrice1
+        );
         pool.swap(address(_yToken), fullToken, getAmountSubFee(expected));
 
         uint cumulativePrice2 = CumulativePrice(address(pool)).cumulativePrice();
         uint lastBlockTimestamp2 = CumulativePrice(address(pool)).lastBlockTimestamp();
 
         assertEq(
-            cumulativePrice2, (vm.getBlockTimestamp() - lastBlockTimestamp1) * spotPrice + cumulativePrice1,
+            cumulativePrice2,
+            (vm.getBlockTimestamp() - lastBlockTimestamp1) * spotPrice + cumulativePrice1,
             "cumulativePrice should equal spotPrice * block.timestamp after second trade"
         );
         assertEq(lastBlockTimestamp2, vm.getBlockTimestamp(), "lastBlockTimestamp should equal block.timestamp after second trade");
 
         vm.warp(warpSeconds);
         spotPrice = pool.spotPrice();
-        (expected,,) = pool.simSwap(address(_yToken), fullToken); 
+        (expected, , ) = pool.simSwap(address(_yToken), fullToken);
 
         vm.expectEmit(true, true, true, true, address(pool));
-        emit IPoolEvents.CumulativePriceUpdated(vm.getBlockTimestamp(), spotPrice * (vm.getBlockTimestamp() - lastBlockTimestamp2) + cumulativePrice2);  
+        emit IPoolEvents.CumulativePriceUpdated(
+            vm.getBlockTimestamp(),
+            spotPrice * (vm.getBlockTimestamp() - lastBlockTimestamp2) + cumulativePrice2
+        );
         pool.swap(address(_yToken), fullToken, getAmountSubFee(expected));
 
         uint cumulativePrice3 = CumulativePrice(address(pool)).cumulativePrice();
         uint lastBlockTimestamp3 = CumulativePrice(address(pool)).lastBlockTimestamp();
 
         assertEq(
-            cumulativePrice3, (vm.getBlockTimestamp() - lastBlockTimestamp2) * spotPrice + cumulativePrice2,
+            cumulativePrice3,
+            (vm.getBlockTimestamp() - lastBlockTimestamp2) * spotPrice + cumulativePrice2,
             "cumulativePrice should equal spotPrice * block.timestamp after third trade"
         );
         assertEq(lastBlockTimestamp3, vm.getBlockTimestamp(), "lastBlockTimestamp should equal block.timestamp after third trade");
@@ -1021,13 +1033,13 @@ abstract contract PoolCommonTest is TestCommonSetup {
 
         // Advance the block time, make a swap, update the oracle
         vm.warp(oraclePeriod + baseWarp);
-        (uint expected,,) = pool.simSwap(address(_yToken), swapAmount);
+        (uint expected, , ) = pool.simSwap(address(_yToken), swapAmount);
         pool.swap(address(_yToken), swapAmount, getAmountSubFee(expected));
         priceOracle.update();
 
         // Make the 2nd swap, update the oracle
         vm.warp(2 * oraclePeriod + baseWarp);
-        (expected,,) = pool.simSwap(address(_yToken), swapAmount);
+        (expected, , ) = pool.simSwap(address(_yToken), swapAmount);
         pool.swap(address(_yToken), swapAmount, getAmountSubFee(expected));
         priceOracle.update();
 
@@ -1035,13 +1047,13 @@ abstract contract PoolCommonTest is TestCommonSetup {
         uint lastBlockTimestamp = CumulativePrice(address(pool)).lastBlockTimestamp();
         uint spotPrice = pool.spotPrice();
         uint priceAverage = priceOracle.priceAverage();
-        
+
         // Make the 3rd swap, update the oracle
         vm.warp(3 * oraclePeriod + baseWarp);
-        (expected,,) = pool.simSwap(address(_yToken), swapAmount);
+        (expected, , ) = pool.simSwap(address(_yToken), swapAmount);
         pool.swap(address(_yToken), swapAmount, getAmountSubFee(expected));
         priceOracle.update();
- 
+
         // get updated prices
         uint lastBlockTimestamp1 = CumulativePrice(address(pool)).lastBlockTimestamp();
         uint spotPrice1 = pool.spotPrice();
@@ -1053,7 +1065,7 @@ abstract contract PoolCommonTest is TestCommonSetup {
 
         // Make the 4th swap, update the oracle
         vm.warp(4 * oraclePeriod + baseWarp);
-        (expected,,) = pool.simSwap(address(_yToken), swapAmount);
+        (expected, , ) = pool.simSwap(address(_yToken), swapAmount);
         pool.swap(address(_yToken), swapAmount, getAmountSubFee(expected));
         priceOracle.update();
 

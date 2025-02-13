@@ -57,9 +57,13 @@ abstract contract PoolPrecisionUnitTest is TestCommonSetup {
     }
 
     function testLiquidity_PoolUnit_PrecisionComparison() public endWithStopPrank {
+        console2.log("Before _precisionSetUp");
         (wadPool, sdPool) = _setupPrecisionPools(MAX_SUPPLY, 0);
+        console2.log("Before _precisionSetUp");
         _assignTokens();
+        console2.log("After assign tokens");
         _runSwaps();
+        console2.log("After run swaps");
     }
 
     function testLiquidity_PoolUnit_PrecisionComparisonWithFee() public endWithStopPrank {
