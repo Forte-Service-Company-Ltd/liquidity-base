@@ -30,7 +30,7 @@ interface IPoolEvents is CommonEvents {
     event ProtocolFeeGenerated(uint256 indexed _amount);
     event LPFeesCollected(address indexed _collector, uint256 indexed _amount);
     event ProtocolFeesCollected(address indexed _collector, uint256 indexed _amount);
-    event RevenueWithdrawn(address indexed _collector, uint256 indexed _amount);
+    event RevenueWithdrawn(address indexed _collector, uint256 indexed tokenId, uint256 indexed _amount);
     event CumulativePriceUpdated(uint256 indexed blockTimestamp, uint cumulativePrice);
 }
 

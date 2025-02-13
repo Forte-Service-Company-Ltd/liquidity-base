@@ -17,6 +17,9 @@ interface ILPToken {
     function updateLPTokenWithdrawal(address lp, uint256 tokenId, uint256 uj) external;
     function mint(address lp, uint256 liquidityAmount, uint256 hn) external;
     function ownerOf(uint256) external returns (address);
+    function lpToken(address lp, uint256 tokenId) external returns (uint256 rj, uint256 wj);
+    function updateLPTokenLastRevenueClaim(address lp, uint256 tokenId, uint256 newRj) external;
+    function w() external returns (uint256);
 }
 
 /**
@@ -50,7 +53,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     uint256 public x;
 
     /**
-     * @dev lifetime revenue collected by the pool
+     * @dev lifetime revenue claimed by the pool
      */
     // slither-disable-next-line constable-states // updated in child contract
     uint256 public R = 0;
@@ -295,6 +298,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         // slither-disable-end reentrancy-benign
         _amount = afterBalance - beforeBalance;
         _validateLiquidityAdd(x, afterBalance);
+        _mint(_msgSender(), _amount / 1e18, 0);
     }
 
     /**
@@ -302,10 +306,11 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      * @dev This function closes the pool by removing all liquidity from it.
      * @notice This function can be called only if the flag liquidityRemovalAllowed was set to true at construction time.
      */
+    // TODO fix closePool to support multiple liquidity providers
     function closePool() external virtual onlyOwner ifLiquidityRemovalAllowed {
         uint256 collectedProtocolFeeAmount = collectedProtocolFees;
         uint collectedLPFeesAmount = collectedLPFees;
-        uint256 Q = _getRevenueAvailable();
+        uint256 Q = _revenueAvailable(_msgSender(), 0);
         uint xBalance = IERC20(xToken).balanceOf(address(this));
         /// yBalance will include LPFees, Q and yLiquidity
         uint yBalance = IERC20(yToken).balanceOf(address(this)) - collectedProtocolFees;
@@ -317,7 +322,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         delete protocolFee;
 
         emit PoolClosed(xBalance, yBalance);
-        if (Q > 0) emit RevenueWithdrawn(_msgSender(), Q);
+        if (Q > 0) emit RevenueWithdrawn(_msgSender(), 0, Q);
         if (collectedLPFeesAmount > 0) emit LPFeesCollected(_msgSender(), collectedLPFeesAmount);
         if (collectedProtocolFeeAmount > 0) {
             emit ProtocolFeesCollected(protocolFeeCollector, collectedProtocolFeeAmount);
@@ -381,7 +386,8 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      * @dev This function gets the liquidity in the pool for yToken in WAD
      * @return the liquidity in the pool for yToken in WAD
      */
-    function yTokenLiquidity() external view virtual returns (uint256) {
+    function yTokenLiquidity() external virtual returns (uint256) {
+        // TODO determine if yToken liquidity is applicable
         return IERC20(yToken).balanceOf(address(this)) - collectedLPFees - collectedProtocolFees;
     }
 
@@ -398,10 +404,13 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     }
 
     /**
-     * @dev This function allows to know the accrued revenue in the Pool.
+     * @dev This function returns the available revenue for the given token
+     * @param tokenId The ID of the LPToken
+     * @return revenue The amount of revenue available for the given token
      */
-    function revenueAvailable() external view returns (uint256) {
-        return _getRevenueAvailable();
+    function revenueAvailable(address lp, uint256 tokenId) external returns (uint256 revenue) {
+        revenue = _revenueAvailable(lp, tokenId);
+        revenue = _normalizeTokenDecimals(false, revenue);
     }
 
     /**
@@ -414,6 +423,15 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         } else {
             revert("LPToken address already set");
         }
+    }
+
+    /**
+     * @dev This function withdraws revenue for the given token
+     * @param tokenId the id of the LP token to withdraw revenue for
+     * @param Q the amount of revenue to withdraw
+     */
+    function withdrawRevenue(uint256 tokenId, uint256 Q) external {
+        _withdrawRevenue(_msgSender(), tokenId, _normalizeTokenDecimals(true, Q));
     }
 
     /**
@@ -435,6 +453,35 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      */
     function _updateLPTokenWithdrawal(address lp, uint256 tokenId, uint256 uj) internal {
         ILPToken(LPTokenAddress).updateLPTokenWithdrawal(lp, tokenId, uj);
+    }
+
+    /**
+     * @dev This is the function to retrieve the current spot price of the x token.
+     * @param lp address of the liquidity provider
+     * @param tokenId The ID of the LPToken being updated
+     * @return the rj for the specified  token
+     * @return the wj for the specified  token
+     */
+    function _getLPToken(address lp, uint256 tokenId) internal returns (uint256, uint256) {
+        return ILPToken(LPTokenAddress).lpToken(lp, tokenId);
+    }
+
+    /**
+     * @dev A helper function to update a specified LPToken's lastRevenueClaim field
+     * @param lp address of the liquidity provider
+     * @param tokenId The ID of the LPToken being updated
+     * @param addedRj The amount of revenue claimed to add to the lpToken being updated
+     */
+    function _updateLPTokenLastRevenueClaim(address lp, uint256 tokenId, uint256 addedRj) internal {
+        ILPToken(LPTokenAddress).updateLPTokenLastRevenueClaim(lp, tokenId, addedRj);
+    }
+
+    /**
+     * @dev This function gets the w value for the LOPToken contract.
+     * @return the w value for the LPToken contract in WAD
+     */
+    function _w() internal returns (uint256) {
+        return ILPToken(LPTokenAddress).w();
     }
 
     /**
@@ -537,18 +584,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      */
     function _checkSlippage(uint256 _amountOut, uint256 _minOut) internal pure {
         if (_amountOut < _minOut) revert("max slippage reached");
-    }
-
-    /**
-     * @dev This function calculates current revenue available to be pulled by the owner of the pool.
-     * @return Rmax the amount of revenue available to be pulled in native yToken decimals
-     */
-    function _getRevenueAvailable() internal view returns (uint256 Rmax) {
-        // note: decimals should be normalized before and after calling this function for accuracy
-        uint _R = _normalizeTokenDecimals(true, R);
-        uint256 Q = _calculateRMax(x, _R);
-        Rmax = _normalizeTokenDecimals(false, Q);
-        // note: Rmax should be pulled out to ensure correctness of the Rmax equation, always take the max
     }
 
     function _safeTransfer(address _yToken, address _to, uint256 _amount) internal {

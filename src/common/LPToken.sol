@@ -44,6 +44,16 @@ contract LPToken is ERC721, Ownable2Step, ERC721Enumerable {
     }
 
     /**
+     * @dev Updates the values wj and rj of tokenId
+     * @param lp The address of the liquidity provider owning the lpToken being updated
+     * @param tokenId The token id of the lpToken being updated
+     * @param addedRj The amount of revenue claimed to add to the lpToken being updated
+     */
+    function updateLPTokenLastRevenueClaim(address lp, uint256 tokenId, uint256 addedRj) external onlyOwner {
+        _updateLPTokenLastRevenueClaim(lp, tokenId, addedRj);
+    }
+
+    /**
      * @dev Updates the amount of liquidity associated with an LP Token. Used when withdrawing a full or partial liquidity position.
      * @notice If an LP is withdrawing their entire position, the LP Token associated will be burned.
      * @param lp The address of the liquidity provider owning the lpToken being updated
@@ -62,6 +72,18 @@ contract LPToken is ERC721, Ownable2Step, ERC721Enumerable {
      */
     function mint(address lp, uint256 liquidityAmount, uint256 hn) external onlyOwner {
         _mintTokenAndUpdate(lp, liquidityAmount, hn);
+    }
+
+    /**
+     * @dev Get the liquidity share and last claimed amount for an lpToken
+     * @param lp The address of the liquidity provider owning the lpToken being updated
+     * @param tokenId The token id of the lpToken being updated
+     * @return wj the amount of the lpToken
+     * @return rj the last revenue claim of the lpToken
+     */
+    function getLPToken(address lp, uint256 tokenId) public view returns (uint256 wj, uint256 rj) {
+        LPTokenS memory token = lpToken[lp][tokenId];
+        return (token.wj, token.rj);
     }
 
     /**
@@ -95,6 +117,16 @@ contract LPToken is ERC721, Ownable2Step, ERC721Enumerable {
         w += wj;
         lpToken[lp][tokenId].rj = _calculateRj(lp, tokenId, wj, hn);
         lpToken[lp][tokenId].wj += wj;
+    }
+
+    /**
+     * @dev Updates the values wj and rj of tokenId
+     * @param lp The address of the liquidity provider owning the lpToken being updated
+     * @param tokenId The token id of the lpToken being updated
+     * @param addedRj The amount of revenue claimed to add to the lpToken being updated
+     */
+    function _updateLPTokenLastRevenueClaim(address lp, uint256 tokenId, uint256 addedRj) internal {
+        lpToken[lp][tokenId].rj += addedRj;
     }
 
     /**
