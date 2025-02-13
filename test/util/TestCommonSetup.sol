@@ -205,10 +205,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
 
         vm.startPrank(admin);
         PoolBase(address(poolRet)).acceptOwnership();
-        console2.log(PoolBase(address(poolRet)).owner());
-        console2.log("Before enable");
         poolRet.enableSwaps(true);
-        console2.log("After enable");
         _approvePool(poolRet, false);
         _addInitialLiquidity(poolRet, X_TOKEN_MAX_SUPPLY);
     }
