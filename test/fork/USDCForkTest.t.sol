@@ -18,7 +18,6 @@ interface IUSDC {
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve @palmerg4
  */
 abstract contract USDCForkTest is ForkTestBase {
-
     function _setUp(address usdcAddress, string memory key) internal {
         IUSDC usdc = IUSDC(usdcAddress);
         uint256 fork = vm.createFork(vm.envString(key));
@@ -52,27 +51,5 @@ abstract contract USDCForkTest is ForkTestBase {
         _yToken.transfer(address(alice), balance - 1);
         vm.expectRevert("ERC20: transfer amount exceeds balance");
         pool.swap(address(_yToken), 1e13 * STABLECOIN_DEC, expected);
-    }
-}
-
-/**
- * @title USDC Mainnet Fork Testing
- * @dev unit test
- * @author @oscarsernarosero @mpetersoCode55 @cirsteve @palmerg4
- */
-abstract contract USDCMainnetForkTest is USDCForkTest {
-    function setUp() public {
-        _setUp(address(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48), "ETHEREUM_RPC_KEY");
-    }
-}
-
-/**
- * @title USDC Polygon Fork Testing
- * @dev unit test
- * @author @oscarsernarosero @mpetersoCode55 @cirsteve @palmerg4
- */
-abstract contract USDCPolygonForkTest is USDCForkTest {
-    function setUp() public {
-        _setUp(address(0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359), "POLYGON_RPC_KEY");
     }
 }

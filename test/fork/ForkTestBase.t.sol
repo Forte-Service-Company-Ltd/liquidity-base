@@ -2,15 +2,22 @@
 pragma solidity ^0.8.24;
 
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
-import {PoolCommonUnitTest, GenericERC20FixedSupply, GenericERC20} from "test/amm/common/PoolCommon.t.u.sol";
+import {GenericERC20FixedSupply, GenericERC20} from "test/util/TestCommon.sol";
+import {TestModifiers} from "test/util/TestModifiers.sol";
+import {TestConstants} from "test/util/TestConstants.sol";
 
 /**
  * @title Base for Fork Testing
  * @dev unit test
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve @palmerg4
  */
-abstract contract ForkTestBase is PoolCommonUnitTest {
-    
+abstract contract ForkTestBase is TestModifiers, TestConstants {
+    IERC20 _yToken;
+    bool withStableCoin;
+    bool wEth;
+    bool wMatic;
+    uint fullToken;
+
     function testTransferZeroCollateralA() public startAsAdmin {
         vm.expectRevert(abi.encodeWithSignature("ZeroValueNotAllowed()"));
         pool.swap(address(_yToken), 0, 1000);
