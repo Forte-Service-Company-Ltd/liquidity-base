@@ -13,27 +13,14 @@ import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {CumulativePrice} from "src/amm/base/CumulativePrice.sol";
 import {TestCommonSetup, TestCommonSetupAbs} from "test/util/TestCommonSetup.sol";
 import {TBCInputOption} from "test/util/TestConstants.sol";
+import {PoolCommonAbs} from "test/amm/common/PoolCommonAbs.sol";
 
 /**
  * @title Test Pool functionality
  * @dev unit test
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve
  */
-abstract contract PoolCommonTest is TestCommonSetup {
-    IERC20 _yToken;
-    uint fullToken;
-
-    function _checkClosePoolState() internal virtual {}
-    function _checkLiquidityExcessState() internal virtual {}
-    function _checkWithdrawRevenueState() internal virtual {}
-    function _checkBackAndForthSwapsState() internal virtual {}
-    function _getMinMaxX() internal virtual returns (uint, uint);
-
-    function _setupCollateralToken() internal {
-        _yToken = IERC20(pool.yToken());
-        fullToken = address(_yToken) == address(stableCoin) ? STABLECOIN_DEC : ERC20_DECIMALS;
-    }
-
+abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
     function testLiquidity_Pool_version() public view {
         assertEq(pool.VERSION(), "v0.2.0");
     }
@@ -404,28 +391,6 @@ abstract contract PoolCommonTest is TestCommonSetup {
         pool.simSwapReversed(_xToken, outOfBoundAmount);
     }
 
-    function testLiquidity_Pool_Fees_SellingTokenY() public endWithStopPrank {
-        (, , PoolBase poolWFee, PoolBase poolWOutFee) = _setupParallelTokensAndPoolsForFees();
-        vm.startPrank(admin);
-        for (uint j = 0; j < 100; j++) {
-            (uint expected, uint expectedFeeAmount, ) = poolWFee.simSwap(address(_yToken), (1 * fullToken) / 1_000);
-            vm.expectEmit(true, false, false, false, address(poolWFee));
-            emit IPoolEvents.LPFeeGenerated(expectedFeeAmount);
-            vm.expectEmit(true, false, false, false, address(poolWFee));
-            emit IPoolEvents.ProtocolFeeGenerated(0);
-            (uint actual, uint actualFeeAmount, ) = poolWFee.swap(address(_yToken), (1 * fullToken) / 1_000, expected);
-            assertEq(actual, expected);
-            assertEq(expectedFeeAmount, actualFeeAmount);
-
-            (uint expectedNoFee, uint expectedFeeAmountNoFee, ) = poolWOutFee.simSwap(address(_yToken), (1 * fullToken) / 1_000);
-            (uint actualNoFee, uint actualFeeAmountNoFee, ) = poolWOutFee.swap(address(_yToken), (1 * fullToken) / 1_000, expected);
-            assertEq(actualNoFee, expectedNoFee);
-            assertEq(expectedFeeAmountNoFee, 0);
-            assertEq(actualFeeAmountNoFee, 0);
-            assertLt(actual, actualNoFee);
-        }
-    }
-
     function testLiquidity_Pool_LPFeesAccuracyInSimSwapReversed_BuyX(uint256 amount) public endWithStopPrank startAsAdmin {
         amount = bound(amount, 1 * ERC20_DECIMALS, 10_000 * ERC20_DECIMALS);
         (uint expectedIn, uint estimatedFees, ) = pool.simSwapReversed(address(pool.xToken()), amount);
@@ -470,49 +435,6 @@ abstract contract PoolCommonTest is TestCommonSetup {
         _pool.setProtocolFee(5);
     }
 
-    function testLiquidity_Pool_ProtocolFees_SellingTokenY() public endWithStopPrank {
-        (, , PoolBase poolWFee, PoolBase poolWOutFee) = _setupParallelTokensAndPoolsForFees();
-        _activateProtocolFeesInPool(poolWFee);
-        vm.startPrank(admin);
-        for (uint j = 0; j < 100; j++) {
-            (uint expected, uint expectedFeeAmount, uint expectedProtocolFee) = poolWFee.simSwap(address(_yToken), (1 * fullToken) / 1_000);
-            vm.expectEmit(true, false, false, false, address(poolWFee));
-            emit IPoolEvents.LPFeeGenerated(expectedFeeAmount);
-            vm.expectEmit(true, false, false, false, address(poolWFee));
-            emit IPoolEvents.ProtocolFeeGenerated(expectedProtocolFee);
-            (uint actual, uint actualFeeAmount, uint actualProtocolFee) = poolWFee.swap(
-                address(_yToken),
-                (1 * fullToken) / 1_000,
-                expected
-            );
-            assertEq(actual, expected);
-            assertEq(expectedFeeAmount, actualFeeAmount);
-            assertEq(expectedProtocolFee, actualProtocolFee);
-
-            (uint expectedNoFee, uint expectedFeeAmountNoFee, uint expectedProtocolNoFee) = poolWOutFee.simSwap(
-                address(_yToken),
-                (1 * fullToken) / 1_000
-            );
-            (uint actualNoFee, uint actualFeeAmountNoFee, uint actualProtocolNoFee) = poolWOutFee.swap(
-                address(_yToken),
-                (1 * fullToken) / 1_000,
-                expected
-            );
-            assertEq(actualNoFee, expectedNoFee);
-            assertEq(expectedFeeAmountNoFee, 0);
-            assertEq(actualFeeAmountNoFee, 0);
-            assertEq(expectedProtocolNoFee, 0);
-            assertEq(actualProtocolNoFee, 0);
-            assertLt(actual, actualNoFee);
-        }
-        vm.startPrank(bob);
-        uint yBalanceBefore = _yToken.balanceOf(bob);
-        uint protocolFeesCollected = poolWFee.collectedProtocolFees();
-        console2.log("protocolFeesCollected", protocolFeesCollected);
-        poolWFee.collectProtocolFees();
-        assertEq(protocolFeesCollected, (_yToken.balanceOf(bob) - yBalanceBefore));
-    }
-
     function testLiquidity_Pool_ProtocolFeesAccuracyInSimSwapReversed_BuyX(uint256 amount) public endWithStopPrank {
         _activateProtocolFeesInPool(pool);
         vm.startPrank(admin);
@@ -537,15 +459,6 @@ abstract contract PoolCommonTest is TestCommonSetup {
         emit IPoolEvents.ProtocolFeesCollected(bob, protocolFeesCollected);
         pool.collectProtocolFees();
         assertEq(protocolFeesCollected, (_yToken.balanceOf(bob) - yBalanceBefore));
-    }
-
-    function getAmountPlusFee(uint256 amount) internal view returns (uint256) {
-        return amount / ((totalBasisPoints - transferFee) / transferFee) + amount;
-    }
-
-    function getAmountSubFee(uint256 amount) internal view returns (uint256) {
-        if (transferFee > 0) return amount - ((amount * transferFee) / totalBasisPoints);
-        else return amount;
     }
 
     function testLiquidity_Pool_ProtocolFeesAccuracyInSimSwapReversed_BuyY(uint256 amount) public endWithStopPrank {
@@ -674,44 +587,6 @@ abstract contract PoolCommonTest is TestCommonSetup {
         console2.log("yliq", yliq);
         console2.log("yBalance - fees:", yBalance - fees);
         _checkLiquidityExcessState();
-    }
-
-    function testLiquidity_Pool_Fees_SellingTokenX() public endWithStopPrank {
-        (
-            GenericERC20FixedSupply xTokenWithFee,
-            GenericERC20FixedSupply xTokenWoutFee,
-            PoolBase poolWFee,
-            PoolBase poolWOutFee
-        ) = _setupParallelTokensAndPoolsForFees();
-        vm.startPrank(admin);
-        // Set initial X value to something above 0 before starting to swap for X
-        (uint _expected, , ) = poolWFee.simSwap(address(_yToken), 1 * fullToken);
-        poolWFee.swap(address(_yToken), 1 * fullToken, _expected);
-
-        (uint _expectedNoFee, , ) = poolWOutFee.simSwap(address(_yToken), 1 * fullToken);
-        poolWOutFee.swap(address(_yToken), 1 * fullToken, _expectedNoFee);
-
-        for (uint j = 0; j < 100; j++) {
-            _approvePool(poolWFee, false);
-            _approvePool(poolWOutFee, false);
-            vm.startPrank(admin);
-
-            (uint expected, uint expectedFeeAmount, ) = poolWFee.simSwap(address(xTokenWithFee), 1_000_000_000_000_000);
-            (uint actual, uint actualFeeAmount, ) = poolWFee.swap(address(xTokenWithFee), 1_000_000_000_000_000, expected);
-
-            assertEq(actual, expected);
-            assertEq(expectedFeeAmount, actualFeeAmount);
-
-            (uint expectedNoFee, uint expectedFeeAmountNoFee, ) = poolWOutFee.simSwap(address(xTokenWoutFee), 1_000_000_000_000_000);
-            (uint actualNoFee, uint actualFeeAmountNoFee, ) = poolWOutFee.swap(address(xTokenWoutFee), 1_000_000_000_000_000, expected);
-
-            assertEq(actualNoFee, expectedNoFee);
-            assertEq(expectedFeeAmountNoFee, 0);
-            assertEq(actualFeeAmountNoFee, 0);
-
-            uint256 feeAmount = (actualNoFee * 30) / 10_000 + 1;
-            assertLt(feeAmount - actualFeeAmount, 1e6);
-        }
     }
 
     function testLiquidity_Pool_backAndForthSwaps() public startAsAdmin endWithStopPrank {
