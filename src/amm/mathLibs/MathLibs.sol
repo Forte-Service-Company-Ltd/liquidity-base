@@ -9,6 +9,7 @@ import {Uint1024} from "uint1024/Uint1024.sol";
 import {uint512, uint768, uint1024} from "uint1024/UintTypes.sol";
 import {LN} from "./lib/LN.sol";
 import {QuadraticEquation} from "./lib/QuadraticEq.sol";
+import "lib/float128/src/Float128.sol";
 
 /**
  * @title Abstraction Layer between Equations and the underlying Math libraries
@@ -28,6 +29,9 @@ library MathLibs {
     using Uint1024 for uint1024;
     using LN for uint256;
     using QuadraticEquation for uint256;
+    using Float128 for int256;
+    using Float128 for Float;
+    using Float128 for packedFloat;
 
     uint256 constant WAD = FixedPointMathLib.WAD;
 
@@ -577,4 +581,179 @@ library MathLibs {
     function findWADsToSlashTo0(uint256 x) internal pure returns (uint256 precisionSlashingFactor) {
         precisionSlashingFactor = x.findWADsToSlashTo0();
     }
+
+     /**
+     * @dev adds 2 signed floating point numbers
+     * @param a the first addend
+     * @param b the second addend
+     * @return r the result of a + b
+     * @notice this version of the function uses only the packedFloat type
+     */
+    function add(packedFloat a, packedFloat b) internal pure returns (packedFloat r) {
+        r = a.add(b);
+    }
+
+    /**
+     * @dev gets the difference between 2 signed floating point numbers
+     * @param a the minuend
+     * @param b the subtrahend
+     * @return r the result of a - b
+     * @notice this version of the function uses only the packedFloat type
+     */
+    function sub(packedFloat a, packedFloat b) internal pure returns (packedFloat r) {
+        r = a.sub(b);
+    }
+
+    /**
+     * @dev gets the multiplication of 2 signed floating point numbers
+     * @param a the first factor
+     * @param b the second factor
+     * @return r the result of a * b
+     * @notice this version of the function uses only the packedFloat type
+     */
+    function mul(packedFloat a, packedFloat b) internal pure returns (packedFloat r) {
+        r = a.mul(b);
+    }
+
+    /**
+     * @dev gets the division of 2 signed floating point numbers
+     * @param a the numerator
+     * @param b the denominator
+     * @return r the result of a / b
+     * @notice this version of the function uses only the packedFloat type
+     */
+    function div(packedFloat a, packedFloat b) internal pure returns (packedFloat r) {
+        r = a.div(b);
+    }
+
+    /**
+     * @dev gets the square root of a signed floating point
+     * @notice only positive numbers can get its square root calculated through this function
+     * @param a the numerator to get the square root of
+     * @return r the result of √a
+     * @notice this version of the function uses only the packedFloat type
+     */
+    function sqrt(packedFloat a) internal pure returns (packedFloat r) {
+        r = a.sqrt();
+    }
+
+    /**
+     * @dev adds 2 signed floating point numbers
+     * @param a the first addend
+     * @param b the second addend
+     * @return r the result of a + b
+     * @notice this version of the function uses only the Float type
+     */
+    function add(Float memory a, Float memory b) internal pure returns (Float memory r) {
+        r = a.add(b);
+    }
+
+    /**
+     * @dev gets the difference between 2 signed floating point numbers
+     * @param a the minuend
+     * @param b the subtrahend
+     * @return r the result of a - b
+     * @notice this version of the function uses only the Float type
+     */
+    function sub(Float memory a, Float memory b) internal pure returns (Float memory r) {
+        r = a.sub(b);
+    }
+
+    /**
+     * @dev gets the multiplication of 2 signed floating point numbers
+     * @param a the first factor
+     * @param b the second factor
+     * @return r the result of a * b
+     * @notice this version of the function uses only the Float type
+     */
+    function mul(Float memory a, Float memory b) internal pure returns (Float memory r) {
+        r = a.mul(b);
+    }
+
+    /**
+     * @dev gets the division of 2 signed floating point numbers
+     * @param a the numerator
+     * @param b the denominator
+     * @return r the result of a / b
+     * @notice this version of the function uses only the Float type
+     */
+    function div(Float memory a, Float memory b) internal pure returns (Float memory r) {
+        r = a.div(b);
+    }
+
+    /**
+     * @dev gets the square root of a signed floating point
+     * @notice only positive numbers can get its square root calculated through this function
+     * @param a the numerator to get the square root of
+     * @return r the result of √a
+     * @notice this version of the function uses only the Float type
+     */
+    function sqrt(Float memory a) internal pure returns (Float memory r) {
+        r = a.sqrt();
+    }
+
+    /**
+     * @dev encodes a pair of signed integer values describing a floating point number into a packedFloat
+     * Examples: 1234.567 can be expressed as: 123456 x 10**(-3), or 1234560 x 10**(-4), or 12345600 x 10**(-5), etc.
+     * @notice the mantissa can hold a maximum of 38 digits. Any number with more digits will lose precision.
+     * @param mantissa the integer that holds the mantissa digits (38 digits max)
+     * @param exponent the exponent of the floating point number (between -16384 and +16383)
+     * @return float the encoded number. This value will ocupy a single 256-bit word and will hold the normalized
+     * version of the floating-point number (shifts the exponent enough times to have exactly 38 significant digits)
+     */
+    function toPackedFloat(int mantissa, int exponent) internal pure returns (packedFloat float) {
+        float = mantissa.toPackedFloat(exponent);
+    }
+
+    /**
+     * @dev decodes a packedFloat into its mantissa and its exponent
+     * @param float the floating-point number expressed as a packedFloat to decode
+     * @return mantissa the 38 mantissa digits of the floating-point number
+     * @return exponent the exponent of the floating-point number
+     */
+    function decode(packedFloat float) internal pure returns (int mantissa, int exponent) {
+        (mantissa, exponent) = float.decode();
+    }
+
+    /**
+     * @dev shifts the exponent enough times to have a mantissa with exactly 38 digits
+     * @notice this is a VITAL STEP to ensure the highest precision of the calculations
+     * @param x the Float number to normalize
+     * @return float the normalized version of x
+     */
+    function normalize(Float memory x) internal pure returns (Float memory float) {
+        float = x.normalize();
+    }
+
+    /**
+     * @dev packs a pair of signed integer values describing a floating-point number into a Float struct.
+     * Examples: 1234.567 can be expressed as: 123456 x 10**(-3), or 1234560 x 10**(-4), or 12345600 x 10**(-5), etc.
+     * @notice the mantissa can hold a maximum of 38 digits. Any number with more digits will lose precision.
+     * @param _mantissa the integer that holds the mantissa digits (38 digits max)
+     * @param _exponent the exponent of the floating point number (between -16384 and +16383)
+     * @return float the normalized version of the floating-point number packed in a Float struct.
+     */
+    function toFloat(int _mantissa, int _exponent) internal pure returns (Float memory float) {
+        float = _mantissa.toFloat(_exponent);
+    }
+
+    /**
+     * @dev from Float to packedFloat
+     * @param _float the Float number to encode into a packedFloat
+     * @return float the packed version of Float
+     */
+    function convertToPackedFloat(Float memory _float) internal pure returns (packedFloat float) {
+        float = _float.convertToPackedFloat();
+    }
+
+    /**
+     * @dev from packedFloat to Float
+     * @param _float the encoded floating-point number to unpack into a Float
+     * @return float the unpacked version of packedFloat
+     */
+    function convertToUnpackedFloat(packedFloat _float) internal pure returns (Float memory float) {
+        float = _float.convertToUnpackedFloat();
+    }
+
+
 }
