@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {Ownable2Step, Ownable} from "@openzeppelin/contracts/access/Ownable2Step.sol";
 import {ERC721Enumerable} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
 /**
@@ -11,7 +11,7 @@ import {ERC721Enumerable} from "@openzeppelin/contracts/token/ERC721/extensions/
  * @dev Revenue and liquidity position are stored in the LP Token metadata and updated by the pool contract.
  * @author @palmerg4 @oscarsernarosero @cirsteve
  */
-contract LPToken is ERC721, Ownable, ERC721Enumerable {
+contract LPToken is ERC721, Ownable2Step, ERC721Enumerable {
     uint256 public w;
     uint256 public currentTokenId;
     string public baseUri;

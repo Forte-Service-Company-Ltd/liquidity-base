@@ -193,6 +193,7 @@ abstract contract PoolCommonTest is TestCommonSetup {
         PoolBase _pool = PoolBase(_deployPool(address(_xToken), address(_yToken), 30, false, TBCInputOption.BASE));
         _approvePool(_pool, false);
         vm.startPrank(admin);
+        PoolBase(address(_pool)).acceptOwnership();
         uint amount = X_TOKEN_MAX_SUPPLY;
         initialBalance = _xToken.balanceOf(address(_pool));
         vm.expectEmit(true, true, true, true, address(_pool));
@@ -224,6 +225,7 @@ abstract contract PoolCommonTest is TestCommonSetup {
         _pool = _deployPool(address(_xToken), address(_yToken), 30, false, TBCInputOption.BASE);
         _approvePool(_pool, false);
         vm.startPrank(admin);
+        PoolBase(address(_pool)).acceptOwnership();
         _pool.enableSwaps(true);
     }
 
@@ -278,6 +280,7 @@ abstract contract PoolCommonTest is TestCommonSetup {
         NoZeroTransferERC20 _xToken = new NoZeroTransferERC20("X token", "X");
         PoolBase _pool = _deployPool(address(_xToken), address(_yToken), 30, true, TBCInputOption.BASE);
         vm.startPrank(admin);
+        PoolBase(address(_pool)).acceptOwnership();
         _pool.closePool();
     }
 

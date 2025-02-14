@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
-import {Ownable} from "../../../lib/openzeppelin-contracts/contracts/access/Ownable.sol";
+import {Ownable2Step, Ownable} from "../../../lib/openzeppelin-contracts/contracts/access/Ownable2Step.sol";
 import {Pausable} from "../../../lib/openzeppelin-contracts/contracts/utils/Pausable.sol";
 import {IERC20Metadata} from "../../../lib/openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import {IERC20} from "../../../lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
@@ -28,7 +28,7 @@ interface ILPToken {
  * Any pool implementation must inherits this contract and implement all the functions from CalculatorBase.
  * @author  @oscarsernarosero @mpetersoCode55 @cirsteve
  */
-abstract contract PoolBase is IPool, CalculatorBase, Ownable, Pausable, CumulativePrice {
+abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, CumulativePrice {
     using SafeERC20 for IERC20;
 
     address public immutable xToken;

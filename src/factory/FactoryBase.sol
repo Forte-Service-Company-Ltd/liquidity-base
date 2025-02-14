@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import {Ownable2Step, Ownable} from "@openzeppelin/contracts/access/Ownable2Step.sol";
 import "../common/IErrors.sol";
 import {IFactory} from "../factory/IFactory.sol";
 import {IAllowList} from "../allowList/IAllowList.sol";
@@ -12,7 +12,7 @@ import {IAllowList} from "../allowList/IAllowList.sol";
  * @author  @oscarsernarosero @mpetersoCode55 @cirsteve
  */
 
-abstract contract FactoryBase is Ownable, IFactory {
+abstract contract FactoryBase is Ownable2Step, IFactory {
     string public constant VERSION = "v0.2.0";
     uint16 public constant MAX_PROTOCOL_FEE = 20;
 
@@ -22,8 +22,7 @@ abstract contract FactoryBase is Ownable, IFactory {
     address public proposedProtocolFeeCollector;
     uint16 public protocolFee;
 
-    constructor() Ownable(_msgSender()) {
-    }
+    constructor() Ownable(_msgSender()) {}
 
     modifier onlyAllowedDeployers() {
         if (!IAllowList(deployerAllowList).isAllowed(_msgSender())) revert NotAnAllowedDeployer();
