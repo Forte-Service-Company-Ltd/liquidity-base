@@ -9,7 +9,7 @@ import {Uint1024} from "uint1024/Uint1024.sol";
 import {uint512, uint768, uint1024} from "uint1024/UintTypes.sol";
 import {LN} from "./lib/LN.sol";
 import {QuadraticEquation} from "./lib/QuadraticEq.sol";
-import "lib/float128/src/Float128.sol";
+import {Float128, Float, packedFloat} from "../../../lib/float128/src/Float128.sol";
 
 /**
  * @title Abstraction Layer between Equations and the underlying Math libraries
@@ -572,7 +572,7 @@ library MathLibs {
     function solveQuadraticEquation(uint a, uint b, uint c, bool isBNegative) internal pure returns (uint256) {
         return a.solveQuadraticEquation(b, c, isBNegative);
     }
-    
+
     /**
      * @dev this function tells how many WADs a number needs to be divided by to get to 0
      * @param x the number to be divided
@@ -582,7 +582,7 @@ library MathLibs {
         precisionSlashingFactor = x.findWADsToSlashTo0();
     }
 
-     /**
+    /**
      * @dev adds 2 signed floating point numbers
      * @param a the first addend
      * @param b the second addend
@@ -754,6 +754,4 @@ library MathLibs {
     function convertToUnpackedFloat(packedFloat _float) internal pure returns (Float memory float) {
         float = _float.convertToUnpackedFloat();
     }
-
-
 }
