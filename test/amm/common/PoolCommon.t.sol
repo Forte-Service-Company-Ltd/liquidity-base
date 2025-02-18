@@ -219,13 +219,11 @@ abstract contract PoolCommonTest is TestCommonSetup {
         PoolBase(address(_pool)).addXSupply(X_TOKEN_MAX_SUPPLY);
     }
 
-    function _buildLiquidityRemovalNotAllowed() internal startAsAdmin returns (PoolBase _pool) {
+    function _buildLiquidityRemovalNotAllowed() internal returns (PoolBase _pool) {
         GenericERC20FixedSupply _xToken = new GenericERC20FixedSupply("X token", "X", X_TOKEN_MAX_SUPPLY);
-        vm.stopPrank();
         _pool = _deployPool(address(_xToken), address(_yToken), 30, false, TBCInputOption.BASE);
         _approvePool(_pool, false);
         vm.startPrank(admin);
-        PoolBase(address(_pool)).acceptOwnership();
         _pool.enableSwaps(true);
     }
 
