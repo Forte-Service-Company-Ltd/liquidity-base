@@ -6,6 +6,7 @@ optimizer = true
 viaIR = false
 solc_version = "0.8.24"
 gas_limit = "18446744073709551615"
+allow_internal_expect_revert = true
 
 
 

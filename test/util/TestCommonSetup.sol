@@ -100,7 +100,6 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         poolRet = _deployPool(address(xToken), yTokenAddress, 30, true, TBCInputOption.BASE);
         _deployAndSetLPToken(poolRet);
         vm.startPrank(admin);
-        PoolBase(address(poolRet)).acceptOwnership();
         poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
         _addInitialLiquidity(poolRet, X_TOKEN_MAX_SUPPLY);
@@ -118,11 +117,8 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
     ) internal endWithStopPrank returns (PoolBase poolRet) {
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
         poolRet = _deployPool(_xTokenAddress, yTokenAddress, fee, true, TBCInputOption.BASE);
-
         _deployAndSetLPToken(poolRet);
-
         vm.startPrank(admin);
-        PoolBase(address(poolRet)).acceptOwnership();
         poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
         _addInitialLiquidity(poolRet, X_TOKEN_MAX_SUPPLY);
@@ -142,11 +138,8 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         GenericERC20FixedSupply xTokenWithFee = new GenericERC20FixedSupply("Fee token", "FEE", 10e3 * ERC20_DECIMALS);
 
         poolRet = PoolBase(_deployPool(address(xTokenWithFee), _yTokenAddress, 0, true, TBCInputOption.FORK));
-
         _deployAndSetLPToken(poolRet);
-
         vm.startPrank(admin);
-        PoolBase(address(poolRet)).acceptOwnership();
         poolRet.enableSwaps(true);
         _approvePool(poolRet, usdt);
         _addInitialLiquidity(poolRet, 10e3 * ERC20_DECIMALS);
@@ -164,7 +157,6 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         poolRet = _deployPool(address(xToken), yTokenAddress, 0, true, TBCInputOption.FORK);
         _deployAndSetLPToken(poolRet);
         vm.startPrank(admin);
-        PoolBase(address(poolRet)).acceptOwnership();
         poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
         _addInitialLiquidity(poolRet, 10e3 * ERC20_DECIMALS);
@@ -177,11 +169,8 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         _setUpTokensAndFactories(maxSupply);
 
         wadPool = _deployPool(address(xToken), address(yToken), fee, true, TBCInputOption.PRECISION);
-
         _deployAndSetLPToken(wadPool);
-
         vm.startPrank(admin);
-        PoolBase(address(wadPool)).acceptOwnership();
         wadPool.enableSwaps(true);
         _approvePool(wadPool, false);
         _addInitialLiquidity(wadPool, maxSupply);
@@ -192,12 +181,10 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         yTokenAllowList.addToAllowList(address(stableCoin));
         sixDecimalPool = _deployPool(address(xToken), address(stableCoin), fee, true, TBCInputOption.PRECISION);
 
+        _loadAdminAndAlice();
         _deployAndSetLPToken(sixDecimalPool);
 
-        _loadAdminAndAlice();
         vm.startPrank(admin);
-        PoolBase(address(sixDecimalPool)).acceptOwnership();
-
         sixDecimalPool.enableSwaps(true);
         _approvePool(sixDecimalPool, false);
         _addInitialLiquidity(sixDecimalPool, maxSupply);
@@ -209,7 +196,6 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         poolRet = _deployPool(address(xToken), yTokenAddress, 30, true, TBCInputOption.BASE);
         _deployAndSetLPToken(poolRet);
         vm.startPrank(admin);
-        PoolBase(address(poolRet)).acceptOwnership();
         poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
         _addInitialLiquidity(poolRet, X_TOKEN_MAX_SUPPLY / 2);
@@ -218,13 +204,9 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
     function _setupFOTPool(bool withStableCoin) internal endWithStopPrank returns (PoolBase poolRet) {
         _setUpTokensAndFactories(X_TOKEN_MAX_SUPPLY);
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
-        //
         poolRet = _deployPool(address(fotCoin), yTokenAddress, 30, true, TBCInputOption.BASE);
-
         _deployAndSetLPToken(poolRet);
-
         vm.startPrank(admin);
-        PoolBase(address(poolRet)).acceptOwnership();
         poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
         _addInitialLiquidity(poolRet, X_TOKEN_MAX_SUPPLY);
