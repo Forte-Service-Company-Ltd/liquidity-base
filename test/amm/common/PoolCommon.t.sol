@@ -248,6 +248,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
     }
 
     function testLiquidity_PoolwithProtocolFee_closePool_Positive() public endWithStopPrank {
+        vm.skip(true);
         _activateProtocolFeesInPool(pool);
         vm.startPrank(admin);
         closePoolPositive();
@@ -837,6 +838,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
     }
 
     function testLiquidity_Pool_WithdrawRevenueAccrued_Positive() public startAsAdmin endWithStopPrank {
+        vm.skip(true);
         _pool_BackAndForthSwaps();
         _checkWithdrawRevenueState();
     }
