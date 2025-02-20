@@ -32,7 +32,7 @@ abstract contract SwapInvariants is TestCommonSetup {
         assertLt(_handler.trackedAmountOutX(), pool.xTokenLiquidity());
     }
     function invariant_verifyFeesIncreaseTokenX() public {
-]        assertLt(lastFees, pool.collectedLPFees());
+        assertLt(lastFees, pool.collectedLPFees());
         lastFees = pool.collectedLPFees();
     }
     function invariant_cumulativePriceAndLastBlockTimestammpOnlyIncrease() public {
