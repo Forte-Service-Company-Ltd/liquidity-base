@@ -26,6 +26,10 @@ import "forge-std/console2.sol";
  * _create = deploy contract, return the contract
  */
 abstract contract TestCommonSetup is TestCommonSetupAbs {
+    function _setupCollateralToken() internal {
+        _yToken = IERC20(pool.yToken());
+        fullToken = address(_yToken) == address(stableCoin) ? STABLECOIN_DEC : ERC20_DECIMALS;
+    }
     function _setUpTokens(uint256 _xTokenSupply) internal startAsAdmin endWithStopPrank {
         xToken = new GenericERC20FixedSupply("x token", "GAME", _xTokenSupply + 1);
         yToken = new GenericERC20("collateral token", "COLL");
@@ -223,5 +227,14 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         vm.stopPrank();
         poolWFee = _setupPoolWithFee(withStableCoin, address(xTokenWithFee), 30);
         poolWOutFee = _setupPoolWithFee(withStableCoin, address(xTokenWoutFee), 0);
+    }
+
+    function getAmountPlusFee(uint256 amount) internal view returns (uint256) {
+        return amount / ((totalBasisPoints - transferFee) / transferFee) + amount;
+    }
+
+    function getAmountSubFee(uint256 amount) internal view returns (uint256) {
+        if (transferFee > 0) return amount - ((amount * transferFee) / totalBasisPoints);
+        else return amount;
     }
 }

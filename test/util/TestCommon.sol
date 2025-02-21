@@ -53,6 +53,8 @@ abstract contract TestCommon is PythonUtils {
     uint16 transferFee = 0;
     uint16 totalBasisPoints = 10000;
     PoolBase pool;
+    IERC20 _yToken;
+    uint fullToken;
 
     // Check if an address exists in the list
     function exists(address _address, address[] memory _addressList) public pure returns (bool) {

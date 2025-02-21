@@ -25,7 +25,7 @@ abstract contract WETHForkTest is ForkTestBase {
         uint256 fork = vm.createFork(vm.envString(key));
         vm.selectFork(fork);
 
-        if(wethAddress == address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2)){
+        if (wethAddress == address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2)) {
             weth = IERC20(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
             ethMainnet = true;
             vm.rollFork(19976520);
@@ -55,7 +55,7 @@ abstract contract WETHForkTest is ForkTestBase {
 
         _yToken.balanceOf(address(admin));
         (uint expected, , ) = pool.simSwap(address(_yToken), 1e2 * ERC20_DECIMALS);
-        if(ethMainnet){
+        if (ethMainnet) {
             vm.expectRevert();
         } else {
             vm.expectRevert("ERC20: transfer amount exceeds allowance");
@@ -71,32 +71,11 @@ abstract contract WETHForkTest is ForkTestBase {
         uint balance = _yToken.balanceOf(address(admin));
         _yToken.transfer(address(alice), balance - 1);
         (uint expected, , ) = pool.simSwap(address(_yToken), 1e3 * ERC20_DECIMALS);
-        if(ethMainnet){
+        if (ethMainnet) {
             vm.expectRevert();
         } else {
             vm.expectRevert("ERC20: transfer amount exceeds balance");
         }
         pool.swap(address(_yToken), 1e6 * ERC20_DECIMALS, expected);
-    }
-}
-
-/**
- * @title WETH Mainnet Fork Testing
- * @dev unit test
- * @author @oscarsernarosero @mpetersoCode55 @cirsteve @palmerg4
- */
-abstract contract WETHMainnetForkTest is WETHForkTest {
-    function setUp() public override {
-        _setUp(address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2), "ETHEREUM_RPC_KEY");
-    }
-}
-
-/**
- * @title WETH Polygon Fork Testing
- * @author @oscarsernarosero @mpetersoCode55 @cirsteve @palmerg4
- */
-abstract contract WETHPolygonForkTest is WETHForkTest {
-    function setUp() public override {
-        _setUp(address(0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619), "POLYGON_RPC_KEY");
     }
 }

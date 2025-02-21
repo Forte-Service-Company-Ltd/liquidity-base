@@ -75,15 +75,11 @@ abstract contract PoolPrecisionUnitTest is TestCommonSetup {
         uint SWAPS = 1000;
 
         for (uint i = 0; i < SWAPS; i++) {
-            console2.log("buy: ", i);
             (uint256 amountOutWad, , uint256 expectedWad, uint256 expectedReverseWad) = _swapX(true, wadPool, buyAmountWad);
             (uint256 amountOutSd, , uint256 expectedSd, uint256 expectedReverseSd) = _swapX(true, sdPool, buyAmountSixDecimal);
 
             assertTrue(buyAmountWad >= expectedReverseWad);
             assertTrue(buyAmountSixDecimal >= expectedReverseSd);
-
-            console2.log("wad: ", amountOutWad, expectedWad, expectedReverseWad);
-            console2.log(" sd: ", amountOutSd, expectedSd, expectedReverseSd);
 
             uint yBalanceWad = wadYToken.balanceOf(address(wadPool));
             uint xBalanceWad = wadXToken.balanceOf(address(wadPool));
@@ -91,8 +87,6 @@ abstract contract PoolPrecisionUnitTest is TestCommonSetup {
             uint yBalanceSd = sdYToken.balanceOf(address(sdPool));
             uint xBalanceSd = sdXToken.balanceOf(address(sdPool));
 
-            console2.log("wad y: ", yBalanceWad, " wad x: ", xBalanceWad);
-            console2.log(" sd y:  ", yBalanceSd * 10 ** 12, " sd x: ", xBalanceSd);
             assertTrue(areWithinTolerance(xBalanceWad, xBalanceSd, 9, 10 ** 9), "x balances should be within tolerance after buy");
             assertTrue(areWithinTolerance(yBalanceSd * 10 ** 12, yBalanceWad, MAX_TOLERANCE_X, TOLERANCE_DEN_X), "x out of tolerance");
         }
@@ -103,12 +97,9 @@ abstract contract PoolPrecisionUnitTest is TestCommonSetup {
         uint sellAmountWad = xBalanceAdminWad / SWAPS;
 
         for (uint i = 0; i < SWAPS; i++) {
-            console2.log("sell: ", i);
             (uint256 amountOutWad, , uint256 expectedWad, uint256 expectedReverseWad) = _swapX(false, wadPool, sellAmountWad);
             (uint256 amountOutSd, , uint256 expectedSd, uint256 expectedReverseSd) = _swapX(false, sdPool, sellAmountSixDecimal);
             assertTrue(amountOutSd <= amountOutWad, "amount out in six decimal should not exceed amount out in wad");
-            console2.log("wad: ", amountOutWad, expectedWad, expectedReverseWad);
-            console2.log(" sd: ", amountOutSd, expectedSd, expectedReverseSd);
 
             uint yBalanceWad = wadYToken.balanceOf(address(wadPool));
             uint xBalanceWad = wadXToken.balanceOf(address(wadPool));
@@ -116,8 +107,6 @@ abstract contract PoolPrecisionUnitTest is TestCommonSetup {
             uint yBalanceSd = sdYToken.balanceOf(address(sdPool));
             uint xBalanceSd = sdXToken.balanceOf(address(sdPool));
 
-            console2.log("wad y: ", yBalanceWad, " wad x: ", xBalanceWad);
-            console2.log(" sd y: ", yBalanceSd, " sd x: ", xBalanceSd);
             assertTrue(areWithinTolerance(xBalanceWad, xBalanceSd, 9, 10 ** 9), "x pool balances should be within tolerance");
             assertTrue(yBalanceWad <= (yBalanceSd * 10 ** 12), "y balance in six decimal should not exceed amount out in wad");
         }

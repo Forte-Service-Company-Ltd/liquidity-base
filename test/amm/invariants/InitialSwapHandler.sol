@@ -2,13 +2,13 @@
 pragma solidity ^0.8.24;
 
 import {PoolBase} from "src/amm/base/PoolBase.sol";
-import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
+import {TestCommon} from "test/util/TestCommon.sol";
 
 /**
  * @title Handler for the testing the invariant defined for the initial swap mechanics.
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve
  */
-abstract contract InitialSwapHandler is TestCommonSetup {
+contract InitialSwapHandler is TestCommon {
     PoolBase public poolUnderTest;
     uint256 public trackedAmountOutX;
     uint256 public trackedAmountOutY;
