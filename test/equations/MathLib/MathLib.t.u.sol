@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 import "forge-std/console2.sol";
-import {MathLibs} from "src/amm/mathLibs/MathLibs.sol";
+import {MathLibs, packedFloat} from "src/amm/mathLibs/MathLibs.sol";
 import {NegativeValue} from "src/common/IErrors.sol";
 import {TestCommon} from "test/util/TestCommon.sol";
 import {QuadraticEquation} from "src/amm/mathLibs/lib/QuadraticEq.sol";
@@ -14,6 +14,9 @@ import {QuadraticEquation} from "src/amm/mathLibs/lib/QuadraticEq.sol";
  */
 contract MathLibTests is TestCommon {
     using MathLibs for uint256;
+    using MathLibs for packedFloat;
+    using MathLibs for int256;
+
     uint one = 1;
     uint two = 2;
     uint max256 = 2 ** 256 - 1;
@@ -310,5 +313,25 @@ contract MathLibTests is TestCommon {
                     )
                 );
         }
+    }
+
+    function testconvertpackedFloatToWADPositive() public {
+        int256 manA = 2000;
+        int256 expA = 20;
+        packedFloat floA = manA.toPackedFloat(expA);
+        
+        int256 result = MathLibs.convertpackedFloatToWAD(floA);
+        console2.log(result);
+        assertEq(200000, result);
+    }
+
+    function testconvertpackedFloatToWADNegative() public {
+        int256 manA = 2000;
+        int256 expA = 16;
+        packedFloat floA = manA.toPackedFloat(expA);
+        
+        int256 result = MathLibs.convertpackedFloatToWAD(floA);
+        console2.log(result);
+        assertEq(20, result);
     }
 }

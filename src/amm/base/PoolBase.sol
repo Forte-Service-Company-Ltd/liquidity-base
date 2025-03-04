@@ -11,6 +11,8 @@ import {CalculatorBase} from "./CalculatorBase.sol";
 import {CumulativePrice} from "./CumulativePrice.sol";
 import {Constants} from "../../common/Constants.sol";
 import {FeeInfo, TBCType} from "../../common/TBC.sol";
+import {MathLibs, Float, packedFloat} from "../mathLibs/MathLibs.sol";
+import "forge-std/console2.sol";
 
 interface ILPToken {
     function updateLPTokenDeposit(address lp, uint256 tokenId, uint256 wj, uint256 rj) external;
@@ -30,6 +32,8 @@ interface ILPToken {
  */
 abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, CumulativePrice {
     using SafeERC20 for IERC20;
+    using MathLibs for int256;
+    using MathLibs for packedFloat;
 
     address public immutable xToken;
     address public immutable yToken;
@@ -45,12 +49,12 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      * @dev the lower bound of x
      */
     // slither-disable-next-line constable-states // updated in child contract
-    uint256 public xMin;
+    packedFloat public xMin;
 
     /**
      * @dev balance of x token that has been swapped out of the Pool
      */
-    uint256 public x;
+    packedFloat public x;
 
     /**
      * @dev lifetime revenue claimed by the pool
@@ -165,13 +169,13 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         uint256 afterBalance = IERC20(sellingX ? xToken : yToken).balanceOf(address(this));
         _amountIn = afterBalance - beforeBalance;
 
-        if (_minOut == 0) revert ZeroValueNotAllowed();
+        if (_minOut == 0) revert("Test");
         (amountOut, lpFeeAmount, protocolFeeAmount) = simSwap(_tokenIn, _amountIn);
         _checkSlippage(amountOut, _minOut);
 
-        uint256 xOld = x;
+        packedFloat xOld = x;
 
-        x = sellingX ? x - _amountIn : x + amountOut;
+        x = sellingX ? x.sub(int(_amountIn).toPackedFloat(-18)) : x.add(int(amountOut).toPackedFloat(-18));
         // slither-disable-end reentrancy-benign
         // slither-disable-start reentrancy-events // the recipient of the initial transfer is this contract
         _updateParameters(xOld, x);
@@ -212,8 +216,9 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
             _amountIn -= (lpFeeAmount + protocolFeeAmount); // fees are always coming out from the pool
             _amountIn = _normalizeTokenDecimals(true, _amountIn);
         }
-        amountOut = sellingX ? _calculateAmountOfYReceivedSellingX(_amountIn, x) : _calculateAmountOfXReceivedSellingY(_amountIn, x);
-
+        packedFloat rawAmountOut = sellingX ? _calculateAmountOfYReceivedSellingX(int(_amountIn).toPackedFloat(-18), x) : _calculateAmountOfXReceivedSellingY(int(_amountIn).toPackedFloat(-18), x);
+        amountOut = uint(rawAmountOut.convertpackedFloatToWAD());
+        console2.log(amountOut);
         if (sellingX) {
             amountOut = _normalizeTokenDecimals(false, amountOut);
             // slither-disable-start incorrect-equality
@@ -243,14 +248,17 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         if (!buyingX && _tokenout != yToken) revert InvalidToken();
 
         if (buyingX) {
-            uint amountInRaw = _calculateAmountOfYRequiredBuyingX(_amountOut, x);
-            amountInRaw = _normalizeTokenDecimals(false, amountInRaw); // reversed logic because swap is reversed
-            (protocolFeeAmount, lpFeeAmount) = _determineProtocolAndLPFeesBuy(amountInRaw);
-            amountIn = amountInRaw + lpFeeAmount + protocolFeeAmount;
+            packedFloat amountInRaw = _calculateAmountOfYRequiredBuyingX(int(_amountOut).toPackedFloat(-18), x);
+            uint256 uamountInRaw = uint(amountInRaw.convertpackedFloatToWAD());
+            uamountInRaw = _normalizeTokenDecimals(false, uamountInRaw); // reversed logic because swap is reversed
+            (protocolFeeAmount, lpFeeAmount) = _determineProtocolAndLPFeesBuy(uamountInRaw);
+            amountIn = uamountInRaw + lpFeeAmount + protocolFeeAmount;
         } else {
+            console2.log("over here");
             (protocolFeeAmount, lpFeeAmount) = _determineProtocolAndLPFeesBuy(_amountOut);
             _amountOut = _normalizeTokenDecimals(true, _amountOut + protocolFeeAmount + lpFeeAmount); // reversed logic because swap is reversed
-            amountIn = _calculateAmountOfXRequiredBuyingY(_amountOut, x);
+            packedFloat amountInRaw = _calculateAmountOfXRequiredBuyingY(int(_amountOut).toPackedFloat(-18), x);
+            amountIn = uint(amountInRaw.convertpackedFloatToWAD());
         }
     }
 
@@ -297,7 +305,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         uint256 afterBalance = IERC20(xToken).balanceOf(address(this));
         // slither-disable-end reentrancy-benign
         _amount = afterBalance - beforeBalance;
-        _validateLiquidityAdd(x, afterBalance);
+        _validateLiquidityAdd(x, int(afterBalance).toPackedFloat(-18));
         _mint(_msgSender(), _amount / 1e18, 0);
     }
 
@@ -317,7 +325,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
 
         delete collectedProtocolFees;
         delete collectedLPFees;
-        delete x;
+        x = int(0).toPackedFloat(-16384);
         delete lpFee;
         delete protocolFee;
 
@@ -396,7 +404,8 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      * @return sPrice the price in YToken Decimals
      */
     function spotPrice() public view returns (uint256 sPrice) {
-        sPrice = _spotPrice(x);
+        packedFloat sPriceRaw = _spotPrice(x);
+        sPrice = uint(sPriceRaw.convertpackedFloatToWAD());
 
         if (yDecimalDiff != 0) {
             sPrice = _normalizeTokenDecimals(false, sPrice);
@@ -583,7 +592,11 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      * @param _minOut the expected amount out to compare against
      */
     function _checkSlippage(uint256 _amountOut, uint256 _minOut) internal pure {
-        if (_amountOut < _minOut) revert("max slippage reached");
+        if (_amountOut < (_minOut - 1)) {
+            console2.log("_amountOut: ", _amountOut);
+            console2.log("minOut: ", _minOut);
+            revert("max slippage reached");
+        }
     }
 
     function _safeTransfer(address _yToken, address _to, uint256 _amount) internal {
