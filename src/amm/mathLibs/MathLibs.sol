@@ -780,7 +780,6 @@ library MathLibs {
     function convertpackedFloatToWAD(packedFloat value) internal view returns (int256 result) {
         Float memory float = value.convertToUnpackedFloat();
         float.exponent *= -1;
-
         if (float.mantissa == 0) {
             result = 0;
         } else {
@@ -797,7 +796,6 @@ library MathLibs {
     function convertpackedFloatToDoubleWAD(packedFloat value) internal view returns (int256 result) {
         Float memory float = value.convertToUnpackedFloat();
         float.exponent *= -1;
-
         if (float.mantissa == 0) {
             result = 0;
         } else {
