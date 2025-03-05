@@ -10,6 +10,7 @@ import {GenericERC20FixedSupply} from "src/example/ERC20/GenericERC20FixedSupply
 import {NoZeroTransferERC20} from "src/example/ERC20/NoZeroTransferERC20.sol";
 import {SimplePriceOracle} from "src/example/SimplePriceOracle.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
+import {packedFloat, MathLibs} from "src/amm/mathLibs/MathLibs.sol";
 import {CumulativePrice} from "src/amm/base/CumulativePrice.sol";
 import {TestCommonSetup, TestCommonSetupAbs} from "test/util/TestCommonSetup.sol";
 import {TBCInputOption} from "test/util/TestConstants.sol";
@@ -21,6 +22,9 @@ import {PoolCommonAbs} from "test/amm/common/PoolCommonAbs.sol";
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve
  */
 abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
+    using MathLibs for packedFloat;
+    using MathLibs for int256;
+
     function testLiquidity_Pool_version() public view {
         assertEq(pool.VERSION(), "v0.2.0");
     }
@@ -387,7 +391,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         transferFee = 30;
         uint minOut = getAmountSubFee(targetAmount);
         (uint actual, , ) = pool.swap(_yTokenAddress, expected, minOut);
-        assertEq(pool.x(), actual + xMin);
+        assertEq(packedFloat.unwrap(pool.x()), packedFloat.unwrap(int(actual + xMin).toPackedFloat(-18)));
         uint outOfBoundAmount = maxX + 1 - xMin - actual;
         vm.expectRevert(abi.encodeWithSignature("XOutOfBounds(uint256)", 1)); // XOutOfBounds is impossible to be triggered in this scenario
         pool.simSwapReversed(_xToken, outOfBoundAmount);
@@ -750,7 +754,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         amount = bound(amount, address(_yToken) == address(stableCoin) ? amountMinBound : 10, 1e3 * fullToken);
         _yToken.approve(address(pool), amount * 2);
 
-        uint currentX = PoolBase(address(pool)).x();
+        packedFloat currentX = PoolBase(address(pool)).x();
         uint currentPrice = pool.spotPrice();
 
         (uint256 tout, , ) = pool.simSwap(address(_yToken), amount);
@@ -780,7 +784,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         (uint256 toutOp, , ) = pool.simSwap(address(_yToken), initialAmount);
         pool.swap(address(_yToken), initialAmount, getAmountSubFee(toutOp));
 
-        uint256 xBefore = PoolBase(address(pool)).x();
+        packedFloat xBefore = PoolBase(address(pool)).x();
         uint256 priceBefore = pool.spotPrice();
         _yToken.approve(address(pool), amount);
         (toutOp, , ) = pool.simSwap(address(_yToken), amount);
@@ -793,10 +797,9 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         if (yOut > 0) {
             pool.swap(_xToken, toutOp, yOut);
             uint256 priceAfter = pool.spotPrice();
-            uint256 xAfter = PoolBase(address(pool)).x();
-            console2.log(priceBefore, priceAfter);
-            if (transferFee == 0) assertEq(xBefore, xAfter);
-            assertGe((priceAfter), priceBefore);
+            packedFloat xAfter = PoolBase(address(pool)).x();
+            if (transferFee == 0) assertEq(packedFloat.unwrap(xBefore), packedFloat.unwrap(xAfter));
+            assertGe(priceAfter, priceBefore);
         }
     }
 

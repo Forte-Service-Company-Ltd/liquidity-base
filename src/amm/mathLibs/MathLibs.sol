@@ -693,6 +693,28 @@ library MathLibs {
     }
 
     /**
+     * @dev performs a greater than comparison
+     * @param a the first term
+     * @param b the second term
+     * @return r retVal the result of a > b
+     * @notice this version of the function uses only the packedFloat type
+     */
+    function gt(packedFloat a, packedFloat b) internal pure returns (bool r) {
+        r = a.gt(b);
+    }
+
+    /**
+     * @dev performs a less than comparison
+     * @param a the first term
+     * @param b the second term
+     * @return r retVal the result of a < b
+     * @notice this version of the function uses only the packedFloat type
+     */
+    function lt(packedFloat a, packedFloat b) internal pure returns (bool r) {
+        r = a.lt(b);
+    }
+
+    /**
      * @dev encodes a pair of signed integer values describing a floating point number into a packedFloat
      * Examples: 1234.567 can be expressed as: 123456 x 10**(-3), or 1234560 x 10**(-4), or 12345600 x 10**(-5), etc.
      * @notice the mantissa can hold a maximum of 38 digits. Any number with more digits will lose precision.
@@ -753,5 +775,37 @@ library MathLibs {
      */
     function convertToUnpackedFloat(packedFloat _float) internal pure returns (Float memory float) {
         float = _float.convertToUnpackedFloat();
+    }
+
+    function convertpackedFloatToWAD(packedFloat value) internal view returns (int256 result) {
+        Float memory float = value.convertToUnpackedFloat();
+        float.exponent *= -1;
+        if(float.mantissa == 0) {
+            result = 0;
+        } else {
+            if(float.exponent > 18) {
+                uint256 diff = uint(float.exponent - 18);
+                result = int(uint(float.mantissa) / (10 ** diff));
+            } else {
+                uint256 diff = uint(18 - float.exponent);
+                result = int(uint(float.mantissa) * (10 ** diff));
+            }
+        }
+    }
+
+    function convertpackedFloatToDoubleWAD(packedFloat value) internal view returns (int256 result) {
+        Float memory float = value.convertToUnpackedFloat();
+        float.exponent *= -1;
+        if(float.mantissa == 0) {
+            result = 0;
+        } else {
+            if(float.exponent > 36) {
+                uint256 diff = uint(float.exponent - 36);
+                result = int(uint(float.mantissa) / (10 ** diff));
+            } else {
+                uint256 diff = uint(36 - float.exponent);
+                result = int(uint(float.mantissa) * (10 ** diff));
+            }
+        }
     }
 }

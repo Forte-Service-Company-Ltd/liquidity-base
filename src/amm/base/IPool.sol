@@ -199,11 +199,4 @@ interface IPool is IPoolEvents {
      * @notice this value is immutable
      */
     function liquidityRemovalAllowed() external returns (bool);
-
-    /**
-     * @dev tells the current value of x.
-     * @notice Outstanding liquidity can be calculated as x - xMin.
-     * @return x expressed in xToken decimals
-     */
-    function x() external returns (uint256);
 }
