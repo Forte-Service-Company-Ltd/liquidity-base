@@ -754,4 +754,36 @@ library MathLibs {
     function convertToUnpackedFloat(packedFloat _float) internal pure returns (Float memory float) {
         float = _float.convertToUnpackedFloat();
     }
+
+    function convertpackedFloatToWAD(packedFloat value) internal view returns (int256 result) {
+        Float memory float = value.convertToUnpackedFloat();
+        float.exponent *= -1;
+        if (float.mantissa == 0) {
+            result = 0;
+        } else {
+            if (float.exponent > 18) {
+                uint256 diff = uint(float.exponent - 18);
+                result = int(uint(float.mantissa) / (10 ** diff));
+            } else {
+                uint256 diff = uint(18 - float.exponent);
+                result = int(uint(float.mantissa) * (10 ** diff));
+            }
+        }
+    }
+
+    function convertpackedFloatToDoubleWAD(packedFloat value) internal view returns (int256 result) {
+        Float memory float = value.convertToUnpackedFloat();
+        float.exponent *= -1;
+        if (float.mantissa == 0) {
+            result = 0;
+        } else {
+            if (float.exponent > 36) {
+                uint256 diff = uint(float.exponent - 36);
+                result = int(uint(float.mantissa) / (10 ** diff));
+            } else {
+                uint256 diff = uint(36 - float.exponent);
+                result = int(uint(float.mantissa) * (10 ** diff));
+            }
+        }
+    }
 }

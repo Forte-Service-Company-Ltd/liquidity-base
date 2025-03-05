@@ -3,7 +3,7 @@ pragma solidity ^0.8.24;
 
 /**
  * @dev File that contains all the events for the project
- * @author  @oscarsernarosero @mpetersoCode55 @cirsteve
+ * @author  @oscarsernarosero @mpetersoCode55 @cirsteve @palmerg4
  * @notice this file should be then inherited in the contract interfaces to use the events.
  */
 
@@ -32,6 +32,7 @@ interface IPoolEvents is CommonEvents {
     event ProtocolFeesCollected(address indexed _collector, uint256 indexed _amount);
     event RevenueWithdrawn(address indexed _collector, uint256 indexed tokenId, uint256 indexed _amount);
     event CumulativePriceUpdated(uint256 indexed blockTimestamp, uint cumulativePrice);
+    event LiquidityWithdrawn(address lp, uint indexed tokenId, uint256 indexed amountOutXToken, uint256 indexed amountOutYToken);
 }
 
 /**
@@ -44,9 +45,7 @@ interface IFactoryEvents is CommonEvents {
     event SetDeployerAllowList(address indexed _allowedList);
 }
 
-
 interface IAllowListEvents {
     event AllowListDeployed();
     event AddressAllowed(address indexed _address, bool indexed _allowed);
 }
-
