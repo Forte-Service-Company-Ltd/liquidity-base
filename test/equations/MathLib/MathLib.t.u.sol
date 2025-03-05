@@ -334,4 +334,24 @@ contract MathLibTests is TestCommon {
         console2.log(result);
         assertEq(20, result);
     }
+
+    function testconvertpackedFloatToDoubleWADPositive() public {
+        int256 manA = 2000;
+        int256 expA = -34;
+        packedFloat floA = manA.toPackedFloat(expA);
+        
+        int256 result = MathLibs.convertpackedFloatToDoubleWAD(floA);
+        console2.log(result);
+        assertEq(200000, result);
+    }
+
+    function testconvertpackedFloatToDoubleWADNegative() public {
+        int256 manA = 2000;
+        int256 expA = -38;
+        packedFloat floA = manA.toPackedFloat(expA);
+        
+        int256 result = MathLibs.convertpackedFloatToDoubleWAD(floA);
+        console2.log(result);
+        assertEq(20, result);
+    }
 }
