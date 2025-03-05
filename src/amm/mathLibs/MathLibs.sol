@@ -10,7 +10,6 @@ import {uint512, uint768, uint1024} from "uint1024/UintTypes.sol";
 import {LN} from "./lib/LN.sol";
 import {QuadraticEquation} from "./lib/QuadraticEq.sol";
 import {Float128, Float, packedFloat} from "../../../lib/float128/src/Float128.sol";
-import "forge-std/console2.sol";
 
 /**
  * @title Abstraction Layer between Equations and the underlying Math libraries

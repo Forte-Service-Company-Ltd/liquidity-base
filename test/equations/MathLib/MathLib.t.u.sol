@@ -317,7 +317,7 @@ contract MathLibTests is TestCommon {
 
     function testconvertpackedFloatToWADPositive() public {
         int256 manA = 2000;
-        int256 expA = 20;
+        int256 expA = -16;
         packedFloat floA = manA.toPackedFloat(expA);
         
         int256 result = MathLibs.convertpackedFloatToWAD(floA);
@@ -327,7 +327,7 @@ contract MathLibTests is TestCommon {
 
     function testconvertpackedFloatToWADNegative() public {
         int256 manA = 2000;
-        int256 expA = 16;
+        int256 expA = -20;
         packedFloat floA = manA.toPackedFloat(expA);
         
         int256 result = MathLibs.convertpackedFloatToWAD(floA);

@@ -12,7 +12,6 @@ import {CumulativePrice} from "./CumulativePrice.sol";
 import {Constants} from "../../common/Constants.sol";
 import {FeeInfo, TBCType} from "../../common/TBC.sol";
 import {MathLibs, Float, packedFloat} from "../mathLibs/MathLibs.sol";
-import "forge-std/console2.sol";
 
 interface ILPToken {
     function updateLPTokenDeposit(address lp, uint256 tokenId, uint256 wj, uint256 rj) external;
@@ -169,7 +168,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         uint256 afterBalance = IERC20(sellingX ? xToken : yToken).balanceOf(address(this));
         _amountIn = afterBalance - beforeBalance;
 
-        if (_minOut == 0) revert("Test");
+        if (_minOut == 0) revert ZeroValueNotAllowed();
         (amountOut, lpFeeAmount, protocolFeeAmount) = simSwap(_tokenIn, _amountIn);
         _checkSlippage(amountOut, _minOut);
 
@@ -218,7 +217,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         }
         packedFloat rawAmountOut = sellingX ? _calculateAmountOfYReceivedSellingX(int(_amountIn).toPackedFloat(-18), x) : _calculateAmountOfXReceivedSellingY(int(_amountIn).toPackedFloat(-18), x);
         amountOut = uint(rawAmountOut.convertpackedFloatToWAD());
-        console2.log(amountOut);
         if (sellingX) {
             amountOut = _normalizeTokenDecimals(false, amountOut);
             // slither-disable-start incorrect-equality
@@ -254,7 +252,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
             (protocolFeeAmount, lpFeeAmount) = _determineProtocolAndLPFeesBuy(uamountInRaw);
             amountIn = uamountInRaw + lpFeeAmount + protocolFeeAmount;
         } else {
-            console2.log("over here");
             (protocolFeeAmount, lpFeeAmount) = _determineProtocolAndLPFeesBuy(_amountOut);
             _amountOut = _normalizeTokenDecimals(true, _amountOut + protocolFeeAmount + lpFeeAmount); // reversed logic because swap is reversed
             packedFloat amountInRaw = _calculateAmountOfXRequiredBuyingY(int(_amountOut).toPackedFloat(-18), x);
@@ -592,11 +589,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      * @param _minOut the expected amount out to compare against
      */
     function _checkSlippage(uint256 _amountOut, uint256 _minOut) internal pure {
-        if (_amountOut < (_minOut - 1)) {
-            console2.log("_amountOut: ", _amountOut);
-            console2.log("minOut: ", _minOut);
-            revert("max slippage reached");
-        }
+        if (_amountOut < (_minOut - 1)) revert("max slippage reached");
     }
 
     function _safeTransfer(address _yToken, address _to, uint256 _amount) internal {

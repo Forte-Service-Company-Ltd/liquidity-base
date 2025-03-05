@@ -36,7 +36,6 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
 
     function testLiquidity_Pool_enableSwaps_Positive() public startAsAdmin {
         bool isPaused = pool.paused();
-        packedFloat p = pool.x();
         assertFalse(isPaused, "setup function should've already activated trading");
         vm.expectEmit(true, true, true, true, address(pool));
         emit Pausable.Paused(admin);
