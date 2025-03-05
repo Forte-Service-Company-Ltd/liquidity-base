@@ -11,7 +11,7 @@ import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
 abstract contract RemovingLiquidityInvariants is TestCommonSetup {
     uint constant Y_TOKEN_LIQUIDITY = 1e5 * 1e18;
     uint xTokenLiquidity;
-    function _setUp() internal endWithStopPrank {
+    function setUp() public endWithStopPrank {
         pool = _setupPool(false);
         xTokenLiquidity = IERC20(pool.xToken()).totalSupply();
         bytes4[] memory selectors = new bytes4[](2);

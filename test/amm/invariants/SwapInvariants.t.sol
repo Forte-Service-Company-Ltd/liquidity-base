@@ -15,7 +15,7 @@ abstract contract SwapInvariants is TestCommonSetup {
     uint256 lastFees;
     uint lastCumulativePrice;
     uint lastBlockTimestamp;
-    function _setUp() internal endWithStopPrank {
+    function setUp() public endWithStopPrank {
         pool = _setupPool(false);
         _handler = new SwapHandler(pool);
         bytes4[] memory selectors = new bytes4[](1);

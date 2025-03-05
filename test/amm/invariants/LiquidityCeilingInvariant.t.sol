@@ -14,7 +14,7 @@ abstract contract LiquidityCeilingInvariants is TestCommonSetup {
     uint256 _xTotal;
     uint256 _yTotal;
 
-    function _setUp() internal endWithStopPrank {
+    function setUp() public endWithStopPrank {
         pool = _setupPool(false);
 
         IERC20 tokenX = IERC20(pool.xToken());

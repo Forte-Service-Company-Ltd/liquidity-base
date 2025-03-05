@@ -10,7 +10,7 @@ import {InitialSwapHandler} from "test/amm/invariants/InitialSwapHandler.sol";
  */
 abstract contract InitialSwapInvariant is TestCommonSetup {
     InitialSwapHandler _handler;
-    function _setUp() internal endWithStopPrank {
+    function setUp() public endWithStopPrank {
         pool = _setupPool(false);
         _handler = new InitialSwapHandler(pool);
         bytes4[] memory selectors = new bytes4[](1);
