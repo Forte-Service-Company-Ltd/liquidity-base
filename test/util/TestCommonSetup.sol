@@ -11,10 +11,7 @@ import {SixDecimalERC20} from "src/example/ERC20/SixDecimalERC20.sol";
 import {FeeOnTransferERC20} from "src/example/ERC20/FeeOnTransferERC20.sol";
 import {TwentyTwoDecimalERC20} from "src/example/ERC20/TwentyTwoDecimalERC20.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
-import {TestCommon} from "test/util/TestCommon.sol";
-import {TestModifiers} from "test/util/TestModifiers.sol";
-import {TestCommonSetupAbs} from "test/util/TestCommonSetupAbs.sol";
-import {TestConstants, TBCInputOption} from "test/util/TestConstants.sol";
+import {TestCommonSetupAbs, TBCInputOption} from "test/util/TestCommonSetupAbs.sol";
 import {LPToken} from "src/common/LPToken.sol";
 import "forge-std/console2.sol";
 
@@ -54,6 +51,11 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
     function _deployAndSetLPToken(PoolBase _pool) internal startAsAdmin endWithStopPrank {
         lpToken = new LPToken("LPToken", "LPT", address(_pool), "example.uri/");
         _pool.setLPTokenAddress(address(lpToken));
+    }
+
+    function _deployLPToken(address _poolAddress) internal returns (LPToken LPTokenAddress) {
+        vm.startPrank(admin);
+        LPTokenAddress = new LPToken("LPToken", "LPT", address(_poolAddress), "example.uri/");
     }
 
     function _setupAllowLists() internal startAsAdmin endWithStopPrank {

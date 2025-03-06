@@ -1,18 +1,10 @@
 /// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
-import "@openzeppelin/contracts/utils/Pausable.sol";
 import "forge-std/console2.sol";
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
-import {Ownable} from "openzeppelin-contracts/contracts/access/Ownable.sol";
-import "src/common/IEvents.sol";
-import {GenericERC20FixedSupply} from "src/example/ERC20/GenericERC20FixedSupply.sol";
-import {NoZeroTransferERC20} from "src/example/ERC20/NoZeroTransferERC20.sol";
-import {SimplePriceOracle} from "src/example/SimplePriceOracle.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
-import {CumulativePrice} from "src/amm/base/CumulativePrice.sol";
-import {TestCommonSetup, TestCommonSetupAbs} from "test/util/TestCommonSetup.sol";
-import {TBCInputOption} from "test/util/TestConstants.sol";
+import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
 import {PoolCommonAbs} from "test/amm/common/PoolCommonAbs.sol";
 
 /**
