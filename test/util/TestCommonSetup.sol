@@ -108,6 +108,8 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         _approvePool(poolRet, false);
         _addInitialLiquidity(poolRet, X_TOKEN_MAX_SUPPLY);
         amountMinBound = 2;
+        pool = poolRet;
+        _setupCollateralToken();
     }
 
     function _setupPoolWithFee(bool withStableCoin, uint16 fee) internal endWithStopPrank returns (PoolBase poolRet) {
@@ -214,6 +216,8 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
         _addInitialLiquidity(poolRet, X_TOKEN_MAX_SUPPLY);
+        pool = poolRet;
+        _setupCollateralToken();
     }
 
     function _setupParallelTokensAndPoolsForFees()
@@ -236,5 +240,14 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
     function getAmountSubFee(uint256 amount) internal view returns (uint256) {
         if (transferFee > 0) return amount - ((amount * transferFee) / totalBasisPoints);
         else return amount;
+    }
+
+    /**
+     * @dev Convenience function to start prank and set protocol fee on a pool
+     * @param _pool pool to set fee on
+     */
+    function _activateProtocolFeesInPool(PoolBase _pool) internal endWithStopPrank {
+        vm.startPrank(bob);
+        _pool.setProtocolFee(5);
     }
 }

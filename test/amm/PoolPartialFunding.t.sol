@@ -20,7 +20,7 @@ abstract contract PoolPartialFundingTest is TestCommonSetup {
 
     function testLiquidity_Pool_initializePartialXSupply_Positive() public {
         uint maxSupply = _getMaxXTokenSupply();
-        
+
         uint poolBalance = xToken.balanceOf(address(pool));
 
         assertGt(maxSupply, poolBalance);

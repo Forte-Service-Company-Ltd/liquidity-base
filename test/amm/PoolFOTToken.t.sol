@@ -1,7 +1,7 @@
 /// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
-import {PoolCommonTest} from "test/amm/common/PoolCommon.t.sol";
+import {PoolCommonTest} from "test/amm/common/PoolCommon.t.u.sol";
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
 import {FeeOnTransferERC20} from "src/example/ERC20/FeeOnTransferERC20.sol";
 
@@ -13,8 +13,7 @@ import {FeeOnTransferERC20} from "src/example/ERC20/FeeOnTransferERC20.sol";
 abstract contract PoolFOTTokenTest is PoolCommonTest {
     function setUp() public endWithStopPrank {
         transferFee = 1000;
-        pool = _setupFOTPool(false);
-        _setupCollateralToken();
+        _setupFOTPool(false);
     }
 
     function testLiquidity_Pool_FeeOnTransferToken_feeDeducted() public startAsAdmin endWithStopPrank {
