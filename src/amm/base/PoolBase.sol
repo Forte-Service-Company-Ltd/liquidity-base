@@ -457,8 +457,8 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      * @param tokenId The ID of the LPToken being updated
      * @param uj The amount of liquidity lp would like to withdraw
      */
-    function _updateLPTokenWithdrawal(address lp, uint256 tokenId, uint256 uj) internal {
-        ILPToken(LPTokenAddress).updateLPTokenWithdrawal(lp, tokenId, uj);
+    function _updateLPTokenWithdrawal(address lp, uint256 tokenId, uint256 uj) internal returns (uint256) {
+        return ILPToken(LPTokenAddress).updateLPTokenWithdrawal(lp, tokenId, uj);
     }
 
     /**
