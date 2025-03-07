@@ -15,7 +15,7 @@ import {MathLibs, Float, packedFloat} from "../mathLibs/MathLibs.sol";
 
 interface ILPToken {
     function updateLPTokenDeposit(address lp, uint256 tokenId, uint256 wj, uint256 rj) external;
-    function updateLPTokenWithdrawal(address lp, uint256 tokenId, uint256 uj) external;
+    function updateLPTokenWithdrawal(address lp, uint256 tokenId, uint256 uj) external returns (uint256);
     function mint(address lp, uint256 liquidityAmount, uint256 hn) external;
     function ownerOf(uint256) external returns (address);
     function lpToken(address lp, uint256 tokenId) external returns (uint256 rj, uint256 wj);
@@ -215,7 +215,9 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
             _amountIn -= (lpFeeAmount + protocolFeeAmount); // fees are always coming out from the pool
             _amountIn = _normalizeTokenDecimals(true, _amountIn);
         }
-        packedFloat rawAmountOut = sellingX ? _calculateAmountOfYReceivedSellingX(int(_amountIn).toPackedFloat(-18), x) : _calculateAmountOfXReceivedSellingY(int(_amountIn).toPackedFloat(-18), x);
+        packedFloat rawAmountOut = sellingX
+            ? _calculateAmountOfYReceivedSellingX(int(_amountIn).toPackedFloat(-18), x)
+            : _calculateAmountOfXReceivedSellingY(int(_amountIn).toPackedFloat(-18), x);
         amountOut = uint(rawAmountOut.convertpackedFloatToWAD());
         if (sellingX) {
             amountOut = _normalizeTokenDecimals(false, amountOut);
