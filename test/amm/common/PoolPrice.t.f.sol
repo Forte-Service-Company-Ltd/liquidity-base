@@ -10,7 +10,7 @@ import {packedFloat, MathLibs} from "src/amm/mathLibs/MathLibs.sol";
 
 /**
  * @title Test Pool functionality
- * @dev unit test
+ * @dev fuzz test
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve
  */
 abstract contract PoolPriceFuzzTest is TestCommonSetup, PoolCommonAbs {
