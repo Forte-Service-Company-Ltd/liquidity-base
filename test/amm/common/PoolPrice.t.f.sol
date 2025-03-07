@@ -6,6 +6,7 @@ import {IERC20} from "forge-std/interfaces/IERC20.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
 import {PoolCommonAbs} from "test/amm/common/PoolCommonAbs.sol";
+import {packedFloat, MathLibs} from "src/amm/mathLibs/MathLibs.sol";
 
 /**
  * @title Test Pool functionality
@@ -13,6 +14,9 @@ import {PoolCommonAbs} from "test/amm/common/PoolCommonAbs.sol";
  * @author @oscarsernarosero @mpetersoCode55 @cirsteve
  */
 abstract contract PoolPriceFuzzTest is TestCommonSetup, PoolCommonAbs {
+    using MathLibs for packedFloat;
+    using MathLibs for int256;
+
     function testLiquidity_Pool_priceAlwaysGoesUpToTheRight(uint256 amount) public startAsAdmin {
         amount = bound(amount, address(_yToken) == address(stableCoin) ? amountMinBound : 10, 1_000 * fullToken);
 
@@ -51,7 +55,7 @@ abstract contract PoolPriceFuzzTest is TestCommonSetup, PoolCommonAbs {
         amount = bound(amount, address(_yToken) == address(stableCoin) ? amountMinBound : 10, 1e3 * fullToken);
         _yToken.approve(address(pool), amount * 2);
 
-        uint currentX = PoolBase(address(pool)).x();
+        packedFloat currentX = PoolBase(address(pool)).x();
         uint currentPrice = pool.spotPrice();
 
         (uint256 tout, , ) = pool.simSwap(address(_yToken), amount);
@@ -81,7 +85,7 @@ abstract contract PoolPriceFuzzTest is TestCommonSetup, PoolCommonAbs {
         (uint256 toutOp, , ) = pool.simSwap(address(_yToken), initialAmount);
         pool.swap(address(_yToken), initialAmount, getAmountSubFee(toutOp));
 
-        uint256 xBefore = PoolBase(address(pool)).x();
+        packedFloat xBefore = PoolBase(address(pool)).x();
         uint256 priceBefore = pool.spotPrice();
         _yToken.approve(address(pool), amount);
         (toutOp, , ) = pool.simSwap(address(_yToken), amount);
@@ -94,9 +98,9 @@ abstract contract PoolPriceFuzzTest is TestCommonSetup, PoolCommonAbs {
         if (yOut > 0) {
             pool.swap(_xToken, toutOp, yOut);
             uint256 priceAfter = pool.spotPrice();
-            uint256 xAfter = PoolBase(address(pool)).x();
+            packedFloat xAfter = PoolBase(address(pool)).x();
             console2.log(priceBefore, priceAfter);
-            if (transferFee == 0) assertEq(xBefore, xAfter);
+            if (transferFee == 0) assertEq(xBefore.convertpackedFloatToWAD(), xAfter.convertpackedFloatToWAD());
             assertGe((priceAfter), priceBefore);
         }
     }

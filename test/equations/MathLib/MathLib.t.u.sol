@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 import "forge-std/console2.sol";
-import {MathLibs} from "src/amm/mathLibs/MathLibs.sol";
+import {MathLibs, packedFloat} from "src/amm/mathLibs/MathLibs.sol";
 import {TestCommon} from "test/util/TestCommon.sol";
 import {QuadraticEquation} from "src/amm/mathLibs/lib/QuadraticEq.sol";
 
