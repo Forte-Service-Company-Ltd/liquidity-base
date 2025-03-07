@@ -780,10 +780,10 @@ library MathLibs {
     function convertpackedFloatToWAD(packedFloat value) internal view returns (int256 result) {
         Float memory float = value.convertToUnpackedFloat();
         float.exponent *= -1;
-        if(float.mantissa == 0) {
+        if (float.mantissa == 0) {
             result = 0;
         } else {
-            if(float.exponent > 18) {
+            if (float.exponent > 18) {
                 uint256 diff = uint(float.exponent - 18);
                 result = int(uint(float.mantissa) / (10 ** diff));
             } else {
@@ -796,10 +796,10 @@ library MathLibs {
     function convertpackedFloatToDoubleWAD(packedFloat value) internal view returns (int256 result) {
         Float memory float = value.convertToUnpackedFloat();
         float.exponent *= -1;
-        if(float.mantissa == 0) {
+        if (float.mantissa == 0) {
             result = 0;
         } else {
-            if(float.exponent > 36) {
+            if (float.exponent > 36) {
                 uint256 diff = uint(float.exponent - 36);
                 result = int(uint(float.mantissa) / (10 ** diff));
             } else {

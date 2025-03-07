@@ -60,8 +60,8 @@ contract LPToken is ERC721, Ownable2Step, ERC721Enumerable {
      * @param tokenId The token id of the lpToken being updated
      * @param uj The amount of liquidity the LP would like to withdraw
      */
-    function updateLPTokenWithdrawal(address lp, uint256 tokenId, uint256 uj) external onlyOwner {
-        _updateLPTokenVarsWithdrawal(lp, tokenId, uj);
+    function updateLPTokenWithdrawal(address lp, uint256 tokenId, uint256 uj) external onlyOwner returns (uint256) {
+        return _updateLPTokenVarsWithdrawal(lp, tokenId, uj);
     }
 
     /**
@@ -148,13 +148,19 @@ contract LPToken is ERC721, Ownable2Step, ERC721Enumerable {
      * @param _tokenId The token id of the lpToken being updated
      * @param _uj The amount of liquidity the LP would like to withdraw
      */
-    function _updateLPTokenVarsWithdrawal(address _lp, uint256 _tokenId, uint256 _uj) internal {
-        if (lpToken[_lp][_tokenId].wj > _uj) {
+    function _updateLPTokenVarsWithdrawal(address _lp, uint256 _tokenId, uint256 _uj) internal returns (uint256) {
+        uint256 wj = lpToken[_lp][_tokenId].wj;
+        if (wj < _uj) revert("LPToken: withdrawal amount exceeds allowance");
+
+        w -= _uj;
+
+        if (wj > _uj) {
             lpToken[_lp][_tokenId].wj -= _uj;
         } else {
             _burn(_tokenId);
             lpToken[_lp][_tokenId].wj = 0;
         }
+        return lpToken[_lp][_tokenId].rj;
     }
 
     /**
