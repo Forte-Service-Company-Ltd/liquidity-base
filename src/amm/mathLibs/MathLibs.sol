@@ -338,10 +338,10 @@ library MathLibs {
      * @param x1 higher bits of y
      * @param y0 lower bits of y
      * @param y1 higher bits of y
-     * @return gt boolean. True if x > y
+     * @return r boolean. True if x > y
      */
-    function gt512(uint256 x0, uint256 x1, uint256 y0, uint256 y1) internal pure returns (bool gt) {
-        gt = x0.gt512(x1, y0, y1);
+    function gt512(uint256 x0, uint256 x1, uint256 y0, uint256 y1) internal pure returns (bool r) {
+        r = x0.gt512(x1, y0, y1);
     }
 
     /**
@@ -351,10 +351,10 @@ library MathLibs {
      * @param x1 higher bits of y
      * @param y0 lower bits of y
      * @param y1 higher bits of y
-     * @return eq boolean. True if x = y
+     * @return r boolean. True if x = y
      */
-    function eq512(uint256 x0, uint256 x1, uint256 y0, uint256 y1) internal pure returns (bool eq) {
-        eq = x0.eq512(x1, y0, y1);
+    function eq512(uint256 x0, uint256 x1, uint256 y0, uint256 y1) internal pure returns (bool r) {
+        r = x0.eq512(x1, y0, y1);
     }
 
     /**
@@ -364,10 +364,10 @@ library MathLibs {
      * @param x1 higher bits of y
      * @param y0 lower bits of y
      * @param y1 higher bits of y
-     * @return ge boolean. True if x >= y
+     * @return r boolean. True if x >= y
      */
-    function ge512(uint256 x0, uint256 x1, uint256 y0, uint256 y1) internal pure returns (bool ge) {
-        ge = x0.ge512(x1, y0, y1);
+    function ge512(uint256 x0, uint256 x1, uint256 y0, uint256 y1) internal pure returns (bool r) {
+        r = x0.ge512(x1, y0, y1);
     }
 
     /**
@@ -377,10 +377,10 @@ library MathLibs {
      * @param x1 higher bits of y
      * @param y0 lower bits of y
      * @param y1 higher bits of y
-     * @return lt boolean. True if x < y
+     * @return r boolean. True if x < y
      */
-    function lt512(uint256 x0, uint256 x1, uint256 y0, uint256 y1) internal pure returns (bool lt) {
-        lt = x0.lt512(x1, y0, y1);
+    function lt512(uint256 x0, uint256 x1, uint256 y0, uint256 y1) internal pure returns (bool r) {
+        r = x0.lt512(x1, y0, y1);
     }
 
     /**
