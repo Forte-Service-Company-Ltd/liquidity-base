@@ -23,8 +23,7 @@ jobs:
           submodules: recursive
 
       - name: Install Foundry
-        run: |
-          uses: foundry-rs/foundry-toolchain@v1
+        uses: foundry-rs/foundry-toolchain@v1
 
       - name: Build
         run: |
