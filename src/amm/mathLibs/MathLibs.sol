@@ -726,6 +726,17 @@ library MathLibs {
     }
 
     /**
+     * @dev performs an equality comparison
+     * @param a the first term
+     * @param b the second term
+     * @return r true if a is equal to b
+     * @notice this version of the function uses only the packedFloat type
+     */
+    function eq(packedFloat a, packedFloat b) internal pure returns (bool r) {
+        r = a.eq(b);
+    }
+
+    /**
      * @dev encodes a pair of signed integer values describing a floating point number into a packedFloat
      * Examples: 1234.567 can be expressed as: 123456 x 10**(-3), or 1234560 x 10**(-4), or 12345600 x 10**(-5), etc.
      * @notice the mantissa can hold a maximum of 38 digits. Any number with more digits will lose precision.
