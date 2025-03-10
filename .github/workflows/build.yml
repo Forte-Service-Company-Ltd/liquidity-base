@@ -12,7 +12,7 @@ env:
   FOUNDRY_PROFILE: ci
 
 jobs:
-  build:
+  build-test:
     name: Build
     runs-on: ubuntu-latest-m-16
 
@@ -27,6 +27,13 @@ jobs:
           curl -sSL https://raw.githubusercontent.com/thrackle-io/foundry/refs/heads/master/foundryup/foundryup -o $HOME/foundryup
           FOUNDRY_DIR=$HOME/foundry bash $HOME/foundryup --version $(awk '$1~/^[^#]/' script/foundryScripts/foundry.lock)
           echo "$HOME/foundry/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        run: |
+          git config user.email "cloudops@thrackle.io"
+          git config user.name "CloudOps Thrackle"
+          sudo apt-get update
+          sudo apt-get install -y python3-pip
       - name: Build
         run: |
           forge clean && forge build --optimize
