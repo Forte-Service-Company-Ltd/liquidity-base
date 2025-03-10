@@ -3,7 +3,6 @@ pragma solidity ^0.8.24;
 
 import "forge-std/console2.sol";
 import {MathLibs, packedFloat} from "src/amm/mathLibs/MathLibs.sol";
-import {NegativeValue} from "src/common/IErrors.sol";
 import {TestCommon} from "test/util/TestCommon.sol";
 import {QuadraticEquation} from "src/amm/mathLibs/lib/QuadraticEq.sol";
 
@@ -195,9 +194,9 @@ contract MathLibTests is TestCommon {
     }
 
     function testEquations_MathLibTests_QuadraticEquation(uint256 a, uint256 b, uint256 c, bool isBNegative) public {
-        a = bound(a, 2, 2**256-1);
-        b = bound(b, 0, 2**256-1);
-        c = bound(c, 0, 2**255-1);
+        a = bound(a, 2, 2 ** 256 - 1);
+        b = bound(b, 0, 2 ** 256 - 1);
+        c = bound(c, 0, 2 ** 255 - 1);
 
         string[] memory inputs = _buildFFIQuadraticEquation(a, b, c, isBNegative);
         bytes memory res = vm.ffi(inputs);
@@ -211,7 +210,7 @@ contract MathLibTests is TestCommon {
         } else if (flag == 2) {
             vm.expectRevert("QuadraticEquation: negative result");
             QuadraticEquation.solveQuadraticEquation(a, b, c, isBNegative);
-        }  else if (flag == 3) {
+        } else if (flag == 3) {
             vm.expectRevert("Uint512: a1 >= b div512x256");
             QuadraticEquation.solveQuadraticEquation(a, b, c, isBNegative);
         }
@@ -219,9 +218,9 @@ contract MathLibTests is TestCommon {
         console2.log("returnVal: ", solVal, pyVal, isBNegative);
 
         // NOTE: perfect precision excluding the last 18 precision decimals out of the 36.
-        assertEq(pyVal/1e18, solVal/1e18);
+        assertEq(pyVal / 1e18, solVal / 1e18);
     }
-    
+
     function testEquation_MathLibTests_div512ByPowerOf2(uint a0, uint a1, uint8 n) public {
         a1 = a1 % (2 ** 254);
         n = (n % 254) + 1;
@@ -319,7 +318,7 @@ contract MathLibTests is TestCommon {
         int256 manA = 2000;
         int256 expA = -16;
         packedFloat floA = manA.toPackedFloat(expA);
-        
+
         int256 result = MathLibs.convertpackedFloatToWAD(floA);
         console2.log(result);
         assertEq(200000, result);
@@ -329,7 +328,7 @@ contract MathLibTests is TestCommon {
         int256 manA = 2000;
         int256 expA = -20;
         packedFloat floA = manA.toPackedFloat(expA);
-        
+
         int256 result = MathLibs.convertpackedFloatToWAD(floA);
         console2.log(result);
         assertEq(20, result);
@@ -339,7 +338,7 @@ contract MathLibTests is TestCommon {
         int256 manA = 2000;
         int256 expA = -34;
         packedFloat floA = manA.toPackedFloat(expA);
-        
+
         int256 result = MathLibs.convertpackedFloatToDoubleWAD(floA);
         console2.log(result);
         assertEq(200000, result);
@@ -349,7 +348,7 @@ contract MathLibTests is TestCommon {
         int256 manA = 2000;
         int256 expA = -38;
         packedFloat floA = manA.toPackedFloat(expA);
-        
+
         int256 result = MathLibs.convertpackedFloatToDoubleWAD(floA);
         console2.log(result);
         assertEq(20, result);

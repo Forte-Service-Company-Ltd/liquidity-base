@@ -3,7 +3,6 @@ pragma solidity ^0.8.24;
 
 import "forge-std/console2.sol";
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
-import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {IPoolEvents} from "src/common/IEvents.sol";
 import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
 import {GenericERC20} from "src/example/ERC20/GenericERC20.sol";
@@ -20,7 +19,7 @@ abstract contract PoolPartialFundingTest is TestCommonSetup {
 
     function testLiquidity_Pool_initializePartialXSupply_Positive() public {
         uint maxSupply = _getMaxXTokenSupply();
-        
+
         uint poolBalance = xToken.balanceOf(address(pool));
 
         assertGt(maxSupply, poolBalance);

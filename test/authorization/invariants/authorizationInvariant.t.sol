@@ -13,7 +13,7 @@ abstract contract authorizationInvariants is TestCommonSetup {
     uint256 _startingXLiquidity;
     uint256 _startingYLiquidity;
 
-    function _setUp() internal endWithStopPrank {
+    function setUp() public endWithStopPrank {
         pool = _setupPool(false);
 
         bytes4[] memory selectors = new bytes4[](5);

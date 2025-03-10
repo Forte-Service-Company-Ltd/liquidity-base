@@ -7,12 +7,8 @@ import {IERC20} from "forge-std/interfaces/IERC20.sol";
 import {Ownable} from "openzeppelin-contracts/contracts/access/Ownable.sol";
 import "src/common/IEvents.sol";
 import {GenericERC20FixedSupply} from "src/example/ERC20/GenericERC20FixedSupply.sol";
-import {NoZeroTransferERC20} from "src/example/ERC20/NoZeroTransferERC20.sol";
-import {SimplePriceOracle} from "src/example/SimplePriceOracle.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
-import {CumulativePrice} from "src/amm/base/CumulativePrice.sol";
-import {TestCommonSetup, TestCommonSetupAbs} from "test/util/TestCommonSetup.sol";
-import {TBCInputOption} from "test/util/TestConstants.sol";
+import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
 
 /**
  * @title Test Pool functionality
@@ -48,11 +44,6 @@ abstract contract PoolFeeComparisonTest is TestCommonSetup {
             assertEq(actualFeeAmountNoFee, 0);
             assertLt(actual, actualNoFee);
         }
-    }
-
-    function _activateProtocolFeesInPool(PoolBase _pool) internal endWithStopPrank {
-        vm.startPrank(bob);
-        _pool.setProtocolFee(5);
     }
 
     function testLiquidity_Pool_ProtocolFees_SellingTokenY() public endWithStopPrank {

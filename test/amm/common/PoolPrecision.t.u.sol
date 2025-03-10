@@ -11,7 +11,7 @@ import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
  * @dev unit test
  * @author @oscarsernarosero @mpetersoCode55
  */
-abstract contract PoolPrecisionUnitTest is TestCommonSetup {
+abstract contract PoolPrecisionTest is TestCommonSetup {
     uint8 constant MAX_TOLERANCE_X = 12;
     uint8 constant TOLERANCE_PRECISION_X = 12;
     uint256 constant TOLERANCE_DEN_X = 10 ** TOLERANCE_PRECISION_X;
@@ -23,6 +23,11 @@ abstract contract PoolPrecisionUnitTest is TestCommonSetup {
     IERC20 sdYToken;
     IERC20 wadXToken;
     IERC20 sdXToken;
+
+    function _setUp(uint16 _fee) internal {
+        (wadPool, sdPool) = _setupPrecisionPools(MAX_SUPPLY, _fee);
+        _assignTokens();
+    }
 
     function _assignTokens() internal {
         wadXToken = IERC20(wadPool.xToken());
@@ -56,27 +61,15 @@ abstract contract PoolPrecisionUnitTest is TestCommonSetup {
         (amountOut, feeAmount, ) = _pool.swap(address(tokenIn), swapAmount, expected);
     }
 
-    function testLiquidity_PoolUnit_PrecisionComparison() public endWithStopPrank {
-        (wadPool, sdPool) = _setupPrecisionPools(MAX_SUPPLY, 0);
-        _assignTokens();
-        _runSwaps();
-    }
-
-    function testLiquidity_PoolUnit_PrecisionComparisonWithFee() public endWithStopPrank {
-        (wadPool, sdPool) = _setupPrecisionPools(MAX_SUPPLY, 30);
-        _assignTokens();
-        _runSwaps();
-    }
-
-    function _runSwaps() internal startAsAdmin endWithStopPrank {
+    function test_poolPrecision_swapTests() public startAsAdmin endWithStopPrank {
         uint buyAmountSixDecimal = 1_000_000;
         uint buyAmountWad = 1_000_000_000_000_000_000;
 
         uint SWAPS = 1000;
 
         for (uint i = 0; i < SWAPS; i++) {
-            (uint256 amountOutWad, , uint256 expectedWad, uint256 expectedReverseWad) = _swapX(true, wadPool, buyAmountWad);
-            (uint256 amountOutSd, , uint256 expectedSd, uint256 expectedReverseSd) = _swapX(true, sdPool, buyAmountSixDecimal);
+            (, , , uint256 expectedReverseWad) = _swapX(true, wadPool, buyAmountWad);
+            (, , , uint256 expectedReverseSd) = _swapX(true, sdPool, buyAmountSixDecimal);
 
             assertTrue(buyAmountWad >= expectedReverseWad);
             assertTrue(buyAmountSixDecimal >= expectedReverseSd);
@@ -97,8 +90,8 @@ abstract contract PoolPrecisionUnitTest is TestCommonSetup {
         uint sellAmountWad = xBalanceAdminWad / SWAPS;
 
         for (uint i = 0; i < SWAPS; i++) {
-            (uint256 amountOutWad, , uint256 expectedWad, uint256 expectedReverseWad) = _swapX(false, wadPool, sellAmountWad);
-            (uint256 amountOutSd, , uint256 expectedSd, uint256 expectedReverseSd) = _swapX(false, sdPool, sellAmountSixDecimal);
+            (uint256 amountOutWad, , , ) = _swapX(false, wadPool, sellAmountWad);
+            (uint256 amountOutSd, , , ) = _swapX(false, sdPool, sellAmountSixDecimal);
             assertTrue(amountOutSd <= amountOutWad, "amount out in six decimal should not exceed amount out in wad");
 
             uint yBalanceWad = wadYToken.balanceOf(address(wadPool));

@@ -12,7 +12,7 @@ abstract contract pausedAuthorizationInvariants is TestCommonSetup {
     uint256 _startingXLiquidity;
     uint256 _startingYLiquidity;
     pausedAuthorizationHandler handler;
-    function _setUp() internal endWithStopPrank {
+    function setUp() public endWithStopPrank {
         pool = _setupPool(false);
         handler = new pausedAuthorizationHandler(pool);
         bytes4[] memory selectors = new bytes4[](1);

@@ -1,12 +1,8 @@
 /// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
-import {IERC20} from "forge-std/interfaces/IERC20.sol";
-import {IFactory} from "src/factory/IFactory.sol";
-import {IFactoryEvents, CommonEvents} from "src/common/IEvents.sol";
-import {GenericERC20} from "src/example/ERC20/GenericERC20.sol";
-import {PoolBase} from "src/amm/base/PoolBase.sol";
-import {TestCommonSetup, FactoryBase, TBCInputOption} from "test/util/TestCommonSetup.sol";
+import {CommonEvents} from "src/common/IEvents.sol";
+import {TestCommonSetup, FactoryBase} from "test/util/TestCommonSetup.sol";
 import "forge-std/console2.sol";
 
 /**

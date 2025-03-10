@@ -4,7 +4,6 @@ pragma solidity ^0.8.24;
 import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
 
-
 /**
  * @title Test all invariants in relation to adding liquidity to the pool.
  * @dev unit test
@@ -14,7 +13,7 @@ abstract contract AddingLiquidityInvariants is TestCommonSetup {
     uint xTokenLiquidity;
     uint yTokenLiquidity;
 
-    function _setUp() internal endWithStopPrank {
+    function setUp() public endWithStopPrank {
         pool = _setupPool(false);
         uint amountToTrade = 50_000 * ERC20_DECIMALS;
 
