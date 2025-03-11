@@ -1,0 +1,30 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened, edited, ready_for_review]
+
+env:
+  FOUNDRY_PROFILE: ci
+
+jobs:
+  build-test:
+    name: Build
+    runs-on: ubuntu-latest-m-16
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.XREPO_GITHUB_TOKEN}}
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Build
+        run: |
+          forge clean && forge build --optimize
