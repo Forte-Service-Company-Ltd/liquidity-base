@@ -338,10 +338,10 @@ library MathLibs {
      * @param x1 higher bits of y
      * @param y0 lower bits of y
      * @param y1 higher bits of y
-     * @return gt boolean. True if x > y
+     * @return r boolean. True if x > y
      */
-    function gt512(uint256 x0, uint256 x1, uint256 y0, uint256 y1) internal pure returns (bool gt) {
-        gt = x0.gt512(x1, y0, y1);
+    function gt512(uint256 x0, uint256 x1, uint256 y0, uint256 y1) internal pure returns (bool r) {
+        r = x0.gt512(x1, y0, y1);
     }
 
     /**
@@ -351,10 +351,10 @@ library MathLibs {
      * @param x1 higher bits of y
      * @param y0 lower bits of y
      * @param y1 higher bits of y
-     * @return eq boolean. True if x = y
+     * @return r boolean. True if x = y
      */
-    function eq512(uint256 x0, uint256 x1, uint256 y0, uint256 y1) internal pure returns (bool eq) {
-        eq = x0.eq512(x1, y0, y1);
+    function eq512(uint256 x0, uint256 x1, uint256 y0, uint256 y1) internal pure returns (bool r) {
+        r = x0.eq512(x1, y0, y1);
     }
 
     /**
@@ -364,10 +364,10 @@ library MathLibs {
      * @param x1 higher bits of y
      * @param y0 lower bits of y
      * @param y1 higher bits of y
-     * @return ge boolean. True if x >= y
+     * @return r boolean. True if x >= y
      */
-    function ge512(uint256 x0, uint256 x1, uint256 y0, uint256 y1) internal pure returns (bool ge) {
-        ge = x0.ge512(x1, y0, y1);
+    function ge512(uint256 x0, uint256 x1, uint256 y0, uint256 y1) internal pure returns (bool r) {
+        r = x0.ge512(x1, y0, y1);
     }
 
     /**
@@ -377,10 +377,10 @@ library MathLibs {
      * @param x1 higher bits of y
      * @param y0 lower bits of y
      * @param y1 higher bits of y
-     * @return lt boolean. True if x < y
+     * @return r boolean. True if x < y
      */
-    function lt512(uint256 x0, uint256 x1, uint256 y0, uint256 y1) internal pure returns (bool lt) {
-        lt = x0.lt512(x1, y0, y1);
+    function lt512(uint256 x0, uint256 x1, uint256 y0, uint256 y1) internal pure returns (bool r) {
+        r = x0.lt512(x1, y0, y1);
     }
 
     /**
@@ -715,6 +715,28 @@ library MathLibs {
     }
 
     /**
+     * @dev performs a less or equal to comparison
+     * @param a the first term
+     * @param b the second term
+     * @return r retVal the result of a < b
+     * @notice this version of the function uses only the packedFloat type
+     */
+    function le(packedFloat a, packedFloat b) internal pure returns (bool r) {
+        r = a.le(b);
+    }
+
+    /**
+     * @dev performs an equality comparison
+     * @param a the first term
+     * @param b the second term
+     * @return r true if a is equal to b
+     * @notice this version of the function uses only the packedFloat type
+     */
+    function eq(packedFloat a, packedFloat b) internal pure returns (bool r) {
+        r = a.eq(b);
+    }
+
+    /**
      * @dev encodes a pair of signed integer values describing a floating point number into a packedFloat
      * Examples: 1234.567 can be expressed as: 123456 x 10**(-3), or 1234560 x 10**(-4), or 12345600 x 10**(-5), etc.
      * @notice the mantissa can hold a maximum of 38 digits. Any number with more digits will lose precision.
@@ -777,7 +799,7 @@ library MathLibs {
         float = _float.convertToUnpackedFloat();
     }
 
-    function convertpackedFloatToWAD(packedFloat value) internal view returns (int256 result) {
+    function convertpackedFloatToWAD(packedFloat value) internal pure returns (int256 result) {
         Float memory float = value.convertToUnpackedFloat();
         float.exponent *= -1;
         if (float.mantissa == 0) {
@@ -793,7 +815,7 @@ library MathLibs {
         }
     }
 
-    function convertpackedFloatToDoubleWAD(packedFloat value) internal view returns (int256 result) {
+    function convertpackedFloatToDoubleWAD(packedFloat value) internal pure returns (int256 result) {
         Float memory float = value.convertToUnpackedFloat();
         float.exponent *= -1;
         if (float.mantissa == 0) {
