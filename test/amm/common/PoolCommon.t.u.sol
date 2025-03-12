@@ -379,7 +379,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
                 break;
             }
         }
-        assertTrue(counter > minimumSwapCount, "Minimum swap count not reached");
+        assertTrue(counter >= minimumSwapCount, "Minimum swap count not reached");
     }
 
     function testLiquidity_Pool_buyGameToken_ExcessX() public startAsAdmin endWithStopPrank {
