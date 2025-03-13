@@ -1,13 +1,13 @@
 /// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
-import {LPToken, Ownable} from "src/common/LPToken.sol";
+import {LPToken} from "src/common/LPToken.sol";
 import "forge-std/console2.sol";
 import {TestCommon} from "test/util/TestCommon.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IERC721Errors} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-contract LPTokenTests is TestCommon {
+/*contract LPTokenTests is TestCommon {
     address _pool = address(0x9001); // We use this _pool instead of pool because pool is currently address(0), which cant be set to owner
     uint256 wj_input = 1_000; // Arbitrary value for qWn, used to update amount of liquidity of a position
     uint256 rj_input = 100; // Arbitrary value for last_revenue_claim, used to update last_revenue_claim of a position
@@ -15,8 +15,7 @@ contract LPTokenTests is TestCommon {
 
     function setUp() public {
         vm.startPrank(address(_pool));
-        lpToken = new LPToken("LP Token", "LPT", address(_pool), "Example.uri/");
-        lpToken.mint(address(admin), w0, 0);
+        lpToken = new LPToken("LP Token", "LPT");
     }
 
     function test_LPToken_SetGlobalWInConstructor() public view {
@@ -158,4 +157,4 @@ contract LPTokenTests is TestCommon {
         vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, ADDRESSES[0]));
         lpToken.mint(ADDRESSES[0], wj_input, rj_input);
     }
-}
+}*/

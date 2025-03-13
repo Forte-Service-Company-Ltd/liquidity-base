@@ -49,13 +49,12 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
     }
 
     function _deployAndSetLPToken(PoolBase _pool) internal startAsAdmin endWithStopPrank {
-        lpToken = new LPToken("LPToken", "LPT", address(_pool), "example.uri/");
-        _pool.setLPTokenAddress(address(lpToken));
+        lpToken = new LPToken("LPToken", "LPT");
     }
 
     function _deployLPToken(address _poolAddress) internal returns (LPToken LPTokenAddress) {
         vm.startPrank(admin);
-        LPTokenAddress = new LPToken("LPToken", "LPT", address(_poolAddress), "example.uri/");
+        LPTokenAddress = new LPToken("LPToken", "LPT");
     }
 
     function _setupAllowLists() internal startAsAdmin endWithStopPrank {
