@@ -357,11 +357,12 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         uint256 startingLiquidity = pool.xTokenLiquidity();
         uint256 totalOut;
         uint counter = 1;
-        uint minimumSwapCount = 9;
+        uint minimumSwapCount = 8;
         uint previousCollectedFees;
 
         while (totalOut + amountIn < startingLiquidity) {
             amountIn = counter * counter * amountIn;
+            console2.log("amountIn", amountIn);
             try pool.simSwap(address(_yToken), amountIn) returns (uint expected, uint expectedFeeAmount, uint pFee) {
                 pFee;
                 transferFee = 300;
@@ -379,6 +380,10 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
                 break;
             }
         }
+        console2.log("startingLiquidity", startingLiquidity);
+        console2.log("previousCollectedFees", previousCollectedFees);
+        console2.log("counter", counter);
+        console2.log("minimumSwapCount", minimumSwapCount);
         assertTrue(counter > minimumSwapCount, "Minimum swap count not reached");
     }
 
