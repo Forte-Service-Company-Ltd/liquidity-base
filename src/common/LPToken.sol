@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
-import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import {Ownable2Step, Ownable} from "@openzeppelin/contracts/access/Ownable2Step.sol";
-import {ERC721Enumerable} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import {ERC721} from "../../lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
+import {ERC721Enumerable} from "../../lib/openzeppelin-contracts/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
 /**
  * @title Liquidity provider token
@@ -11,10 +10,9 @@ import {ERC721Enumerable} from "@openzeppelin/contracts/token/ERC721/extensions/
  * @dev Revenue and liquidity position are stored in the LP Token metadata and updated by the pool contract.
  * @author @palmerg4 @oscarsernarosero @cirsteve
  */
-contract LPToken is ERC721, Ownable2Step, ERC721Enumerable {
+contract LPToken is ERC721, ERC721Enumerable {
     uint256 public w;
     uint256 public currentTokenId;
-    string public baseUri;
 
     mapping(address lp => mapping(uint256 tokenId => LPTokenS lpToken)) public lpToken;
 
@@ -23,56 +21,7 @@ contract LPToken is ERC721, Ownable2Step, ERC721Enumerable {
         uint256 wj;
     }
 
-    constructor(
-        string memory _name,
-        string memory _symbol,
-        address _poolAddress,
-        string memory _baseUri
-    ) Ownable(_poolAddress) ERC721(_name, _symbol) {
-        baseUri = _baseUri;
-    }
-
-    /**
-     * @dev Updates the values wj and rj of tokenId
-     * @param lp The address of the liquidity provider owning the lpToken being updated
-     * @param tokenId The token id of the lpToken being updated
-     * @param wj The amount of liquidity associated with the lpToken being updated
-     * @param rj The amount of revenue associated with the lpToken being updated
-     */
-    function updateLPTokenDeposit(address lp, uint256 tokenId, uint256 wj, uint256 rj) external onlyOwner {
-        _updateLPTokenVarsDeposit(lp, tokenId, wj, rj);
-    }
-
-    /**
-     * @dev Updates the values wj and rj of tokenId
-     * @param lp The address of the liquidity provider owning the lpToken being updated
-     * @param tokenId The token id of the lpToken being updated
-     * @param addedRj The amount of revenue claimed to add to the lpToken being updated
-     */
-    function updateLPTokenLastRevenueClaim(address lp, uint256 tokenId, uint256 addedRj) external onlyOwner {
-        _updateLPTokenLastRevenueClaim(lp, tokenId, addedRj);
-    }
-
-    /**
-     * @dev Updates the amount of liquidity associated with an LP Token. Used when withdrawing a full or partial liquidity position.
-     * @notice If an LP is withdrawing their entire position, the LP Token associated will be burned.
-     * @param lp The address of the liquidity provider owning the lpToken being updated
-     * @param tokenId The token id of the lpToken being updated
-     * @param uj The amount of liquidity the LP would like to withdraw
-     */
-    function updateLPTokenWithdrawal(address lp, uint256 tokenId, uint256 uj) external onlyOwner returns (uint256) {
-        return _updateLPTokenVarsWithdrawal(lp, tokenId, uj);
-    }
-
-    /**
-     * @dev Mints a new lpToken to a liquidity provider and updated the value associated with this new lpToken
-     * @param lp The address of the liquidity provider owning the lpToken being updated
-     * @param liquidityAmount The amount of liquidity provided by the liquidity provider
-     * @param hn The revenue parameter of the pool associated with the lpToken contract
-     */
-    function mint(address lp, uint256 liquidityAmount, uint256 hn) external onlyOwner {
-        _mintTokenAndUpdate(lp, liquidityAmount, hn);
-    }
+    constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) {}
 
     /**
      * @dev Get the liquidity share and last claimed amount for an lpToken
@@ -161,14 +110,6 @@ contract LPToken is ERC721, Ownable2Step, ERC721Enumerable {
             lpToken[_lp][_tokenId].wj = 0;
         }
         return lpToken[_lp][_tokenId].rj;
-    }
-
-    /**
-     * @dev Function to return baseUri for contract
-     * @return baseUri URI link to NFT metadata
-     */
-    function _baseURI() internal view override returns (string memory) {
-        return baseUri;
     }
 
     /**

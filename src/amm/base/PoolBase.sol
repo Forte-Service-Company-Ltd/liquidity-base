@@ -12,16 +12,7 @@ import {CumulativePrice} from "./CumulativePrice.sol";
 import {Constants} from "../../common/Constants.sol";
 import {FeeInfo, TBCType} from "../../common/TBC.sol";
 import {MathLibs, Float, packedFloat} from "../mathLibs/MathLibs.sol";
-
-interface ILPToken {
-    function updateLPTokenDeposit(address lp, uint256 tokenId, uint256 wj, uint256 rj) external;
-    function updateLPTokenWithdrawal(address lp, uint256 tokenId, uint256 uj) external returns (uint256);
-    function mint(address lp, uint256 liquidityAmount, uint256 hn) external;
-    function ownerOf(uint256) external returns (address);
-    function lpToken(address lp, uint256 tokenId) external returns (uint256 rj, uint256 wj);
-    function updateLPTokenLastRevenueClaim(address lp, uint256 tokenId, uint256 newRj) external;
-    function w() external returns (uint256);
-}
+import {LPToken} from "../../../src/common/LPToken.sol";
 
 /**
  * @title Pool Base
@@ -29,7 +20,7 @@ interface ILPToken {
  * Any pool implementation must inherits this contract and implement all the functions from CalculatorBase.
  * @author  @oscarsernarosero @mpetersoCode55 @cirsteve
  */
-abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, CumulativePrice {
+abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, CumulativePrice, LPToken {
     using SafeERC20 for IERC20;
     using MathLibs for int256;
     using MathLibs for packedFloat;
@@ -91,11 +82,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      */
     uint256 public collectedProtocolFees;
 
-    /**
-     * @dev The address of the pool-associated LPToken contract
-     */
-    address public LPTokenAddress;
-
     modifier ifLiquidityRemovalAllowed() {
         if (!liquidityRemovalAllowed) revert LiquidityRemovalForbidden();
         _;
@@ -124,8 +110,10 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         address _yToken,
         FeeInfo memory fees,
         bool _liquidityRemovalAllowed,
-        address sender
-    ) Ownable(_msgSender()) {
+        address sender,
+        string memory _name,
+        string memory _symbol
+    ) Ownable(_msgSender()) LPToken(_name, _symbol) {
         _validateInput(_xToken, _yToken, fees._protocolFeeCollector);
         // slither-disable-start missing-zero-check // This is done in the _validateInput function
         xToken = _xToken;
@@ -305,7 +293,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         // slither-disable-end reentrancy-benign
         _amount = afterBalance - beforeBalance;
         _validateLiquidityAdd(x, int(afterBalance).toPackedFloat(-18));
-        _mint(_msgSender(), _amount / 1e18, 0);
+        _mintTokenAndUpdate(_msgSender(), _amount / 1e18, 0);
     }
 
     /**
@@ -422,84 +410,12 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     }
 
     /**
-     * @dev This function is temporary. It allows the owner to set the LPToken address.
-     * @param _LPTokenAddress The address of the LPToken associated with the pool.
-     */
-    function setLPTokenAddress(address _LPTokenAddress) external onlyOwner {
-        if (LPTokenAddress == address(0)) {
-            LPTokenAddress = _LPTokenAddress;
-        } else {
-            revert("LPToken address already set");
-        }
-    }
-
-    /**
      * @dev This function withdraws revenue for the given token
      * @param tokenId the id of the LP token to withdraw revenue for
      * @param Q the amount of revenue to withdraw
      */
     function withdrawRevenue(uint256 tokenId, uint256 Q) external {
         _withdrawRevenue(_msgSender(), tokenId, _normalizeTokenDecimals(true, Q));
-    }
-
-    /**
-     * @dev A helper function to update a specified LPToken when a deposit is made
-     * @param lp address of the liquidity provider
-     * @param tokenId The ID of the LPToken being updated
-     * @param wj The amount being deposited by lp
-     * @param rj The last revenue claim of the provided tokenId
-     */
-    function _updateLPTokenDeposit(address lp, uint256 tokenId, uint256 wj, uint256 rj) internal {
-        ILPToken(LPTokenAddress).updateLPTokenDeposit(lp, tokenId, wj, rj);
-    }
-
-    /**
-     * @dev A helper function to update a specified LPToken when a withdrawal is made
-     * @param lp address of the liquidity provider
-     * @param tokenId The ID of the LPToken being updated
-     * @param uj The amount of liquidity lp would like to withdraw
-     */
-    function _updateLPTokenWithdrawal(address lp, uint256 tokenId, uint256 uj) internal returns (uint256) {
-        return ILPToken(LPTokenAddress).updateLPTokenWithdrawal(lp, tokenId, uj);
-    }
-
-    /**
-     * @dev This is the function to retrieve the current spot price of the x token.
-     * @param lp address of the liquidity provider
-     * @param tokenId The ID of the LPToken being updated
-     * @return the rj for the specified  token
-     * @return the wj for the specified  token
-     */
-    function _getLPToken(address lp, uint256 tokenId) internal returns (uint256, uint256) {
-        return ILPToken(LPTokenAddress).lpToken(lp, tokenId);
-    }
-
-    /**
-     * @dev A helper function to update a specified LPToken's lastRevenueClaim field
-     * @param lp address of the liquidity provider
-     * @param tokenId The ID of the LPToken being updated
-     * @param addedRj The amount of revenue claimed to add to the lpToken being updated
-     */
-    function _updateLPTokenLastRevenueClaim(address lp, uint256 tokenId, uint256 addedRj) internal {
-        ILPToken(LPTokenAddress).updateLPTokenLastRevenueClaim(lp, tokenId, addedRj);
-    }
-
-    /**
-     * @dev This function gets the w value for the LOPToken contract.
-     * @return the w value for the LPToken contract in WAD
-     */
-    function _w() internal returns (uint256) {
-        return ILPToken(LPTokenAddress).w();
-    }
-
-    /**
-     * @dev Mints a new lpToken to a liquidity provider and updated the value associated with this new lpToken
-     * @param lp The address of the liquidity provider owning the lpToken being updated
-     * @param liquidityAmount The amount of liquidity provided by the liquidity provider
-     * @param hn The revenue parameter of the pool associated with the lpToken contract
-     */
-    function _mint(address lp, uint256 liquidityAmount, uint256 hn) internal {
-        ILPToken(LPTokenAddress).mint(lp, liquidityAmount, hn);
     }
 
     /**
@@ -592,9 +508,5 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      */
     function _checkSlippage(uint256 _amountOut, uint256 _minOut) internal pure {
         if (_amountOut < (_minOut - 1)) revert("max slippage reached");
-    }
-
-    function _safeTransfer(address _yToken, address _to, uint256 _amount) internal {
-        IERC20(_yToken).safeTransfer(_to, _amount);
     }
 }
