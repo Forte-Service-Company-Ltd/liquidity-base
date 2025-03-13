@@ -23,7 +23,7 @@ abstract contract LiquidityCeilingInvariants is TestCommonSetup {
         IERC20 tokenY = IERC20(pool.yToken());
         _yTotal = tokenY.totalSupply();
 
-        bytes4[] memory selectors = new bytes4[](13);
+        bytes4[] memory selectors = new bytes4[](12);
         selectors[0] = pool.collectLPFees.selector;
         selectors[1] = pool.swap.selector;
         selectors[2] = pool.simSwap.selector;
@@ -32,11 +32,10 @@ abstract contract LiquidityCeilingInvariants is TestCommonSetup {
         selectors[5] = pool.yToken.selector;
         selectors[6] = pool.enableSwaps.selector;
         selectors[7] = PoolBase(address(pool)).addXSupply.selector;
-        selectors[8] = pool.closePool.selector;
-        selectors[9] = pool.setLPFee.selector;
-        selectors[10] = pool.collectLPFees.selector;
-        selectors[11] = pool.xTokenLiquidity.selector;
-        selectors[12] = pool.yTokenLiquidity.selector;
+        selectors[8] = pool.setLPFee.selector;
+        selectors[9] = pool.collectLPFees.selector;
+        selectors[10] = pool.xTokenLiquidity.selector;
+        selectors[11] = pool.yTokenLiquidity.selector;
 
         targetContract(address(pool));
         targetSelector(FuzzSelector({addr: address(pool), selectors: selectors}));

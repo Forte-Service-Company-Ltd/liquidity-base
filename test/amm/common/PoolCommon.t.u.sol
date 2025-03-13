@@ -218,74 +218,10 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         _pool.enableSwaps(true);
     }
 
-    function closePoolPositive() internal {
-        // TODO determine how to suppoort closePool with new lp mechanism
-        vm.skip(true);
-        uint amountToTrade = 50_000 * fullToken;
-        (uint _expected, , ) = pool.simSwap(address(_yToken), amountToTrade);
-        pool.swap(address(_yToken), amountToTrade, _expected);
-        uint initialLiquidityY = pool.yTokenLiquidity();
-        console2.log("initialLiquidityY", initialLiquidityY);
-        uint fees = pool.collectedLPFees();
-        console2.log("fees", fees);
-        uint protocolFees = pool.collectedProtocolFees();
-        console2.log("protocolFees", protocolFees);
-        address protocolFeeCollector = pool.protocolFeeCollector();
-        console2.log("protocolFeeCollector", protocolFeeCollector);
-        uint ownerBalance = _yToken.balanceOf(admin);
-        uint protocolFeeCollectorBalance = _yToken.balanceOf(protocolFeeCollector);
-        console2.log("protocolFeeCollectorBalance", protocolFeeCollectorBalance);
-        uint RMax = pool.revenueAvailable(address(0), 0);
-        _checkClosePoolState();
-        pool.closePool();
-        uint ownerBalanceClosed = _yToken.balanceOf(admin);
-        uint protocolFeeCollectorBalanceClosed = _yToken.balanceOf(protocolFeeCollector);
-        console2.log("protocolFeeCollectorBalanceClosed", protocolFeeCollectorBalanceClosed);
-        assertEq(protocolFeeCollectorBalanceClosed, protocolFeeCollectorBalance + protocolFees);
-        assertEq(ownerBalanceClosed, ownerBalance + initialLiquidityY + fees + RMax);
-        assertEq(0, pool.xTokenLiquidity());
-        assertEq(0, pool.yTokenLiquidity());
-    }
-
-    function testLiquidity_Pool_closePool_Positive() public startAsAdmin endWithStopPrank {
-        closePoolPositive();
-    }
-
-    function testLiquidity_PoolwithProtocolFee_closePool_Positive() public endWithStopPrank {
-        // TODO determine how to suppoort closePool with new lp mechanism
-        vm.skip(true);
-        _activateProtocolFeesInPool(pool);
-        vm.startPrank(admin);
-        closePoolPositive();
-    }
-
     function testLiquidity_PoolwithNoZeroTransferToken_transfer_amountZero() public {
         NoZeroTransferERC20 _xToken = new NoZeroTransferERC20("X token", "X");
         vm.expectRevert("cannot send 0 amount");
         _xToken.transfer(address(alice), 0);
-    }
-
-    function testLiquidity_PoolwithNoZeroTransferToken_closePool_Positive() public {
-        // TODO determine how to handle closePool with new lp mechanism
-        vm.skip(true);
-        NoZeroTransferERC20 _xToken = new NoZeroTransferERC20("X token", "X");
-        PoolBase _pool = _deployPool(address(_xToken), address(_yToken), 30, true, TBCInputOption.BASE);
-        vm.startPrank(admin);
-        PoolBase(address(_pool)).acceptOwnership();
-        _pool.closePool();
-    }
-
-    function testLiquidity_Pool_closePool_NotOwner() public endWithStopPrank {
-        vm.startPrank(alice);
-        vm.expectRevert(abi.encodeWithSignature("OwnableUnauthorizedAccount(address)", alice));
-        pool.closePool();
-    }
-
-    function testLiquidity_Pool_closePool_RemovalNotAllowed() public endWithStopPrank {
-        PoolBase _pool = _buildLiquidityRemovalNotAllowed();
-        vm.startPrank(admin);
-        vm.expectRevert(abi.encodeWithSignature("LiquidityRemovalForbidden()"));
-        _pool.closePool();
     }
 
     function testLiquidity_Pool_collectLPFees_Positive() public startAsAdmin endWithStopPrank {
