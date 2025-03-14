@@ -13,6 +13,8 @@ import {IFactory} from "../../src/factory/IFactory.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {PythonUtils} from "./pythonUtils.s.sol";
 import {SixDecimalERC20} from "src/example/ERC20/SixDecimalERC20.sol";
+import {ExampleERC721URI} from "src/example/ERC721/ExampleERC721URI.sol";
+import {Descriptor, SVGLinesPart1, SVGLinesPart2, SVGLinesPart3, SVG, HexStrings} from "src/common/NFTSVG.sol";
 
 contract CommonDeployment is Script, PythonUtils {
     function _deployFactory() internal virtual returns (IFactory) {}
@@ -72,6 +74,14 @@ contract CommonDeployment is Script, PythonUtils {
         console2.log("Stable Coin (STC):", address(stableCoin));
     }
 
+    function deployERC721() internal returns (ExampleERC721URI) {
+        ExampleERC721URI erc721 = new ExampleERC721URI("Example ERC721", "ERC721");
+        setENVAddress("ERC721_ADDRESS", vm.toString(address(erc721)));
+        console2.log("Example ERC721 (ERC721):", address(erc721));
+        erc721.mint(vm.envAddress("DEPLOYMENT_OWNER"));
+        return erc721;
+    }
+
     function setProtocolFeeCollector(IFactory factory, address _protocolFeeCollector, uint feeCollectorFee) internal {
         factory.proposeProtocolFeeCollector(_protocolFeeCollector);
         vm.stopBroadcast();
@@ -118,6 +128,14 @@ contract XTokenDeployment is CommonDeployment {
     function run() external {
         vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
         deployTokens(10e21);
+        vm.stopBroadcast();
+    }
+}
+
+contract ERC721Deployment is CommonDeployment {
+    function run() external {
+        vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
+        deployERC721();
         vm.stopBroadcast();
     }
 }
