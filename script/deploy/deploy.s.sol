@@ -249,9 +249,9 @@ contract PoolConfigDeploymentCommon is CommonDeployment, Recorder {
         {
             IERC20 tokenY = IERC20(yTokenAddress);
             tokenX.approve(poolAddress, tokenX.totalSupply());
-            tokenX.approve(vm.envAddress("DEPLOYMENT_OWNER"), tokenX.totalSupply());
+            tokenX.approve(ownerAddress, tokenX.totalSupply());
             tokenY.approve(poolAddress, tokenX.totalSupply());
-            tokenY.approve(vm.envAddress("DEPLOYMENT_OWNER"), tokenX.totalSupply());
+            tokenY.approve(ownerAddress, tokenX.totalSupply());
         }
         {
             PoolBase pool = PoolBase(poolAddress);
