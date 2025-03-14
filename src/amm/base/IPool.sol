@@ -177,8 +177,8 @@ interface IPool is IPoolEvents {
      * @return currently claimable protocol fee balance
      */
     function collectedProtocolFees() external returns (uint256);
-    
-/**
+
+    /**
      * @dev This function returns the available revenue for the given token
      * @param lp The address of the liquidity provider
      * @param tokenId The ID of the LPToken

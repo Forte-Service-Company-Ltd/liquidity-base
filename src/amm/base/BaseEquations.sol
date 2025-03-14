@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
-import {MathLibs, Float} from "../mathLibs/MathLibs.sol";
+import {MathLibs, packedFloat} from "../mathLibs/MathLibs.sol";
 
 /**
  * @title Equations used by multiple TBC types
@@ -8,7 +8,7 @@ import {MathLibs, Float} from "../mathLibs/MathLibs.sol";
  */
 library BaseEquations {
     using MathLibs for uint256;
-    using MathLibs for Float;
+    using MathLibs for packedFloat;
 
     /**
      * @dev This function calculates the last revenue claim to be stored in the associated LPToken variable rj. The result will be a WAD value.
@@ -42,11 +42,11 @@ library BaseEquations {
      * @param w_hat The current liquidity amount of the associated LPToken. Expected to be a Float.
      */
     function calculateLastRevenueClaimFloat(
-        Float memory hn,
-        Float memory wj,
-        Float memory r_hat,
-        Float memory w_hat
-    ) internal pure returns (Float memory) {
+        packedFloat hn,
+        packedFloat wj,
+        packedFloat r_hat,
+        packedFloat w_hat
+    ) internal pure returns (packedFloat) {
         return hn.mul(wj).add(r_hat.mul(w_hat)).div(w_hat.add(wj));
     }
 }

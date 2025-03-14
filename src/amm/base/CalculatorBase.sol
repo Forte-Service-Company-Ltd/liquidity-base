@@ -32,7 +32,10 @@ abstract contract CalculatorBase is Constants {
      * @param x tracker value for the net amount of xTokens sold to the public. Bare in mind that this value is offset by initial synthetic trade
      * @return amountOfX required amount of token X
      */
-    function _calculateAmountOfXRequiredBuyingY(packedFloat _amountOfY, packedFloat x) internal view virtual returns (packedFloat amountOfX);
+    function _calculateAmountOfXRequiredBuyingY(
+        packedFloat _amountOfY,
+        packedFloat x
+    ) internal view virtual returns (packedFloat amountOfX);
 
     /**
      * @dev This function calculates the amount of token Y required for the user to purchase a specific amount of Token X (buy x with y : out perspective).
@@ -40,7 +43,10 @@ abstract contract CalculatorBase is Constants {
      * @param x tracker value for the net amount of xTokens sold to the public. Bare in mind that this value is offset by initial synthetic trade
      * @return amountOfY required amount of token Y
      */
-    function _calculateAmountOfYRequiredBuyingX(packedFloat _amountOfX, packedFloat x) internal view virtual returns (packedFloat amountOfY);
+    function _calculateAmountOfYRequiredBuyingX(
+        packedFloat _amountOfX,
+        packedFloat x
+    ) internal view virtual returns (packedFloat amountOfY);
 
     /**
      * @dev This function calculates the amount of token Y the user will receive when selling token X (sell x for y : in perspective).
@@ -48,7 +54,10 @@ abstract contract CalculatorBase is Constants {
      * @param x tracker value for the net amount of xTokens sold to the public. Bare in mind that this value is offset by initial synthetic trade
      * @return amountOfY amount of token Y to be received
      */
-    function _calculateAmountOfYReceivedSellingX(packedFloat _amountOfX, packedFloat x) internal view virtual returns (packedFloat amountOfY);
+    function _calculateAmountOfYReceivedSellingX(
+        packedFloat _amountOfX,
+        packedFloat x
+    ) internal view virtual returns (packedFloat amountOfY);
 
     /**
      * This function calculates the amount of token X the user will receive when selling token Y (sell y for x : in perspective).
@@ -56,7 +65,10 @@ abstract contract CalculatorBase is Constants {
      * @param x tracker value for the net amount of xTokens sold to the public. Bare in mind that this value is offset by initial synthetic trade
      * @return amountOfX amount of token X to be received
      */
-    function _calculateAmountOfXReceivedSellingY(packedFloat _amountOfY, packedFloat x) internal view virtual returns (packedFloat amountOfX);
+    function _calculateAmountOfXReceivedSellingY(
+        packedFloat _amountOfY,
+        packedFloat x
+    ) internal view virtual returns (packedFloat amountOfX);
 
     /**
      * @dev This function cleans the state of the calculator in the case of the pool closing.
