@@ -639,13 +639,11 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
     }
 
     function testLiquidity_Pool_WithdrawRevenueAccrued_NotOwner() public startAsAdmin endWithStopPrank {
-        //TODO determine how to test new revenue withdrawal mechanism
-        vm.skip(true);
         _pool_BackAndForthSwaps();
         vm.stopPrank();
         vm.startPrank(alice);
-        vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, alice));
-        pool.withdrawRevenue(0, 1);
+        vm.expectRevert(abi.encodeWithSignature("InvalidToken()"));
+        pool.withdrawRevenue(1, 0);
     }
 
     function testLiquidity_Pool_WithdrawRevenueAccrued_Positive() public startAsAdmin endWithStopPrank {

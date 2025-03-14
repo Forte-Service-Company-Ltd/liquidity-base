@@ -373,7 +373,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      * @param tokenId The ID of the LPToken
      * @return revenue The amount of revenue available for the given token
      */
-    function revenueAvailable(address lp, uint256 tokenId) external returns (uint256 revenue) {
+    /*function revenueAvailable(address lp, uint256 tokenId) external returns (uint256 revenue) {
         revenue = _revenueAvailable(lp, tokenId);
         revenue = _normalizeTokenDecimals(false, revenue);
     }
@@ -383,9 +383,9 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      * @param tokenId the id of the LP token to withdraw revenue for
      * @param Q the amount of revenue to withdraw
      */
-    function withdrawRevenue(uint256 tokenId, uint256 Q) external {
+    /*function withdrawRevenue(uint256 tokenId, uint256 Q) external {
         _withdrawRevenue(_msgSender(), tokenId, _normalizeTokenDecimals(true, Q));
-    }
+    }*/
 
     /**
      * @dev A helper function to validate most of constructor's inputs.
