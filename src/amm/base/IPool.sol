@@ -192,4 +192,10 @@ interface IPool is IPoolEvents {
      * @notice this value is immutable
      */
     function liquidityRemovalAllowed() external returns (bool);
+
+    /**
+     * @dev returns the current total liquidity in the Pool
+     * @return w
+     */
+    function w() external returns (uint256);
 }
