@@ -25,7 +25,7 @@ abstract contract pausedAuthorizationInvariants is TestCommonSetup {
         _startingXLiquidity = pool.xTokenLiquidity();
         _startingYLiquidity = pool.yTokenLiquidity();
     }
-    function invariant_verifyRevertsWhilePaused_removeLiquidityXToken() public {
+    function invariant_verifyRevertsWhilePaused_removeLiquidityXToken() public view {
         assertEq(pool.xTokenLiquidity(), _startingXLiquidity);
     }
     function invariant_verifyRevertsWhilePaused_removeLiquidityYToken() public {

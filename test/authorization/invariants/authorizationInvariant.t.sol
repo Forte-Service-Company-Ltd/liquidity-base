@@ -16,12 +16,11 @@ abstract contract authorizationInvariants is TestCommonSetup {
     function setUp() public endWithStopPrank {
         pool = _setupPool(false);
 
-        bytes4[] memory selectors = new bytes4[](5);
+        bytes4[] memory selectors = new bytes4[](4);
         selectors[0] = pool.collectLPFees.selector;
         selectors[1] = pool.enableSwaps.selector;
         selectors[2] = pool.setLPFee.selector;
         selectors[3] = PoolBase(address(pool)).addXSupply.selector;
-        selectors[4] = pool.closePool.selector;
         targetContract(address(pool));
         targetSelector(FuzzSelector({addr: address(pool), selectors: selectors}));
         targetSender(alice);

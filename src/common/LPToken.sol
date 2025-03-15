@@ -46,12 +46,12 @@ contract LPToken is ERC721, ERC721Enumerable {
      * @dev Mints a new lpToken to a liquidity provider and updated the value associated with this new lpToken
      * @notice The internal version of the mint method. Used in the constructor, in order to circumvent ownership transfers.
      * @param lp The address of the liquidity provider owning the lpToken being updated
-     * @param liquidityAmount The amount of liquidity provided by the liquidity provider
+     * @param wj The amount of liquidity provided by the liquidity provider
      * @param hn The revenue parameter of the pool associated with the lpToken contract
      */
-    function _mintTokenAndUpdate(address lp, uint256 liquidityAmount, uint256 hn) internal {
+    function _mintTokenAndUpdate(address lp, uint256 wj, uint256 hn) internal {
         _mint(lp, ++currentTokenId);
-        _updateLPTokenVarsDeposit(lp, currentTokenId, liquidityAmount, hn);
+        _updateLPTokenVarsDeposit(lp, currentTokenId, wj, hn);
     }
 
     /**
@@ -60,11 +60,11 @@ contract LPToken is ERC721, ERC721Enumerable {
      * @param lp The address of the liquidity provider owning the lpToken being updated
      * @param tokenId The token id of the lpToken being updated
      * @param wj The amount of liquidity associated with the lpToken being updated
-     * @param hn The amount of revenue associated with the lpToken being updated
+     * @param rj The amount of revenue associated with the lpToken being updated
      */
-    function _updateLPTokenVarsDeposit(address lp, uint256 tokenId, uint256 wj, uint256 hn) internal {
+    function _updateLPTokenVarsDeposit(address lp, uint256 tokenId, uint256 wj, uint256 rj) internal {
         w += wj;
-        lpToken[lp][tokenId].rj = _calculateRj(lp, tokenId, wj, hn);
+        lpToken[lp][tokenId].rj = rj;
         lpToken[lp][tokenId].wj += wj;
     }
 
@@ -84,11 +84,11 @@ contract LPToken is ERC721, ERC721Enumerable {
      * @param _tokenId The token id of the lpToken being updated
      * @param _hn The amount of revenue associated with the lpToken being updated
      */
-    function _calculateRj(address _lp, uint256 _tokenId, uint256 _wj, uint256 _hn) internal view returns (uint256 result) {
+    /*function _calculateRj(address _lp, uint256 _tokenId, uint256 _wj, uint256 _hn) internal view returns (uint256 result) {
         uint256 w_hat = lpToken[_lp][_tokenId].wj;
         uint256 r_hat = lpToken[_lp][_tokenId].rj;
         r_hat == 0 ? result = (_hn * _wj) / (w_hat + _wj) : result = ((_hn * _wj) + (r_hat * w_hat) / (w_hat + _wj));
-    }
+    }*/
 
     /**
      * @dev Updates the amount of liquidity associated with an LP Token. Used when withdrawing a full or partial liquidity position.

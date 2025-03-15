@@ -87,13 +87,6 @@ interface IPool is IPoolEvents {
     function addXSupply(uint256 _amount) external;
 
     /**
-
-     * @dev This function closes the pool by removing all liquidity from it.
-     * @notice This function can be called only if the flag liquidityRemovalAllowed was set to true at construction time.
-     */
-    function closePool() external;
-
-    /**
      * @dev This is the function to update the LP fees per trading.
      * @param _fee percentage of the transaction that will get collected as fees (in percentage basis points:
      * 10000 -> 100.00%; 500 -> 5.00%; 1 -> 0.01%)
@@ -184,8 +177,8 @@ interface IPool is IPoolEvents {
      * @return currently claimable protocol fee balance
      */
     function collectedProtocolFees() external returns (uint256);
-    
-/**
+
+    /**
      * @dev This function returns the available revenue for the given token
      * @param lp The address of the liquidity provider
      * @param tokenId The ID of the LPToken

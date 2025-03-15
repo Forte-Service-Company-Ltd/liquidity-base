@@ -297,37 +297,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     }
 
     /**
-
-     * @dev This function closes the pool by removing all liquidity from it.
-     * @notice This function can be called only if the flag liquidityRemovalAllowed was set to true at construction time.
-     */
-    // TODO fix closePool to support multiple liquidity providers
-    function closePool() external virtual onlyOwner ifLiquidityRemovalAllowed {
-        uint256 collectedProtocolFeeAmount = collectedProtocolFees;
-        uint collectedLPFeesAmount = collectedLPFees;
-        uint256 Q = _revenueAvailable(_msgSender(), 0);
-        uint xBalance = IERC20(xToken).balanceOf(address(this));
-        /// yBalance will include LPFees, Q and yLiquidity
-        uint yBalance = IERC20(yToken).balanceOf(address(this)) - collectedProtocolFees;
-
-        delete collectedProtocolFees;
-        delete collectedLPFees;
-        x = int(0).toPackedFloat(-16384);
-        delete lpFee;
-        delete protocolFee;
-
-        emit PoolClosed(xBalance, yBalance);
-        if (Q > 0) emit RevenueWithdrawn(_msgSender(), 0, Q);
-        if (collectedLPFeesAmount > 0) emit LPFeesCollected(_msgSender(), collectedLPFeesAmount);
-        if (collectedProtocolFeeAmount > 0) {
-            emit ProtocolFeesCollected(protocolFeeCollector, collectedProtocolFeeAmount);
-            IERC20(yToken).safeTransfer(protocolFeeCollector, collectedProtocolFeeAmount);
-        }
-        if (xBalance > 0) IERC20(xToken).safeTransfer(_msgSender(), xBalance);
-        if (yBalance > 0) IERC20(yToken).safeTransfer(_msgSender(), yBalance);
-    }
-
-    /**
      * @dev This function collects the LP fees from the Pool.
      */
     function collectLPFees() external onlyOwner {
@@ -404,7 +373,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      * @param tokenId The ID of the LPToken
      * @return revenue The amount of revenue available for the given token
      */
-    function revenueAvailable(address lp, uint256 tokenId) external returns (uint256 revenue) {
+    /*function revenueAvailable(address lp, uint256 tokenId) external returns (uint256 revenue) {
         revenue = _revenueAvailable(lp, tokenId);
         revenue = _normalizeTokenDecimals(false, revenue);
     }
@@ -414,9 +383,9 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      * @param tokenId the id of the LP token to withdraw revenue for
      * @param Q the amount of revenue to withdraw
      */
-    function withdrawRevenue(uint256 tokenId, uint256 Q) external {
+    /*function withdrawRevenue(uint256 tokenId, uint256 Q) external {
         _withdrawRevenue(_msgSender(), tokenId, _normalizeTokenDecimals(true, Q));
-    }
+    }*/
 
     /**
      * @dev A helper function to validate most of constructor's inputs.
