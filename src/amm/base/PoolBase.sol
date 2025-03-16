@@ -150,8 +150,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         yDecimalDiff = POOL_NATIVE_DECIMALS - IERC20Metadata(_yToken).decimals();
         _pause();
 
-        _transferOwnership(sender);
-        /// implementation contract must emit a PoolDeployed event
+        /// implementation contract must transfer ownership and emit a PoolDeployed event
     }
 
     /**
