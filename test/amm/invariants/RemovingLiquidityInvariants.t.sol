@@ -15,7 +15,7 @@ abstract contract RemovingLiquidityInvariants is TestCommonSetup {
         pool = _setupPool(false);
         xTokenLiquidity = IERC20(pool.xToken()).totalSupply();
         bytes4[] memory selectors = new bytes4[](1);
-        selectors[0] = pool.collectLPFees.selector;
+        selectors[0] = pool.withdrawRevenue.selector; 
         targetContract(address(pool));
         targetSelector(FuzzSelector({addr: address(pool), selectors: selectors}));
         targetSender(admin);
