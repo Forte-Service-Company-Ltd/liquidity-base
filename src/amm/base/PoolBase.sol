@@ -148,7 +148,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         // slither-disable-end missing-zero-check
         liquidityRemovalAllowed = _liquidityRemovalAllowed;
         yDecimalDiff = POOL_NATIVE_DECIMALS - IERC20Metadata(_yToken).decimals();
-        _pause();
 
         /// implementation contract must transfer ownership and emit a PoolDeployed event
     }
