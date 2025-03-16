@@ -76,6 +76,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         IERC20 _xToken = IERC20(poolRet.xToken());
         IERC20 _yToken = IERC20(poolRet.yToken());
         _xToken.approve(address(poolRet), X_TOKEN_MAX_SUPPLY);
+        _xToken.approve(_getFactoryAddress(), X_TOKEN_MAX_SUPPLY); // approve factory
         if (!usdt) {
             _yToken.approve(address(poolRet), _yToken.balanceOf(admin));
         }
@@ -107,7 +108,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         vm.startPrank(admin);
         poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
-        _addInitialLiquidity(poolRet, X_TOKEN_MAX_SUPPLY);
+        // _addInitialLiquidity(poolRet, X_TOKEN_MAX_SUPPLY);
         amountMinBound = 2;
         pool = poolRet;
         _setupCollateralToken();
@@ -128,7 +129,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         vm.startPrank(admin);
         poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
-        _addInitialLiquidity(poolRet, X_TOKEN_MAX_SUPPLY);
+        // _addInitialLiquidity(poolRet, X_TOKEN_MAX_SUPPLY);
     }
 
     function _setupPoolForkTest(
@@ -149,7 +150,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         vm.startPrank(admin);
         poolRet.enableSwaps(true);
         _approvePool(poolRet, usdt);
-        _addInitialLiquidity(poolRet, 10e3 * ERC20_DECIMALS);
+        // _addInitialLiquidity(poolRet, 10e3 * ERC20_DECIMALS);
 
         (owner, fee);
     }
@@ -166,7 +167,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         vm.startPrank(admin);
         poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
-        _addInitialLiquidity(poolRet, 10e3 * ERC20_DECIMALS);
+        // _addInitialLiquidity(poolRet, 10e3 * ERC20_DECIMALS);
     }
 
     function _setupPrecisionPools(
@@ -180,7 +181,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         vm.startPrank(admin);
         wadPool.enableSwaps(true);
         _approvePool(wadPool, false);
-        _addInitialLiquidity(wadPool, maxSupply);
+        // _addInitialLiquidity(wadPool, maxSupply);
         vm.stopPrank();
 
         _setUpTokens(maxSupply);
@@ -194,7 +195,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         vm.startPrank(admin);
         sixDecimalPool.enableSwaps(true);
         _approvePool(sixDecimalPool, false);
-        _addInitialLiquidity(sixDecimalPool, maxSupply);
+        // _addInitialLiquidity(sixDecimalPool, maxSupply);
     }
 
     function _setupPoolPartialFunding(bool withStableCoin) internal endWithStopPrank returns (PoolBase poolRet) {
@@ -205,7 +206,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         vm.startPrank(admin);
         poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
-        _addInitialLiquidity(poolRet, X_TOKEN_MAX_SUPPLY / 2);
+        // _addInitialLiquidity(poolRet, X_TOKEN_MAX_SUPPLY / 2);
     }
 
     function _setupFOTPool(bool withStableCoin) internal endWithStopPrank returns (PoolBase poolRet) {
@@ -216,7 +217,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         vm.startPrank(admin);
         poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
-        _addInitialLiquidity(poolRet, X_TOKEN_MAX_SUPPLY);
+        // _addInitialLiquidity(poolRet, X_TOKEN_MAX_SUPPLY);
         pool = poolRet;
         _setupCollateralToken();
     }
