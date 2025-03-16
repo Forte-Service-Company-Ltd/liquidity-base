@@ -13,6 +13,7 @@ import {Constants} from "../../common/Constants.sol";
 import {FeeInfo, TBCType} from "../../common/TBC.sol";
 import {MathLibs, Float, packedFloat} from "../mathLibs/MathLibs.sol";
 import {LPToken} from "../../../src/common/LPToken.sol";
+import "forge-std/console2.sol";
 
 /**
  * @title Pool Base
@@ -47,10 +48,22 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     packedFloat public x;
 
     /**
-     * @dev lifetime revenue claimed by the pool
+     * @dev lifetime revenue accrued by the pool
      */
     // slither-disable-next-line constable-states // updated in child contract
-    uint256 public R = 0;
+    uint256 public R;
+
+    /**
+     * @dev lifetime revenue accrued by the pool
+     */
+    // slither-disable-next-line constable-states // updated in child contract
+    packedFloat public h;
+
+    /**
+     * @dev lifetime revenue claimed from the pool
+     */
+    // slither-disable-next-line constable-states // updated in child contract
+    uint256 public r;
 
     /**
      * @dev fee percentage for swaps for the LP
@@ -75,7 +88,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     /**
      * @dev currently claimable fee balance
      */
-    uint256 public collectedLPFees;
+    packedFloat _collectedLPFees;
 
     packedFloat internal _w;
 
@@ -161,7 +174,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         if (_minOut == 0) revert ZeroValueNotAllowed();
         (amountOut, lpFeeAmount, protocolFeeAmount) = simSwap(_tokenIn, _amountIn);
         _checkSlippage(amountOut, _minOut);
-
         packedFloat xOld = x;
 
         x = sellingX ? x.sub(int(_amountIn).toPackedFloat(-18)) : x.add(int(amountOut).toPackedFloat(-18));
@@ -169,7 +181,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         // slither-disable-start reentrancy-events // the recipient of the initial transfer is this contract
         _updateParameters(xOld, x);
 
-        collectedLPFees += lpFeeAmount;
+        _collectedLPFees = _collectedLPFees.add(int(lpFeeAmount).toPackedFloat(int(yDecimalDiff) - int(POOL_NATIVE_DECIMALS)).div(_w));
         emit LPFeeGenerated(lpFeeAmount);
         collectedProtocolFees += protocolFeeAmount;
         emit ProtocolFeeGenerated(protocolFeeAmount);
@@ -299,16 +311,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     }
 
     /**
-     * @dev This function collects the LP fees from the Pool.
-     */
-    function collectLPFees() external onlyOwner {
-        uint256 collectedAmount = collectedLPFees;
-        delete collectedLPFees;
-        emit LPFeesCollected(_msgSender(), collectedAmount);
-        IERC20(yToken).safeTransfer(_msgSender(), collectedAmount);
-    }
-
-    /**
      * @dev This function collects the protocol fees from the Pool.
      */
     function collectProtocolFees() external onlyProtocolFeeCollector {
@@ -348,13 +350,15 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         return IERC20(xToken).balanceOf(address(this));
     }
 
+
     /**
      * @dev This function gets the liquidity in the pool for yToken in WAD
      * @return the liquidity in the pool for yToken in WAD
      */
-    function yTokenLiquidity() external virtual returns (uint256) {
-        // TODO determine if yToken liquidity is applicable
-        return IERC20(yToken).balanceOf(address(this)) - collectedLPFees - collectedProtocolFees;
+    function yTokenLiquidity() external view returns (uint256) {
+        uint revenue = uint((h.mul(_w)).convertpackedFloatToWAD());
+        revenue = _normalizeTokenDecimals(false, revenue);
+        return (IERC20(yToken).balanceOf(address(this)) + r) - (collectedProtocolFees + revenue); 
     }
 
     /**
@@ -368,6 +372,22 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         if (yDecimalDiff != 0) {
             sPrice = _normalizeTokenDecimals(false, sPrice);
         }
+    }
+
+    /**
+     * @dev tells current LP fees accumulated in the pool
+     * @return currently claimable LP fee balance
+     */
+    function collectedLPFees() external view returns (uint256){
+        return _normalizeTokenDecimals(false, uint((_collectedLPFees.mul(_w)).convertpackedFloatToWAD()));
+    }
+
+    /**
+     * @dev tells current LP fees accumulated in the pool
+     * @return currently claimable LP fee balance
+     */
+    function collectedLPFeesPerLiquidityUnit() external view returns (uint256){
+        return _normalizeTokenDecimals(false, uint(_collectedLPFees.convertpackedFloatToWAD()));
     }
 
     /**
