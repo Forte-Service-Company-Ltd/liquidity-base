@@ -30,8 +30,8 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
     }
 
     function testLiquidity_Pool_TokensMustNotBeTheSame() public {
-        vm.expectRevert(abi.encodeWithSignature("XandYTokensAreTheSame()")); 
-        _deployPool(address(yToken), address(yToken), 0, X_TOKEN_MAX_SUPPLY, TBCInputOption.BASE);
+        vm.expectRevert(abi.encodeWithSignature("XandYTokensAreTheSame()"));
+        _deployPool(address(yToken), address(yToken), 0, true, TBCInputOption.BASE);
     }
 
     function testLiquidity_Pool_enableSwaps_Positive() public startAsAdmin {
@@ -485,8 +485,6 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
     }
 
     function testLiquidity_Pool_backAndForthSwaps() public startAsAdmin endWithStopPrank {
-        // TODO determine how to test revenue and liquidity
-        vm.skip(true);
         for (uint i = 0; i < 100; i++) {
             // 10 swaps in each direction back and forth
             for (uint j = 0; j < 10; j++) {
