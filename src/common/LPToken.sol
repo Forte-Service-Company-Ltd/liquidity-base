@@ -3,6 +3,7 @@ pragma solidity ^0.8.24;
 
 import {ERC721} from "../../lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
 import {ERC721Enumerable} from "../../lib/openzeppelin-contracts/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import {IPoolEvents} from "./IEvents.sol";
 
 /**
  * @title Liquidity provider token
@@ -50,7 +51,7 @@ contract LPToken is ERC721, ERC721Enumerable {
      * @param wj The amount of liquidity provided by the liquidity provider
      * @param hn The revenue parameter of the pool associated with the lpToken contract
      */
-    function _mintTokenAndUpdate(address lp, uint256 wj, uint256 hn, bool inactive) internal {
+    function _mintTokenAndUpdate(address lp, uint256 wj, uint256 hn, bool inactive, uint256 tokenXAmount, uint256 tokenYAmount) internal {
         if(inactive) {
             if(!inactiveCreated) {
                 inactiveCreated = true;
@@ -62,7 +63,7 @@ contract LPToken is ERC721, ERC721Enumerable {
             _updateLPTokenVarsDeposit(lp, currentTokenId, wj, hn);
             currentTokenId += 1;
         }
-        
+        emit IPoolEvents.LPTokenMinted(lp, currentTokenId, tokenXAmount, tokenYAmount);
     }
 
     /**
@@ -116,6 +117,7 @@ contract LPToken is ERC721, ERC721Enumerable {
         } else {
             _burn(_tokenId);
             lpToken[_lp][_tokenId].wj = 0;
+            emit IPoolEvents.LPTokenBurned(_lp, _tokenId, _uj);
         }
         return lpToken[_lp][_tokenId].rj;
     }
