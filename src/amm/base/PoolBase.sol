@@ -181,7 +181,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         // slither-disable-start reentrancy-events // the recipient of the initial transfer is this contract
         _updateParameters(xOld, x);
 
-        _collectedLPFees = _collectedLPFees.add(int(lpFeeAmount).toPackedFloat(int(yDecimalDiff) - int(POOL_NATIVE_DECIMALS)).div(int(w).toPackedFloat(-18)));
+        _collectedLPFees = _collectedLPFees.add(int(lpFeeAmount).toPackedFloat(int(yDecimalDiff) - int(POOL_NATIVE_DECIMALS)).div(_w));
         emit LPFeeGenerated(lpFeeAmount);
         collectedProtocolFees += protocolFeeAmount;
         emit ProtocolFeeGenerated(protocolFeeAmount);
@@ -356,7 +356,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      * @return the liquidity in the pool for yToken in WAD
      */
     function yTokenLiquidity() external view returns (uint256) {
-        uint revenue = uint((h.mul(int(w).toPackedFloat(-18))).convertpackedFloatToWAD());
+        uint revenue = uint((h.mul(_w)).convertpackedFloatToWAD());
         revenue = _normalizeTokenDecimals(false, revenue);
         return (IERC20(yToken).balanceOf(address(this)) + r) - (collectedProtocolFees + revenue); 
     }
@@ -379,7 +379,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      * @return currently claimable LP fee balance
      */
     function collectedLPFees() external view returns (uint256){
-        return _normalizeTokenDecimals(false, uint((_collectedLPFees.mul(int(w).toPackedFloat(-18))).convertpackedFloatToWAD()));
+        return _normalizeTokenDecimals(false, uint((_collectedLPFees.mul(_w)).convertpackedFloatToWAD()));
     }
 
     /**
