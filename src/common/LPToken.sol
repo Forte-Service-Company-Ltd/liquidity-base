@@ -11,7 +11,6 @@ import {ERC721Enumerable} from "../../lib/openzeppelin-contracts/contracts/token
  * @author @palmerg4 @oscarsernarosero @cirsteve
  */
 contract LPToken is ERC721, ERC721Enumerable {
-    uint256 public w;
     uint256 public currentTokenId;
 
     mapping(address lp => mapping(uint256 tokenId => LPTokenS lpToken)) public lpToken;
@@ -63,7 +62,6 @@ contract LPToken is ERC721, ERC721Enumerable {
      * @param rj The amount of revenue associated with the lpToken being updated
      */
     function _updateLPTokenVarsDeposit(address lp, uint256 tokenId, uint256 wj, uint256 rj) internal {
-        w += wj;
         lpToken[lp][tokenId].rj = rj;
         lpToken[lp][tokenId].wj += wj;
     }
@@ -100,8 +98,6 @@ contract LPToken is ERC721, ERC721Enumerable {
     function _updateLPTokenVarsWithdrawal(address _lp, uint256 _tokenId, uint256 _uj) internal returns (uint256) {
         uint256 wj = lpToken[_lp][_tokenId].wj;
         if (wj < _uj) revert("LPToken: withdrawal amount exceeds allowance");
-
-        w -= _uj;
 
         if (wj > _uj) {
             lpToken[_lp][_tokenId].wj -= _uj;

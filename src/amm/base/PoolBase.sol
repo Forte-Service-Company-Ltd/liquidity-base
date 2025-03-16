@@ -77,6 +77,8 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      */
     uint256 public collectedLPFees;
 
+    packedFloat internal _w;
+
     /**
      * @dev currently claimable protocol fee balance
      */
@@ -477,5 +479,13 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      */
     function _checkSlippage(uint256 _amountOut, uint256 _minOut) internal pure {
         if (_amountOut < (_minOut - 1)) revert("max slippage reached");
+    }
+
+    /**
+     * @dev returns the current total liquidity in the Pool
+     * @return w
+     */
+    function w() external returns (uint256) {
+        return uint(_w.convertpackedFloatToWAD());
     }
 }
