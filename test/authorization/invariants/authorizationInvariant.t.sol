@@ -17,7 +17,7 @@ abstract contract authorizationInvariants is TestCommonSetup {
         pool = _setupPool(false);
 
         bytes4[] memory selectors = new bytes4[](4);
-        selectors[0] = pool.collectLPFees.selector;
+        selectors[0] = pool.withdrawRevenue.selector;
         selectors[1] = pool.enableSwaps.selector;
         selectors[2] = pool.setLPFee.selector;
         selectors[3] = PoolBase(address(pool)).addXSupply.selector;

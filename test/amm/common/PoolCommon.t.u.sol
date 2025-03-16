@@ -222,24 +222,26 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         _xToken.transfer(address(alice), 0);
     }
 
-    function testLiquidity_Pool_collectLPFees_Positive() public startAsAdmin endWithStopPrank {
-        uint collectedLPFees = (3 * fullToken) / 1e6 + 1;
-        (uint expected, , ) = pool.simSwap(address(_yToken), (1 * fullToken) / 1e3);
-        pool.swap(address(_yToken), (1 * fullToken) / 1e3, expected);
+    // TODO: create same test with withdraw revenue
+    // function testLiquidity_Pool_collectLPFees_Positive() public startAsAdmin endWithStopPrank {
+    //     uint collectedLPFees = (3 * fullToken) / 1e6 + 1;
+    //     (uint expected, , ) = pool.simSwap(address(_yToken), (1 * fullToken) / 1e3);
+    //     pool.swap(address(_yToken), (1 * fullToken) / 1e3, expected);
 
-        uint256 originalBalance = IERC20(_yToken).balanceOf(address(admin));
+    //     uint256 originalBalance = IERC20(_yToken).balanceOf(address(admin));
 
-        vm.expectEmit(true, true, true, true, address(pool));
-        emit IPoolEvents.LPFeesCollected(admin, collectedLPFees);
-        pool.collectLPFees();
-        assertEq(IERC20(_yToken).balanceOf(address(admin)), originalBalance + collectedLPFees);
-    }
+    //     vm.expectEmit(true, true, true, true, address(pool));
+    //     emit IPoolEvents.LPFeesCollected(admin, collectedLPFees);
+    //     pool.collectLPFees();
+    //     assertEq(IERC20(_yToken).balanceOf(address(admin)), originalBalance + collectedLPFees);
+    // }
 
-    function testLiquidity_Pool_collectLPFees_NotOwner() public endWithStopPrank {
-        vm.startPrank(alice);
-        vm.expectRevert(abi.encodeWithSignature("OwnableUnauthorizedAccount(address)", alice));
-        pool.collectLPFees();
-    }
+    // TODO: create same test with withdraw revenue
+    // function testLiquidity_Pool_collectLPFees_NotOwner() public endWithStopPrank {
+    //     vm.startPrank(alice);
+    //     vm.expectRevert(abi.encodeWithSignature("OwnableUnauthorizedAccount(address)", alice));
+    //     pool.collectLPFees();
+    // }
 
     function testLiquidity_Pool_buyGameToken_MaxSlippageReached() public startAsAdmin endWithStopPrank {
         uint16 maxSlippage = 300;

@@ -114,11 +114,6 @@ interface IPool is IPoolEvents {
     function confirmProtocolFeeCollector() external;
 
     /**
-     * @dev This function collects the fees from the Pool.
-     */
-    function collectLPFees() external;
-
-    /**
      * @dev This function allows the owner of the lp token to pull accrued revenue from the Pool.
      * @param tokenId the id of the LP token to withdraw revenue for
      * @param Q the amount of revenue to withdraw
