@@ -92,6 +92,8 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
 
     packedFloat internal _w;
 
+    packedFloat internal _wInactive;
+
     /**
      * @dev currently claimable protocol fee balance
      */
@@ -507,5 +509,9 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      */
     function w() external returns (uint256) {
         return uint(_w.convertpackedFloatToWAD());
+    }
+
+    function wInactive() external returns (uint256) {
+        return uint(_wInactive.convertpackedFloatToWAD());
     }
 }
