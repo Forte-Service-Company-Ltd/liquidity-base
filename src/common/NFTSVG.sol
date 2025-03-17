@@ -482,7 +482,11 @@ library Descriptor {
     /// @param fee fee amount as uint16 where 100 = 1%, 1 = 0.01%
     /// @return fee as a decimal string with percent sign
     function feeToPercentString(uint16 fee, uint256 tokenId) internal pure returns (string memory) {
-        if (fee == 0 || tokenId == 1) { // this is to handle the edge case of the first inactive LP position where it will not earn trading fees
+        if(tokenId == 1) {
+            return "INACTIVE";
+        }
+
+        if (fee == 0) { // this is to handle the edge case of the first inactive LP position where it will not earn trading fees
             return "0%";
         }
         
