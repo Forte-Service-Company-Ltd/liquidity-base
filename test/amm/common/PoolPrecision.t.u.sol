@@ -52,8 +52,9 @@ abstract contract PoolPrecisionTest is TestCommonSetup {
 
         IERC20 tokenIn = isBuy ? _yToken : _xToken;
         IERC20 tokenOut = isBuy ? _xToken : _yToken;
-
+        console2.log("before simswap");
         (expected, , ) = _pool.simSwap(address(tokenIn), swapAmount);
+        console2.log("after simswap");
         try _pool.simSwapReversed(address(tokenOut), expected) returns (uint expectedAmount, uint, uint) {
             expectedReverse = expectedAmount;
         } catch {
@@ -67,12 +68,17 @@ abstract contract PoolPrecisionTest is TestCommonSetup {
         uint buyAmountSixDecimal = 1_000_000;
         uint buyAmountWad = 1_000_000_000_000_000_000;
 
-        uint SWAPS = 1;
+        uint xBalanceAdminWad = wadXToken.balanceOf(address(admin));
+        uint xBalanceAdminSd = sdXToken.balanceOf(address(admin));
+
+        uint SWAPS = 1000;
         console2.log("x liquidity wad pool: ", IERC20(wadPool.xToken()).balanceOf(address(wadPool)));
         console2.log("x liquidity sd pool: ", xToken.balanceOf(address(sdPool)));
+        uint256 expectedReverseWad;
+        uint256 expectedReverseSd;
         for (uint i = 0; i < SWAPS; i++) {
-            (, , , uint256 expectedReverseWad) = _swapX(true, wadPool, buyAmountWad);
-            (, , , uint256 expectedReverseSd) = _swapX(true, sdPool, buyAmountSixDecimal);
+            (, , ,  expectedReverseWad) = _swapX(true, wadPool, buyAmountWad);
+            (, , ,  expectedReverseSd) = _swapX(true, sdPool, buyAmountSixDecimal);
             
             assertTrue(buyAmountWad >= expectedReverseWad);
             assertTrue(buyAmountSixDecimal >= expectedReverseSd);
@@ -90,10 +96,13 @@ abstract contract PoolPrecisionTest is TestCommonSetup {
             assertTrue(areWithinTolerance(yBalanceSd * 10 ** 12, yBalanceWad, MAX_TOLERANCE_X, TOLERANCE_DEN_X), "x out of tolerance");
         }
 
-        uint xBalanceAdminWad = wadXToken.balanceOf(address(admin));
-        uint xBalanceAdminSd = sdXToken.balanceOf(address(admin));
+        xBalanceAdminWad = wadXToken.balanceOf(address(admin)) - xBalanceAdminWad;
+        xBalanceAdminSd = sdXToken.balanceOf(address(admin)) - xBalanceAdminSd;
         uint sellAmountSixDecimal = xBalanceAdminSd / SWAPS;
         uint sellAmountWad = xBalanceAdminWad / SWAPS;
+        console2.log("sellAmountSixDecimal: ", sellAmountSixDecimal);
+        console2.log("sellAmountWad", sellAmountWad);
+
 
         for (uint i = 0; i < SWAPS; i++) {
             (uint256 amountOutWad, , , ) = _swapX(false, wadPool, sellAmountWad);
