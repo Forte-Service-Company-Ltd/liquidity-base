@@ -438,8 +438,6 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
     }
 
     function testLiquidity_Pool_LiquidityExcess(uint initialAmount) public virtual startAsAdmin endWithStopPrank {
-        // TODO determine how to test revenue and liquidity
-        vm.skip(true);
         /// buys a large amount of x tokens at once
         uint256 maxIterations = 7000;
         initialAmount = bound(initialAmount, 100_000_000, 1_000_000_000);
