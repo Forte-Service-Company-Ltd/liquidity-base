@@ -317,7 +317,7 @@ library Descriptor {
     /// @param params Parameters needed to construct the token URI
     /// @return The token URI as a string
     function constructTokenURI(ConstructTokenURIParams memory params) external pure returns (string memory) {
-        string memory name = generateName(params, feeToPercentString(params.fee));
+        string memory name = generateName(params, feeToPercentString(params.fee, params.tokenId));
         string memory descriptionPartOne = generateDescriptionPartOne(
             escapeSpecialCharacters(params.xTokenSymbol),
             escapeSpecialCharacters(params.yTokenSymbol),
@@ -328,7 +328,7 @@ library Descriptor {
             escapeSpecialCharacters(params.xTokenSymbol),
             params.yTokenAddress == address(0) ? "Native" : addressToString(params.yTokenAddress),
             params.xTokenAddress == address(0) ? "Native" : addressToString(params.xTokenAddress),
-            feeToPercentString(params.fee)
+            feeToPercentString(params.fee, params.tokenId)
         );
 
         string memory image = Base64.encode(bytes(generateSVGImage(params)));
@@ -481,8 +481,8 @@ library Descriptor {
     /// @notice Converts fee amount in hundredths of a percent (where 100 = 1%) to decimal string with percent sign
     /// @param fee fee amount as uint16 where 100 = 1%, 1 = 0.01%
     /// @return fee as a decimal string with percent sign
-    function feeToPercentString(uint16 fee) internal pure returns (string memory) {
-        if (fee == 0) {
+    function feeToPercentString(uint16 fee, uint256 tokenId) internal pure returns (string memory) {
+        if (fee == 0 || tokenId == 1) { // this is to handle the edge case of the first inactive LP position where it will not earn trading fees
             return "0%";
         }
         
@@ -527,7 +527,7 @@ library Descriptor {
             yToken: addressToString(params.yTokenAddress),
             xTokenSymbol: params.xTokenSymbol,
             yTokenSymbol: params.yTokenSymbol,
-            feeTier: feeToPercentString(params.fee),
+            feeTier: feeToPercentString(params.fee, params.tokenId),
             poolAddress: addressToString(params.poolManager),
             tokenId: params.tokenId,
             color0: currencyToColorHex(uint256(uint160(params.xTokenAddress)), 136),
