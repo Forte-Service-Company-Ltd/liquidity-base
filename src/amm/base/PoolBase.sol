@@ -13,7 +13,7 @@ import {Constants} from "../../common/Constants.sol";
 import {FeeInfo, TBCType} from "../../common/TBC.sol";
 import {MathLibs, Float, packedFloat} from "../mathLibs/MathLibs.sol";
 import {LPToken} from "../../../src/common/LPToken.sol";
-import "forge-std/console2.sol";
+import {Descriptor} from "../../common/NFTSVG.sol";
 
 /**
  * @title Pool Base
@@ -519,5 +519,29 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
 
     function wInactive() external returns (uint256) {
         return uint(_wInactive.convertpackedFloatToWAD());
+    }
+
+    /**
+     * @dev Overrides the tokenURI function from ERC721 to generate an NFT with pool information
+     * @param tokenId The token ID to generate the URI for
+     * @return The token URI with SVG image and metadata
+     */
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
+        if (_ownerOf(tokenId) == address(0)) revert URIQueryForNonexistentToken();
+        
+        string memory xTokenSymbol = IERC20Metadata(xToken).symbol();
+        string memory yTokenSymbol = IERC20Metadata(yToken).symbol();
+        
+        Descriptor.ConstructTokenURIParams memory params = Descriptor.ConstructTokenURIParams({
+            tokenId: tokenId,
+            xTokenAddress: xToken,
+            yTokenAddress: yToken, 
+            xTokenSymbol: xTokenSymbol,
+            yTokenSymbol: yTokenSymbol,
+            fee: lpFee,
+            poolManager: address(this)
+        });
+        
+        return Descriptor.constructTokenURI(params);
     }
 }

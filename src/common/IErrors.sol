@@ -60,3 +60,5 @@ error NotAnAllowedDeployer();
 /**** Input Errors ****/
 error ZeroAddress();
 
+/**** ERC721 Errors ****/
+error URIQueryForNonexistentToken();
