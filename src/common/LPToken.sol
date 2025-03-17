@@ -11,7 +11,8 @@ import {ERC721Enumerable} from "../../lib/openzeppelin-contracts/contracts/token
  * @author @palmerg4 @oscarsernarosero @cirsteve
  */
 contract LPToken is ERC721, ERC721Enumerable {
-    uint256 public currentTokenId;
+    uint256 public currentTokenId = 1;
+    bool private inactiveCreated = false;
 
     mapping(address lp => mapping(uint256 tokenId => LPTokenS lpToken)) public lpToken;
 
@@ -48,8 +49,15 @@ contract LPToken is ERC721, ERC721Enumerable {
      * @param wj The amount of liquidity provided by the liquidity provider
      * @param hn The revenue parameter of the pool associated with the lpToken contract
      */
-    function _mintTokenAndUpdate(address lp, uint256 wj, uint256 hn) internal {
-        _mint(lp, ++currentTokenId);
+    function _mintTokenAndUpdate(address lp, uint256 wj, uint256 hn, bool inactive) internal {
+        if(inactive) {
+            if(!inactiveCreated) {
+                inactiveCreated = true;
+                _mint(lp, 0);
+            }
+        } else {
+            _mint(lp, ++currentTokenId);
+        }
         _updateLPTokenVarsDeposit(lp, currentTokenId, wj, hn);
     }
 
