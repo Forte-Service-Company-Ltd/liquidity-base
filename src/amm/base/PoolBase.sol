@@ -91,6 +91,11 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     packedFloat _collectedLPFees;
 
     /**
+     * @dev currently claimable protocol fee balance
+     */
+    uint256 public collectedProtocolFees;
+
+    /**
      * @dev inactive liquidity share
      */
     packedFloat _wInactive;
@@ -99,13 +104,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      * @dev total liquidity share
      */
     packedFloat _w;
-
-    packedFloat internal _wInactive;
-
-    /**
-     * @dev currently claimable protocol fee balance
-     */
-    uint256 public collectedProtocolFees;
 
     modifier ifLiquidityRemovalAllowed() {
         if (!liquidityRemovalAllowed) revert LiquidityRemovalForbidden();
