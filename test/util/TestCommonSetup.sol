@@ -171,19 +171,16 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         _approveFactory(address(xToken));
         wadPool = _deployPool(address(xToken), address(yToken), fee, true, TBCInputOption.PRECISION);
         _approvePool(wadPool, false);
-        vm.stopPrank();
 
         _setUpTokens(maxSupply);
+        _approveFactory(address(xToken));
         vm.startPrank(admin);
         yTokenAllowList.addToAllowList(address(stableCoin));
-        _approveFactory(address(xToken));
+        
         sixDecimalPool = _deployPool(address(xToken), address(stableCoin), fee, true, TBCInputOption.PRECISION);
-
+        _approveFactory(address(xToken));
         _loadAdminAndAlice();
-
-        vm.startPrank(admin);
         _approvePool(sixDecimalPool, false);
-        // _addInitialLiquidity(sixDecimalPool, maxSupply);
     }
 
     function _setupPoolPartialFunding(bool withStableCoin) internal endWithStopPrank returns (PoolBase poolRet) {
