@@ -11,7 +11,8 @@ import {ERC721Enumerable} from "../../lib/openzeppelin-contracts/contracts/token
  * @author @palmerg4 @oscarsernarosero @cirsteve
  */
 contract LPToken is ERC721, ERC721Enumerable {
-    uint256 public currentTokenId = 1;
+    uint256 public currentTokenId = 2;
+    uint256 public constant INACTIVE_ID = 1;
     bool private inactiveCreated = false;
 
     mapping(address lp => mapping(uint256 tokenId => LPTokenS lpToken)) public lpToken;
@@ -22,10 +23,6 @@ contract LPToken is ERC721, ERC721Enumerable {
     }
 
     constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) {}
-
-    function checkInactiveCreated() public view returns(bool) {
-        return inactiveCreated;
-    }
 
     /**
      * @dev Get the liquidity share and last claimed amount for an lpToken
@@ -57,7 +54,7 @@ contract LPToken is ERC721, ERC721Enumerable {
         if(inactive) {
             if(!inactiveCreated) {
                 inactiveCreated = true;
-                _mint(lp, 0);
+                _mint(lp, INACTIVE_ID);
                 _updateLPTokenVarsDeposit(lp, 0, wj, hn);
             }
         } else {

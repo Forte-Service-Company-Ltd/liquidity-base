@@ -48,6 +48,8 @@ error KTooLow();
 error KTooHigh();
 error VTooLow();
 error VTooHigh();
+error CannotDepositInactiveLiquidity();
+error AllLiquidityCannotBeInactive();
 
 /**** URQTBCErrors ****/
 error VOutOfBounds();
@@ -57,3 +59,4 @@ error NotAnAllowedDeployer();
 
 /**** Input Errors ****/
 error ZeroAddress();
+

@@ -643,7 +643,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         vm.stopPrank();
         vm.startPrank(alice);
         vm.expectRevert(abi.encodeWithSignature("InvalidToken()"));
-        pool.withdrawRevenue(1, 0);
+        pool.withdrawRevenue(2, 0);
     }
 
     function testLiquidity_Pool_WithdrawRevenueAccrued_Positive() public startAsAdmin endWithStopPrank {
