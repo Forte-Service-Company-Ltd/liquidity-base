@@ -29,6 +29,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     address public immutable xToken;
     address public immutable yToken;
     bool public immutable liquidityRemovalAllowed;
+    int256 constant NEGATIVE_POOL_NATIVE_DECIMALS = 0 - int(POOL_NATIVE_DECIMALS);
 
     /**
      * @dev difference in decimal precision between y token and x token
