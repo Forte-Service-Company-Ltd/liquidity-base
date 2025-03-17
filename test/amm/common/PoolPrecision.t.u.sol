@@ -31,7 +31,9 @@ abstract contract PoolPrecisionTest is TestCommonSetup {
 
     function _assignTokens() internal {
         wadXToken = IERC20(wadPool.xToken());
+        _approveFactory(address(wadXToken));
         sdXToken = IERC20(sdPool.xToken());
+        _approveFactory(address(sdXToken));
         wadYToken = IERC20(wadPool.yToken());
         sdYToken = IERC20(sdPool.yToken());
     }

@@ -28,7 +28,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         fullToken = address(_yToken) == address(stableCoin) ? STABLECOIN_DEC : ERC20_DECIMALS;
     }
     function _setUpTokens(uint256 _xTokenSupply) internal startAsAdmin endWithStopPrank {
-        xToken = new GenericERC20FixedSupply("x token", "GAME", _xTokenSupply + 1);
+        xToken = new GenericERC20FixedSupply("x token", "GAME", _xTokenSupply * 2);
         yToken = new GenericERC20("collateral token", "COLL");
         stableCoin = new SixDecimalERC20("stable coin", "USDX");
         highDecimalCoin = new TwentyTwoDecimalERC20("high deciaml coin", "HDEX");
@@ -176,6 +176,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         _setUpTokens(maxSupply);
         vm.startPrank(admin);
         yTokenAllowList.addToAllowList(address(stableCoin));
+        _approveFactory(address(xToken));
         sixDecimalPool = _deployPool(address(xToken), address(stableCoin), fee, true, TBCInputOption.PRECISION);
 
         _loadAdminAndAlice();
@@ -214,6 +215,8 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         xTokenWithFee = new GenericERC20FixedSupply("Fee token", "FEE", X_TOKEN_MAX_SUPPLY);
         xTokenWoutFee = new GenericERC20FixedSupply("No Fee token", "NOFEE", X_TOKEN_MAX_SUPPLY);
         vm.stopPrank();
+        _approveFactory(address(xTokenWithFee));
+        _approveFactory(address(xTokenWoutFee));
         poolWFee = _setupPoolWithFee(withStableCoin, address(xTokenWithFee), 30);
         poolWOutFee = _setupPoolWithFee(withStableCoin, address(xTokenWoutFee), 0);
     }
