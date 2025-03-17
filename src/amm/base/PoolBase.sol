@@ -13,11 +13,7 @@ import {Constants} from "../../common/Constants.sol";
 import {FeeInfo, TBCType} from "../../common/TBC.sol";
 import {MathLibs, Float, packedFloat} from "../mathLibs/MathLibs.sol";
 import {LPToken} from "../../../src/common/LPToken.sol";
-<<<<<<< HEAD
-import "forge-std/console2.sol";
-=======
 import {Descriptor} from "../../common/NFTSVG.sol";
->>>>>>> 91543b1 (add the whole chalupa of svg libraries, descriptor, changes to the poolbase, an error and scripts along with tests)
 
 /**
  * @title Pool Base
