@@ -90,14 +90,20 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      */
     packedFloat _collectedLPFees;
 
-    packedFloat internal _w;
-
-    packedFloat internal _wInactive;
-
     /**
      * @dev currently claimable protocol fee balance
      */
     uint256 public collectedProtocolFees;
+
+    /**
+     * @dev inactive liquidity share
+     */
+    packedFloat _wInactive;
+
+    /**
+     * @dev total liquidity share
+     */
+    packedFloat _w;
 
     modifier ifLiquidityRemovalAllowed() {
         if (!liquidityRemovalAllowed) revert LiquidityRemovalForbidden();
@@ -309,7 +315,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         // slither-disable-end reentrancy-benign
         _amount = afterBalance - beforeBalance;
         _validateLiquidityAdd(x, int(afterBalance).toPackedFloat(-18));
-        _mintTokenAndUpdate(_msgSender(), _amount / 1e18, 0);
+        _mintTokenAndUpdate(_msgSender(), _amount / 1e18, 0, false);
     }
 
     /**
