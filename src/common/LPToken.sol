@@ -23,6 +23,10 @@ contract LPToken is ERC721, ERC721Enumerable {
 
     constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) {}
 
+    function checkInactiveCreated() public view returns(bool) {
+        return inactiveCreated;
+    }
+
     /**
      * @dev Get the liquidity share and last claimed amount for an lpToken
      * @param lp The address of the liquidity provider owning the lpToken being updated
@@ -54,11 +58,14 @@ contract LPToken is ERC721, ERC721Enumerable {
             if(!inactiveCreated) {
                 inactiveCreated = true;
                 _mint(lp, 0);
+                _updateLPTokenVarsDeposit(lp, 0, wj, hn);
             }
         } else {
-            _mint(lp, ++currentTokenId);
+            _mint(lp, currentTokenId);
+            _updateLPTokenVarsDeposit(lp, currentTokenId, wj, hn);
+            currentTokenId += 1;
         }
-        _updateLPTokenVarsDeposit(lp, currentTokenId, wj, hn);
+        
     }
 
     /**
