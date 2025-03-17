@@ -29,6 +29,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     address public immutable xToken;
     address public immutable yToken;
     bool public immutable liquidityRemovalAllowed;
+    int256 constant POOL_NATIVE_DECIMALS_NEGATIVE = 0 - int(POOL_NATIVE_DECIMALS);
 
     /**
      * @dev difference in decimal precision between y token and x token
@@ -148,10 +149,8 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         // slither-disable-end missing-zero-check
         liquidityRemovalAllowed = _liquidityRemovalAllowed;
         yDecimalDiff = POOL_NATIVE_DECIMALS - IERC20Metadata(_yToken).decimals();
-        _pause();
 
-        _transferOwnership(sender);
-        /// implementation contract must emit a PoolDeployed event
+        /// implementation contract must transfer ownership and emit a PoolDeployed event
     }
 
     /**

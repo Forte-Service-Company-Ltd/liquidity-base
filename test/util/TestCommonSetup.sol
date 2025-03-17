@@ -28,7 +28,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         fullToken = address(_yToken) == address(stableCoin) ? STABLECOIN_DEC : ERC20_DECIMALS;
     }
     function _setUpTokens(uint256 _xTokenSupply) internal startAsAdmin endWithStopPrank {
-        xToken = new GenericERC20FixedSupply("x token", "GAME", _xTokenSupply + 1);
+        xToken = new GenericERC20FixedSupply("x token", "GAME", _xTokenSupply * 3);
         yToken = new GenericERC20("collateral token", "COLL");
         stableCoin = new SixDecimalERC20("stable coin", "USDX");
         highDecimalCoin = new TwentyTwoDecimalERC20("high deciaml coin", "HDEX");
@@ -76,6 +76,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         IERC20 _xToken = IERC20(poolRet.xToken());
         IERC20 _yToken = IERC20(poolRet.yToken());
         _xToken.approve(address(poolRet), X_TOKEN_MAX_SUPPLY);
+        _xToken.approve(_getFactoryAddress(), X_TOKEN_MAX_SUPPLY); // approve factory
         if (!usdt) {
             _yToken.approve(address(poolRet), _yToken.balanceOf(admin));
         }
@@ -84,6 +85,10 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         if (!usdt) {
             _yToken.approve(address(poolRet), _yToken.balanceOf(alice));
         }
+    }
+
+    function _approveFactory(address _xToken) internal startAsAdmin endWithStopPrank {
+        IERC20(_xToken).approve(_getFactoryAddress(), X_TOKEN_MAX_SUPPLY); // approve factory
     }
 
     function _addInitialLiquidity(PoolBase poolRet, uint _amount) internal startAsAdmin endWithStopPrank {
@@ -101,13 +106,10 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
 
     function _setupPool(bool withStableCoin) internal endWithStopPrank returns (PoolBase poolRet) {
         _setUpTokensAndFactories(X_TOKEN_MAX_SUPPLY);
+        _approveFactory(address(xToken));
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
         poolRet = _deployPool(address(xToken), yTokenAddress, 30, true, TBCInputOption.BASE);
-        _deployAndSetLPToken(poolRet);
-        vm.startPrank(admin);
-        poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
-        _addInitialLiquidity(poolRet, X_TOKEN_MAX_SUPPLY);
         amountMinBound = 2;
         pool = poolRet;
         _setupCollateralToken();
@@ -124,11 +126,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
     ) internal endWithStopPrank returns (PoolBase poolRet) {
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
         poolRet = _deployPool(_xTokenAddress, yTokenAddress, fee, true, TBCInputOption.BASE);
-        _deployAndSetLPToken(poolRet);
-        vm.startPrank(admin);
-        poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
-        _addInitialLiquidity(poolRet, X_TOKEN_MAX_SUPPLY);
     }
 
     function _setupPoolForkTest(
@@ -143,13 +141,11 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         _setupAllowLists();
 
         GenericERC20FixedSupply xTokenWithFee = new GenericERC20FixedSupply("Fee token", "FEE", 10e3 * ERC20_DECIMALS);
-
+        _approveFactory(address(xTokenWithFee));
         poolRet = PoolBase(_deployPool(address(xTokenWithFee), _yTokenAddress, 0, true, TBCInputOption.FORK));
         _deployAndSetLPToken(poolRet);
-        vm.startPrank(admin);
-        poolRet.enableSwaps(true);
         _approvePool(poolRet, usdt);
-        _addInitialLiquidity(poolRet, 10e3 * ERC20_DECIMALS);
+        // _addInitialLiquidity(poolRet, 10e3 * ERC20_DECIMALS);
 
         (owner, fee);
     }
@@ -158,15 +154,13 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         // the token supply is the same value used in the stress test simulation and must match
         uint256 maxX = 10e3 * ERC20_DECIMALS;
         _setUpTokensAndFactories(maxX);
+        _approveFactory(address(xToken));
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
         // the pool config values are the same config values used in the stress test simulation and must match
         /// fee: 0.0%, supply: 10K tokens, y-intersect: 10, minPrice: 1, maxPrice: 100
         poolRet = _deployPool(address(xToken), yTokenAddress, 0, true, TBCInputOption.FORK);
-        _deployAndSetLPToken(poolRet);
-        vm.startPrank(admin);
-        poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
-        _addInitialLiquidity(poolRet, 10e3 * ERC20_DECIMALS);
+        // _addInitialLiquidity(poolRet, 10e3 * ERC20_DECIMALS);
     }
 
     function _setupPrecisionPools(
@@ -174,49 +168,37 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         uint16 fee
     ) internal endWithStopPrank returns (PoolBase wadPool, PoolBase sixDecimalPool) {
         _setUpTokensAndFactories(maxSupply);
-
+        _approveFactory(address(xToken));
         wadPool = _deployPool(address(xToken), address(yToken), fee, true, TBCInputOption.PRECISION);
-        _deployAndSetLPToken(wadPool);
-        vm.startPrank(admin);
-        wadPool.enableSwaps(true);
         _approvePool(wadPool, false);
-        _addInitialLiquidity(wadPool, maxSupply);
-        vm.stopPrank();
 
         _setUpTokens(maxSupply);
+        _approveFactory(address(xToken));
         vm.startPrank(admin);
         yTokenAllowList.addToAllowList(address(stableCoin));
+
         sixDecimalPool = _deployPool(address(xToken), address(stableCoin), fee, true, TBCInputOption.PRECISION);
-
+        _approveFactory(address(xToken));
         _loadAdminAndAlice();
-        _deployAndSetLPToken(sixDecimalPool);
-
-        vm.startPrank(admin);
-        sixDecimalPool.enableSwaps(true);
         _approvePool(sixDecimalPool, false);
-        _addInitialLiquidity(sixDecimalPool, maxSupply);
     }
 
     function _setupPoolPartialFunding(bool withStableCoin) internal endWithStopPrank returns (PoolBase poolRet) {
         _setUpTokensAndFactories(X_TOKEN_MAX_SUPPLY);
+        _approveFactory(address(xToken));
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
         poolRet = _deployPool(address(xToken), yTokenAddress, 30, true, TBCInputOption.BASE);
-        _deployAndSetLPToken(poolRet);
         vm.startPrank(admin);
-        poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
-        _addInitialLiquidity(poolRet, X_TOKEN_MAX_SUPPLY / 2);
+        // _addInitialLiquidity(poolRet, X_TOKEN_MAX_SUPPLY / 2);
     }
 
     function _setupFOTPool(bool withStableCoin) internal endWithStopPrank returns (PoolBase poolRet) {
         _setUpTokensAndFactories(X_TOKEN_MAX_SUPPLY);
+        _approveFactory(address(fotCoin));
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
         poolRet = _deployPool(address(fotCoin), yTokenAddress, 30, true, TBCInputOption.BASE);
-        _deployAndSetLPToken(poolRet);
-        vm.startPrank(admin);
-        poolRet.enableSwaps(true);
         _approvePool(poolRet, false);
-        _addInitialLiquidity(poolRet, X_TOKEN_MAX_SUPPLY);
         pool = poolRet;
         _setupCollateralToken();
     }
@@ -230,6 +212,8 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         xTokenWithFee = new GenericERC20FixedSupply("Fee token", "FEE", X_TOKEN_MAX_SUPPLY);
         xTokenWoutFee = new GenericERC20FixedSupply("No Fee token", "NOFEE", X_TOKEN_MAX_SUPPLY);
         vm.stopPrank();
+        _approveFactory(address(xTokenWithFee));
+        _approveFactory(address(xTokenWoutFee));
         poolWFee = _setupPoolWithFee(withStableCoin, address(xTokenWithFee), 30);
         poolWOutFee = _setupPoolWithFee(withStableCoin, address(xTokenWoutFee), 0);
     }

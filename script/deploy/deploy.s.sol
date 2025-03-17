@@ -273,8 +273,6 @@ contract PoolConfigDeploymentCommon is CommonDeployment, Recorder {
         }
         {
             PoolBase pool = PoolBase(poolAddress);
-            pool.addXSupply(tokenX.totalSupply());
-            pool.enableSwaps(true);
             setENVAddress("POOL_CONTRACT", vm.toString(address(pool)));
         }
     }

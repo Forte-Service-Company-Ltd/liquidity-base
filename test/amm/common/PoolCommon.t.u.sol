@@ -192,22 +192,6 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         updatedBalance = _xToken.balanceOf(address(_pool));
     }
 
-    function testLiquidity_Pool_initializeXSupply_Positive() public endWithStopPrank {
-        //TODO determine how to tet new liquidity add mechanism
-        (uint256 initialBalance, uint updatedBalance) = _buildAddLiquidityGameToken();
-        assertTrue(updatedBalance > initialBalance, "Game token balance should be greater after adding");
-    }
-
-    function testLiquidity_Pool_initializeXSupply_NotOwner() public {
-        GenericERC20FixedSupply _xToken = new GenericERC20FixedSupply("X token", "X", X_TOKEN_MAX_SUPPLY);
-        vm.stopPrank();
-        PoolBase _pool = PoolBase(_deployPool(address(_xToken), address(_yToken), 30, false, TBCInputOption.BASE));
-        _approvePool(_pool, false);
-        vm.expectRevert(abi.encodeWithSignature("OwnableUnauthorizedAccount(address)", alice));
-        vm.prank(alice);
-        PoolBase(address(_pool)).addXSupply(X_TOKEN_MAX_SUPPLY);
-    }
-
     function _buildLiquidityRemovalNotAllowed() internal returns (PoolBase _pool) {
         GenericERC20FixedSupply _xToken = new GenericERC20FixedSupply("X token", "X", X_TOKEN_MAX_SUPPLY);
         _pool = _deployPool(address(_xToken), address(_yToken), 30, false, TBCInputOption.BASE);
