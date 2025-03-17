@@ -90,8 +90,14 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      */
     packedFloat _collectedLPFees;
 
+    /**
+     * @dev inactive liquidity share
+     */
     packedFloat _wInactive;
 
+    /**
+     * @dev total liquidity share
+     */
     packedFloat _w;
 
     packedFloat internal _wInactive;
