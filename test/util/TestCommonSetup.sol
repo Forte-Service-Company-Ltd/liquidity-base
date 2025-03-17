@@ -28,7 +28,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         fullToken = address(_yToken) == address(stableCoin) ? STABLECOIN_DEC : ERC20_DECIMALS;
     }
     function _setUpTokens(uint256 _xTokenSupply) internal startAsAdmin endWithStopPrank {
-        xToken = new GenericERC20FixedSupply("x token", "GAME", _xTokenSupply * 2);
+        xToken = new GenericERC20FixedSupply("x token", "GAME", _xTokenSupply * 3);
         yToken = new GenericERC20("collateral token", "COLL");
         stableCoin = new SixDecimalERC20("stable coin", "USDX");
         highDecimalCoin = new TwentyTwoDecimalERC20("high deciaml coin", "HDEX");
@@ -176,7 +176,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         _approveFactory(address(xToken));
         vm.startPrank(admin);
         yTokenAllowList.addToAllowList(address(stableCoin));
-        
+
         sixDecimalPool = _deployPool(address(xToken), address(stableCoin), fee, true, TBCInputOption.PRECISION);
         _approveFactory(address(xToken));
         _loadAdminAndAlice();

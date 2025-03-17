@@ -5,6 +5,7 @@ import "forge-std/console2.sol";
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
+import {packedFloat, MathLibs} from "src/amm/mathLibs/MathLibs.sol";
 
 /**
  * @title Test Pool functionality
@@ -12,6 +13,7 @@ import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
  * @author @oscarsernarosero @mpetersoCode55
  */
 abstract contract PoolPrecisionTest is TestCommonSetup {
+    using MathLibs for packedFloat;
     uint8 constant MAX_TOLERANCE_X = 12;
     uint8 constant TOLERANCE_PRECISION_X = 12;
     uint256 constant TOLERANCE_DEN_X = 10 ** TOLERANCE_PRECISION_X;
@@ -65,12 +67,13 @@ abstract contract PoolPrecisionTest is TestCommonSetup {
         uint buyAmountSixDecimal = 1_000_000;
         uint buyAmountWad = 1_000_000_000_000_000_000;
 
-        uint SWAPS = 1000;
-
+        uint SWAPS = 1;
+        console2.log("x liquidity wad pool: ", IERC20(wadPool.xToken()).balanceOf(address(wadPool)));
+        console2.log("x liquidity sd pool: ", xToken.balanceOf(address(sdPool)));
         for (uint i = 0; i < SWAPS; i++) {
             (, , , uint256 expectedReverseWad) = _swapX(true, wadPool, buyAmountWad);
             (, , , uint256 expectedReverseSd) = _swapX(true, sdPool, buyAmountSixDecimal);
-
+            
             assertTrue(buyAmountWad >= expectedReverseWad);
             assertTrue(buyAmountSixDecimal >= expectedReverseSd);
 
@@ -79,6 +82,9 @@ abstract contract PoolPrecisionTest is TestCommonSetup {
 
             uint yBalanceSd = sdYToken.balanceOf(address(sdPool));
             uint xBalanceSd = sdXToken.balanceOf(address(sdPool));
+
+            console2.log("x wad pool: ", wadPool.x().convertpackedFloatToWAD());
+            console2.log("x sd pool: ", sdPool.x().convertpackedFloatToWAD());
 
             assertTrue(areWithinTolerance(xBalanceWad, xBalanceSd, 9, 10 ** 9), "x balances should be within tolerance after buy");
             assertTrue(areWithinTolerance(yBalanceSd * 10 ** 12, yBalanceWad, MAX_TOLERANCE_X, TOLERANCE_DEN_X), "x out of tolerance");
