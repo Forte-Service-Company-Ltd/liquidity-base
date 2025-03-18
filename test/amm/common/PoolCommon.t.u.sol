@@ -452,7 +452,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         uint256 xBalance = IERC20(pool.xToken()).balanceOf(admin);
         assertEq(getAmountSubFee(actual) + xBalanceInitial, xBalance);
         uint256 amountIn = (xBalance - xBalanceInitial) / maxIterations;
-        uint256 lastAmountIn = xBalance % maxIterations;
+        uint256 lastAmountIn = (xBalance - xBalanceInitial) % maxIterations;
         for (uint i; i < maxIterations; i++) {
             uint adjustedAmountIn = amountIn;
             (expected, , ) = pool.simSwap(address(pool.xToken()), amountIn);
