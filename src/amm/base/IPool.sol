@@ -183,13 +183,6 @@ interface IPool is IPoolEvents {
     function revenueAvailable(address lp, uint256 tokenId) external returns (uint256);
 
     /**
-     * @dev if true, the pool could be closed effectively pulling out all of the liquidity
-     * @return liquidityRemovalAllowed
-     * @notice this value is immutable
-     */
-    function liquidityRemovalAllowed() external returns (bool);
-
-    /**
      * @dev returns the current total liquidity in the Pool
      * @return w
      */

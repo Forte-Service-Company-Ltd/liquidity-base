@@ -10,6 +10,6 @@ import {TestConstants, TBCInputOption} from "test/util/TestConstants.sol";
 abstract contract TestCommonSetupAbs is TestConstants, TestModifiers {
     function _deployFactory() internal virtual;
     function _getFactoryAddress() internal virtual returns (address);
-    function _deployPool(address, address, uint16, bool, TBCInputOption) internal virtual returns (PoolBase);
+    function _deployPool(address, address, uint16, uint256, TBCInputOption) internal virtual returns (PoolBase);
     function _getMaxXTokenSupply() internal virtual returns (uint);
 }
