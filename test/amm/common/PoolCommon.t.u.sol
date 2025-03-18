@@ -15,7 +15,7 @@ import {CumulativePrice} from "src/amm/base/CumulativePrice.sol";
 import {TestCommonSetup, TestCommonSetupAbs} from "test/util/TestCommonSetup.sol";
 import {TBCInputOption} from "test/util/TestConstants.sol";
 import {PoolCommonAbs} from "test/amm/common/PoolCommonAbs.sol";
-
+import "src/common/IErrors.sol";
 /**
  * @title Test Pool functionality
  * @dev unit test
@@ -206,26 +206,26 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         _xToken.transfer(address(alice), 0);
     }
 
-    // TODO: create same test with withdraw revenue
-    // function testLiquidity_Pool_collectLPFees_Positive() public startAsAdmin endWithStopPrank {
-    //     uint collectedLPFees = (3 * fullToken) / 1e6 + 1;
-    //     (uint expected, , ) = pool.simSwap(address(_yToken), (1 * fullToken) / 1e3);
-    //     pool.swap(address(_yToken), (1 * fullToken) / 1e3, expected);
+    function testLiquidity_Pool_withdrawRevenue_Positive() public startAsAdmin endWithStopPrank {
+        uint collectedLPFees = (3 * fullToken) / 1e6 + 1;
+        (uint expected, , ) = pool.simSwap(address(_yToken), (1 * fullToken) / 1e3);
+        pool.swap(address(_yToken), (1 * fullToken) / 1e3, expected);
 
-    //     uint256 originalBalance = IERC20(_yToken).balanceOf(address(admin));
+        uint256 originalBalance = IERC20(_yToken).balanceOf(address(admin));
 
-    //     vm.expectEmit(true, true, true, true, address(pool));
-    //     emit IPoolEvents.LPFeesCollected(admin, collectedLPFees);
-    //     pool.collectLPFees();
-    //     assertEq(IERC20(_yToken).balanceOf(address(admin)), originalBalance + collectedLPFees);
-    // }
+        (uint256 rj, uint256 wj) = pool.getLPToken(admin, 2);
+        uint256 revenue = pool.revenueAvailable(admin, 2);
+        uint256 amount = pool.withdrawRevenue(2, wj);
+        uint256 updatedBalance = IERC20(_yToken).balanceOf(address(admin));
+        uint256 expectedBalance = originalBalance + amount;
+        assertEq(updatedBalance, expectedBalance);
+    }
 
-    // TODO: create same test with withdraw revenue
-    // function testLiquidity_Pool_collectLPFees_NotOwner() public endWithStopPrank {
-    //     vm.startPrank(alice);
-    //     vm.expectRevert(abi.encodeWithSignature("OwnableUnauthorizedAccount(address)", alice));
-    //     pool.collectLPFees();
-    // }
+    function testLiquidity_Pool_withdrawRevenue_NotAuthorized() public endWithStopPrank {
+        vm.startPrank(alice);
+        vm.expectRevert(abi.encodeWithSelector(InvalidToken.selector));
+        pool.withdrawRevenue(2, 1);
+    }
 
     function testLiquidity_Pool_buyGameToken_MaxSlippageReached() public startAsAdmin endWithStopPrank {
         uint16 maxSlippage = 300;
