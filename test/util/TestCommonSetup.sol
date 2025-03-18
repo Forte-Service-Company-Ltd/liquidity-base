@@ -108,7 +108,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         _setUpTokensAndFactories(X_TOKEN_MAX_SUPPLY);
         _approveFactory(address(xToken));
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
-        poolRet = _deployPool(address(xToken), yTokenAddress, 30, true, TBCInputOption.BASE);
+        poolRet = _deployPool(address(xToken), yTokenAddress, 30, X_TOKEN_MAX_SUPPLY, TBCInputOption.BASE);
         _approvePool(poolRet, false);
         amountMinBound = 2;
         pool = poolRet;
@@ -125,7 +125,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         uint16 fee
     ) internal endWithStopPrank returns (PoolBase poolRet) {
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
-        poolRet = _deployPool(_xTokenAddress, yTokenAddress, fee, true, TBCInputOption.BASE);
+        poolRet = _deployPool(_xTokenAddress, yTokenAddress, fee, X_TOKEN_MAX_SUPPLY, TBCInputOption.BASE);
         _approvePool(poolRet, false);
     }
 
@@ -142,7 +142,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
 
         GenericERC20FixedSupply xTokenWithFee = new GenericERC20FixedSupply("Fee token", "FEE", 10e3 * ERC20_DECIMALS);
         _approveFactory(address(xTokenWithFee));
-        poolRet = PoolBase(_deployPool(address(xTokenWithFee), _yTokenAddress, 0, true, TBCInputOption.FORK));
+        poolRet = PoolBase(_deployPool(address(xTokenWithFee), _yTokenAddress, 0, 10e3 * ERC20_DECIMALS, TBCInputOption.FORK));
         _deployAndSetLPToken(poolRet);
         _approvePool(poolRet, usdt);
         // _addInitialLiquidity(poolRet, 10e3 * ERC20_DECIMALS);
@@ -158,7 +158,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
         // the pool config values are the same config values used in the stress test simulation and must match
         /// fee: 0.0%, supply: 10K tokens, y-intersect: 10, minPrice: 1, maxPrice: 100
-        poolRet = _deployPool(address(xToken), yTokenAddress, 0, true, TBCInputOption.FORK);
+        poolRet = _deployPool(address(xToken), yTokenAddress, 0, maxX, TBCInputOption.FORK);
         _approvePool(poolRet, false);
         // _addInitialLiquidity(poolRet, 10e3 * ERC20_DECIMALS);
     }
@@ -169,7 +169,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
     ) internal endWithStopPrank returns (PoolBase wadPool, PoolBase sixDecimalPool) {
         _setUpTokensAndFactories(maxSupply);
         _approveFactory(address(xToken));
-        wadPool = _deployPool(address(xToken), address(yToken), fee, true, TBCInputOption.PRECISION);
+        wadPool = _deployPool(address(xToken), address(yToken), fee, maxSupply, TBCInputOption.PRECISION);
         _approvePool(wadPool, false);
 
         _setUpTokens(maxSupply);
@@ -177,7 +177,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         vm.startPrank(admin);
         yTokenAllowList.addToAllowList(address(stableCoin));
 
-        sixDecimalPool = _deployPool(address(xToken), address(stableCoin), fee, true, TBCInputOption.PRECISION);
+        sixDecimalPool = _deployPool(address(xToken), address(stableCoin), fee, maxSupply, TBCInputOption.PRECISION);
         _approveFactory(address(xToken));
         _loadAdminAndAlice();
         _approvePool(sixDecimalPool, false);
@@ -187,7 +187,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         _setUpTokensAndFactories(X_TOKEN_MAX_SUPPLY);
         _approveFactory(address(xToken));
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
-        poolRet = _deployPool(address(xToken), yTokenAddress, 30, true, TBCInputOption.BASE);
+        poolRet = _deployPool(address(xToken), yTokenAddress, 30, X_TOKEN_MAX_SUPPLY, TBCInputOption.BASE);
         vm.startPrank(admin);
         _approvePool(poolRet, false);
         // _addInitialLiquidity(poolRet, X_TOKEN_MAX_SUPPLY / 2);
@@ -197,7 +197,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         _setUpTokensAndFactories(X_TOKEN_MAX_SUPPLY);
         _approveFactory(address(fotCoin));
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
-        poolRet = _deployPool(address(fotCoin), yTokenAddress, 30, true, TBCInputOption.BASE);
+        poolRet = _deployPool(address(fotCoin), yTokenAddress, 30, X_TOKEN_MAX_SUPPLY, TBCInputOption.BASE);
         _approvePool(poolRet, false);
         pool = poolRet;
         _setupCollateralToken();
