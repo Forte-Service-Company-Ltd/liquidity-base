@@ -28,7 +28,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
 
     address public immutable xToken;
     address public immutable yToken;
-    bool public immutable liquidityRemovalAllowed;
     int256 constant POOL_NATIVE_DECIMALS_NEGATIVE = 0 - int(POOL_NATIVE_DECIMALS);
 
     /**
@@ -106,11 +105,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      */
     packedFloat _w;
 
-    modifier ifLiquidityRemovalAllowed() {
-        if (!liquidityRemovalAllowed) revert LiquidityRemovalForbidden();
-        _;
-    }
-
     modifier onlyProtocolFeeCollector() {
         if (_msgSender() != protocolFeeCollector) revert NotProtocolFeeCollector();
         _;
@@ -126,15 +120,11 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      * @param _xToken address of the X token (x axis)
      * @param _yToken address of the Y token (y axis)
      * @param fees fee information
-     * @param _liquidityRemovalAllowed if true, liquidity can be removed at any time. Removal of liquidity forbidden otherwise.
-     * @param sender address of the to-be owner
      */
     constructor(
         address _xToken,
         address _yToken,
         FeeInfo memory fees,
-        bool _liquidityRemovalAllowed,
-        address sender,
         string memory _name,
         string memory _symbol
     ) Ownable(_msgSender()) LPToken(_name, _symbol) {
@@ -147,7 +137,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         setProtocolFee(fees._protocolFee);
         protocolFeeCollector = fees._protocolFeeCollector;
         // slither-disable-end missing-zero-check
-        liquidityRemovalAllowed = _liquidityRemovalAllowed;
         yDecimalDiff = POOL_NATIVE_DECIMALS - IERC20Metadata(_yToken).decimals();
 
         /// implementation contract must transfer ownership and emit a PoolDeployed event

@@ -34,8 +34,6 @@ error PriceRangeTooLarge();
 error lowerPriceTooLow();
 error ZeroValueNotAllowed();
 error TransferFailed();
-error CTooSmall(uint256 C);
-error CTooLarge();
 error LiquidityRemovalForbidden();
 error InvalidToken();
 error XOutOfBounds(uint256 howMuch);
@@ -44,12 +42,12 @@ error ProtocolFeeAboveMax(uint16 proposedFee, uint16 maxFee);
 error NotProtocolFeeCollector();
 error NotProposedProtocolFeeCollector();
 error NoProtocolFeeCollector();
-error KTooLow();
-error KTooHigh();
-error VTooLow();
-error VTooHigh();
 error CannotDepositInactiveLiquidity();
 error AllLiquidityCannotBeInactive();
+error NoInitialLiquidity();
+error CCannotBeZero();
+error VCannotBeZero();
+error xMinCannotBeZero();
 
 /**** URQTBCErrors ****/
 error VOutOfBounds();
