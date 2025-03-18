@@ -14,7 +14,7 @@ abstract contract PythonUtils is Test {
     using Strings for uint256;
     using MathLibs for uint256;
     bytes slice;
-    
+
     function _buildFFIRecordVars(
         string memory vars,
         string memory fileName,
@@ -116,6 +116,22 @@ abstract contract PythonUtils is Test {
         inputs[3] = vm.toString(b);
         inputs[4] = vm.toString(c);
         inputs[5] = vm.toString(isBNegative ? 1 : 0);
+        return inputs;
+    }
+
+    function _buildFIICalculateLastRevenueClaim(
+        uint256 hn,
+        uint256 wj,
+        uint256 r_hat,
+        uint256 w_hat
+    ) internal pure returns (string[] memory) {
+        string[] memory inputs = new string[](6);
+        inputs[0] = "python3";
+        inputs[1] = "lib/liquidity-base/script/python/equations/calculate_last_revenue_claim.py";
+        inputs[2] = vm.toString(hn);
+        inputs[3] = vm.toString(wj);
+        inputs[4] = vm.toString(r_hat);
+        inputs[5] = vm.toString(w_hat);
         return inputs;
     }
 
