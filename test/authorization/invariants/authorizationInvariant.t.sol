@@ -48,7 +48,7 @@ abstract contract authorizationInvariants is TestCommonSetup {
         assertEq(pool.xTokenLiquidity(), _startingXLiquidity);
     }
 
-    function invariant_verifyRevertsForNotOwner_addLiquidityYToken_removeLiquidityYToken() public {
+    function invariant_verifyRevertsForNotOwner_addLiquidityYToken_removeLiquidityYToken() public view {
         assertEq(pool.yTokenLiquidity(), _startingYLiquidity);
     }
 }

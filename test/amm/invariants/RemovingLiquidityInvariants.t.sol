@@ -15,7 +15,7 @@ abstract contract RemovingLiquidityInvariants is TestCommonSetup {
         pool = _setupPool(false);
         xTokenLiquidity = IERC20(pool.xToken()).totalSupply();
         bytes4[] memory selectors = new bytes4[](1);
-        selectors[0] = pool.withdrawRevenue.selector; 
+        selectors[0] = pool.withdrawRevenue.selector;
         targetContract(address(pool));
         targetSelector(FuzzSelector({addr: address(pool), selectors: selectors}));
         targetSender(admin);
@@ -25,7 +25,7 @@ abstract contract RemovingLiquidityInvariants is TestCommonSetup {
         assertLe(pool.xTokenLiquidity(), xTokenLiquidity);
     }
 
-    function invariant_liquidityCanNeverIncreaseCallingRemoveLiquidity_TokenY() public {
+    function invariant_liquidityCanNeverIncreaseCallingRemoveLiquidity_TokenY() public view {
         assertLe(pool.yTokenLiquidity(), Y_TOKEN_LIQUIDITY);
     }
 }

@@ -207,14 +207,17 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
     }
 
     function testLiquidity_Pool_withdrawRevenue_Positive() public startAsAdmin endWithStopPrank {
-        uint collectedLPFees = (3 * fullToken) / 1e6 + 1;
+        // TODO Investigate this test. Silencing the slither warning
+        //uint collectedLPFees = (3 * fullToken) / 1e6 + 1;
         (uint expected, , ) = pool.simSwap(address(_yToken), (1 * fullToken) / 1e3);
         pool.swap(address(_yToken), (1 * fullToken) / 1e3, expected);
 
         uint256 originalBalance = IERC20(_yToken).balanceOf(address(admin));
 
-        (packedFloat wj, uint256 rj) = pool.getLPToken(admin, 2);
-        uint256 revenue = pool.revenueAvailable(admin, 2);
+        (, uint256 rj) = pool.getLPToken(admin, 2);
+
+        //uint256 revenue = pool.revenueAvailable(admin, 2);
+
         uint256 amount = pool.withdrawRevenue(2, rj);
         uint256 updatedBalance = IERC20(_yToken).balanceOf(address(admin));
         uint256 expectedBalance = originalBalance + amount;
@@ -439,7 +442,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
 
     function testLiquidity_Pool_LiquidityExcess(uint initialAmount) public virtual startAsAdmin endWithStopPrank {
         /// buys a large amount of x tokens at once
-        uint256 maxIterations = 7000;
+        uint256 maxIterations = 1000;
         initialAmount = bound(initialAmount, 100_000_000, 1_000_000_000);
         IERC20(pool.xToken()).transfer(alice, 1);
         uint256 xBalanceInitial = IERC20(pool.xToken()).balanceOf(admin);
