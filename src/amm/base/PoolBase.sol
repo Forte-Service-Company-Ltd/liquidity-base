@@ -296,8 +296,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         // slither-disable-end reentrancy-benign
         _amount = afterBalance - beforeBalance;
         _validateLiquidityAdd(int(afterBalance).toPackedFloat(-18));
-
-        _mintTokenAndUpdate(_msgSender(), (int(_amount / 1e18).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE)), 0, false, _amount, 0);
+        _mintTokenAndUpdate(_msgSender(), (int(_amount).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE)), packedFloat.wrap(0), false, _amount, 0);
     }
 
     /**
