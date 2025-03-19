@@ -4,6 +4,7 @@ pragma solidity ^0.8.24;
 import {ERC721} from "../../lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
 import {ERC721Enumerable} from "../../lib/openzeppelin-contracts/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import {IPoolEvents} from "./IEvents.sol";
+import {packedFloat, MathLibs} from "../amm/mathLibs/MathLibs.sol";
 
 /**
  * @title Liquidity provider token
@@ -12,6 +13,8 @@ import {IPoolEvents} from "./IEvents.sol";
  * @author @palmerg4 @oscarsernarosero @cirsteve
  */
 contract LPToken is ERC721, ERC721Enumerable {
+    using MathLibs for packedFloat;
+
     uint256 public currentTokenId = 2;
     uint256 public constant INACTIVE_ID = 1;
     bool private inactiveCreated = false;
@@ -19,8 +22,8 @@ contract LPToken is ERC721, ERC721Enumerable {
     mapping(address lp => mapping(uint256 tokenId => LPTokenS lpToken)) public lpToken;
 
     struct LPTokenS {
+        packedFloat wj;
         uint256 rj;
-        uint256 wj;
     }
 
     constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) {}
@@ -32,7 +35,7 @@ contract LPToken is ERC721, ERC721Enumerable {
      * @return wj the amount of the lpToken
      * @return rj the last revenue claim of the lpToken
      */
-    function getLPToken(address lp, uint256 tokenId) public view returns (uint256 wj, uint256 rj) {
+    function getLPToken(address lp, uint256 tokenId) public view returns (packedFloat wj, uint256 rj) {
         LPTokenS memory token = lpToken[lp][tokenId];
         return (token.wj, token.rj);
     }
@@ -51,7 +54,7 @@ contract LPToken is ERC721, ERC721Enumerable {
      * @param wj The amount of liquidity provided by the liquidity provider
      * @param hn The revenue parameter of the pool associated with the lpToken contract
      */
-    function _mintTokenAndUpdate(address lp, uint256 wj, uint256 hn, bool inactive, uint256 tokenXAmount, uint256 tokenYAmount) internal {
+    function _mintTokenAndUpdate(address lp, packedFloat wj, uint256 hn, bool inactive, uint256 tokenXAmount, uint256 tokenYAmount) internal {
         if(inactive) {
             if(!inactiveCreated) {
                 inactiveCreated = true;
@@ -74,9 +77,9 @@ contract LPToken is ERC721, ERC721Enumerable {
      * @param wj The amount of liquidity associated with the lpToken being updated
      * @param rj The amount of revenue associated with the lpToken being updated
      */
-    function _updateLPTokenVarsDeposit(address lp, uint256 tokenId, uint256 wj, uint256 rj) internal {
+    function _updateLPTokenVarsDeposit(address lp, uint256 tokenId, packedFloat wj, uint256 rj) internal {
         lpToken[lp][tokenId].rj = rj;
-        lpToken[lp][tokenId].wj += wj;
+        lpToken[lp][tokenId].wj =  lpToken[lp][tokenId].wj.add(wj);
     }
 
     /**
@@ -108,16 +111,16 @@ contract LPToken is ERC721, ERC721Enumerable {
      * @param _tokenId The token id of the lpToken being updated
      * @param _uj The amount of liquidity the LP would like to withdraw
      */
-    function _updateLPTokenVarsWithdrawal(address _lp, uint256 _tokenId, uint256 _uj) internal returns (uint256) {
-        uint256 wj = lpToken[_lp][_tokenId].wj;
-        if (wj < _uj) revert("LPToken: withdrawal amount exceeds allowance");
+    function _updateLPTokenVarsWithdrawal(address _lp, uint256 _tokenId, packedFloat _uj) internal returns (uint256) {
+        packedFloat wj = lpToken[_lp][_tokenId].wj;
+        if (wj.lt(_uj)) revert("LPToken: withdrawal amount exceeds allowance");
 
-        if (wj > _uj) {
-            lpToken[_lp][_tokenId].wj -= _uj;
+        if (wj.gt(_uj)) {
+            lpToken[_lp][_tokenId].wj =  lpToken[_lp][_tokenId].wj.sub(_uj);
         } else {
             _burn(_tokenId);
-            lpToken[_lp][_tokenId].wj = 0;
-            emit IPoolEvents.LPTokenBurned(_lp, _tokenId, _uj);
+            lpToken[_lp][_tokenId].wj = packedFloat.wrap(0);
+            emit IPoolEvents.LPTokenBurned(_lp, _tokenId, uint(_uj.convertpackedFloatToWAD()));
         }
         return lpToken[_lp][_tokenId].rj;
     }
