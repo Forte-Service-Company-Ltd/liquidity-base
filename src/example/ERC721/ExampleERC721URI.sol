@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
-import {Descriptor} from "../../common/NFTSVG.sol";
+import {Descriptor} from "../../common/Descriptor.sol";
 
 
 contract ExampleERC721URI is ERC721 {

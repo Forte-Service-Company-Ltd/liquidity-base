@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 import 'forge-std/Test.sol';
-import 'src/common/NFTSVG.sol';
+import '../../src/common/Descriptor.sol';
 import 'forge-std/console.sol';
 
 

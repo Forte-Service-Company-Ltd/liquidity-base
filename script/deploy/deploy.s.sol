@@ -14,7 +14,6 @@ import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {PythonUtils} from "./pythonUtils.s.sol";
 import {SixDecimalERC20} from "src/example/ERC20/SixDecimalERC20.sol";
 import {ExampleERC721URI} from "src/example/ERC721/ExampleERC721URI.sol";
-import {Descriptor, SVGLinesPart1, SVGLinesPart2, SVGLinesPart3, SVG, HexStrings} from "src/common/NFTSVG.sol";
 
 contract CommonDeployment is Script, PythonUtils {
     function _deployFactory() internal virtual returns (IFactory) {}
