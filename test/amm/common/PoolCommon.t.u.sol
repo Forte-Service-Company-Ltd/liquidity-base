@@ -213,9 +213,9 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
 
         uint256 originalBalance = IERC20(_yToken).balanceOf(address(admin));
 
-        (uint256 rj, uint256 wj) = pool.getLPToken(admin, 2);
+        (packedFloat wj, uint256 rj) = pool.getLPToken(admin, 2);
         uint256 revenue = pool.revenueAvailable(admin, 2);
-        uint256 amount = pool.withdrawRevenue(2, wj);
+        uint256 amount = pool.withdrawRevenue(2, rj);
         uint256 updatedBalance = IERC20(_yToken).balanceOf(address(admin));
         uint256 expectedBalance = originalBalance + amount;
         assertEq(updatedBalance, expectedBalance);
