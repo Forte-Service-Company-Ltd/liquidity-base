@@ -347,15 +347,22 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         return IERC20(xToken).balanceOf(address(this));
     }
 
-
     /**
      * @dev This function gets the liquidity in the pool for yToken in WAD
      * @return the liquidity in the pool for yToken in WAD
      */
     function yTokenLiquidity() external view returns (uint256) {
-        uint revenue = uint((h.mul(_w)).convertpackedFloatToWAD());
+        uint revenue = _totalRevenue();
         revenue = _normalizeTokenDecimals(false, revenue);
-        return (IERC20(yToken).balanceOf(address(this)) + r) - (collectedProtocolFees + revenue); 
+        return (IERC20(yToken).balanceOf(address(this)) + r) - (collectedProtocolFees + revenue);
+    }
+
+    /**
+     * @dev This function returns the total revenue in the pool for yToken in WAD
+     * @return the revenue in the pool for yToken in WAD
+     */
+    function totalRevenue() public view returns (uint256) {
+        return _totalRevenue();
     }
 
     /**
@@ -375,7 +382,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      * @dev tells current LP fees accumulated in the pool
      * @return currently claimable LP fee balance
      */
-    function collectedLPFees() external view returns (uint256){
+    function collectedLPFees() external view returns (uint256) {
         return _normalizeTokenDecimals(false, uint((_collectedLPFees.mul(_w)).convertpackedFloatToWAD()));
     }
 
@@ -383,7 +390,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      * @dev tells current LP fees accumulated in the pool
      * @return currently claimable LP fee balance
      */
-    function collectedLPFeesPerLiquidityUnit() external view returns (uint256){
+    function collectedLPFeesPerLiquidityUnit() external view returns (uint256) {
         return _normalizeTokenDecimals(false, uint(_collectedLPFees.convertpackedFloatToWAD()));
     }
 
@@ -502,11 +509,11 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      * @dev returns the current total liquidity in the Pool
      * @return w
      */
-    function w() external returns (uint256) {
+    function w() external view returns (uint256) {
         return uint(_w.convertpackedFloatToWAD());
     }
 
-    function wInactive() external returns (uint256) {
+    function wInactive() external view returns (uint256) {
         return uint(_wInactive.convertpackedFloatToWAD());
     }
 
@@ -517,20 +524,28 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      */
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         if (_ownerOf(tokenId) == address(0)) revert URIQueryForNonexistentToken();
-        
+
         string memory xTokenSymbol = IERC20Metadata(xToken).symbol();
         string memory yTokenSymbol = IERC20Metadata(yToken).symbol();
-        
+
         Descriptor.ConstructTokenURIParams memory params = Descriptor.ConstructTokenURIParams({
             tokenId: tokenId,
             xTokenAddress: xToken,
-            yTokenAddress: yToken, 
+            yTokenAddress: yToken,
             xTokenSymbol: xTokenSymbol,
             yTokenSymbol: yTokenSymbol,
             fee: lpFee,
             poolManager: address(this)
         });
-        
+
         return Descriptor.constructTokenURI(params);
+    }
+
+    /**
+     * @dev This function gets the total revenue in the pool for yToken in WAD
+     * @return revenue The revenue in the pool for yToken in WAD
+     */
+    function _totalRevenue() internal view returns (uint256 revenue) {
+        revenue = uint((h.mul(_w)).convertpackedFloatToWAD());
     }
 }

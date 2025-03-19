@@ -30,7 +30,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
     }
 
     function testLiquidity_Pool_TokensMustNotBeTheSame() public {
-        vm.expectRevert(abi.encodeWithSignature("XandYTokensAreTheSame()")); 
+        vm.expectRevert(abi.encodeWithSignature("XandYTokensAreTheSame()"));
         _deployPool(address(yToken), address(yToken), 0, X_TOKEN_MAX_SUPPLY, TBCInputOption.BASE);
     }
 
@@ -438,8 +438,6 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
     }
 
     function testLiquidity_Pool_LiquidityExcess(uint initialAmount) public virtual startAsAdmin endWithStopPrank {
-        // TODO determine how to test revenue and liquidity
-        vm.skip(true);
         /// buys a large amount of x tokens at once
         uint256 maxIterations = 7000;
         initialAmount = bound(initialAmount, 100_000_000, 1_000_000_000);
@@ -454,7 +452,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         uint256 xBalance = IERC20(pool.xToken()).balanceOf(admin);
         assertEq(getAmountSubFee(actual) + xBalanceInitial, xBalance);
         uint256 amountIn = (xBalance - xBalanceInitial) / maxIterations;
-        uint256 lastAmountIn = xBalance % maxIterations;
+        uint256 lastAmountIn = (xBalance - xBalanceInitial) % maxIterations;
         for (uint i; i < maxIterations; i++) {
             uint adjustedAmountIn = amountIn;
             (expected, , ) = pool.simSwap(address(pool.xToken()), amountIn);
@@ -485,8 +483,6 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
     }
 
     function testLiquidity_Pool_backAndForthSwaps() public startAsAdmin endWithStopPrank {
-        // TODO determine how to test revenue and liquidity
-        vm.skip(true);
         for (uint i = 0; i < 100; i++) {
             // 10 swaps in each direction back and forth
             for (uint j = 0; j < 10; j++) {
