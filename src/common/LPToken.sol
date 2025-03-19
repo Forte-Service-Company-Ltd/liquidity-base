@@ -23,7 +23,7 @@ contract LPToken is ERC721, ERC721Enumerable {
 
     struct LPTokenS {
         packedFloat wj;
-        uint256 rj;
+        packedFloat rj;
     }
 
     constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) {}
@@ -35,7 +35,7 @@ contract LPToken is ERC721, ERC721Enumerable {
      * @return wj the amount of the lpToken
      * @return rj the last revenue claim of the lpToken
      */
-    function getLPToken(address lp, uint256 tokenId) public view returns (packedFloat wj, uint256 rj) {
+    function getLPToken(address lp, uint256 tokenId) public view returns (packedFloat wj, packedFloat rj) {
         LPTokenS memory token = lpToken[lp][tokenId];
         return (token.wj, token.rj);
     }
@@ -54,7 +54,7 @@ contract LPToken is ERC721, ERC721Enumerable {
      * @param wj The amount of liquidity provided by the liquidity provider
      * @param hn The revenue parameter of the pool associated with the lpToken contract
      */
-    function _mintTokenAndUpdate(address lp, packedFloat wj, uint256 hn, bool inactive, uint256 tokenXAmount, uint256 tokenYAmount) internal {
+    function _mintTokenAndUpdate(address lp, packedFloat wj, packedFloat hn, bool inactive, uint256 tokenXAmount, uint256 tokenYAmount) internal {
         if(inactive) {
             if(!inactiveCreated) {
                 inactiveCreated = true;
@@ -77,7 +77,7 @@ contract LPToken is ERC721, ERC721Enumerable {
      * @param wj The amount of liquidity associated with the lpToken being updated
      * @param rj The amount of revenue associated with the lpToken being updated
      */
-    function _updateLPTokenVarsDeposit(address lp, uint256 tokenId, packedFloat wj, uint256 rj) internal {
+    function _updateLPTokenVarsDeposit(address lp, uint256 tokenId, packedFloat wj, packedFloat rj) internal {
         lpToken[lp][tokenId].rj = rj;
         lpToken[lp][tokenId].wj =  lpToken[lp][tokenId].wj.add(wj);
     }
@@ -88,8 +88,8 @@ contract LPToken is ERC721, ERC721Enumerable {
      * @param tokenId The token id of the lpToken being updated
      * @param addedRj The amount of revenue claimed to add to the lpToken being updated
      */
-    function _updateLPTokenLastRevenueClaim(address lp, uint256 tokenId, uint256 addedRj) internal {
-        lpToken[lp][tokenId].rj += addedRj;
+    function _updateLPTokenLastRevenueClaim(address lp, uint256 tokenId, packedFloat addedRj) internal {
+        lpToken[lp][tokenId].rj = lpToken[lp][tokenId].rj.add(addedRj);
     }
 
     /**
@@ -111,7 +111,7 @@ contract LPToken is ERC721, ERC721Enumerable {
      * @param _tokenId The token id of the lpToken being updated
      * @param _uj The amount of liquidity the LP would like to withdraw
      */
-    function _updateLPTokenVarsWithdrawal(address _lp, uint256 _tokenId, packedFloat _uj) internal returns (uint256) {
+    function _updateLPTokenVarsWithdrawal(address _lp, uint256 _tokenId, packedFloat _uj) internal returns (packedFloat) {
         packedFloat wj = lpToken[_lp][_tokenId].wj;
         if (wj.lt(_uj)) revert("LPToken: withdrawal amount exceeds allowance");
 

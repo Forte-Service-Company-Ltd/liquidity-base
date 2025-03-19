@@ -273,6 +273,22 @@ library MathLibs {
         }
     }
 
+    function convertpackedFloatToSpecificDecimals(packedFloat value, int decimals) internal pure returns (int256 result) {
+        Float memory float = value.convertToUnpackedFloat();
+        float.exponent *= -1;
+        if (float.mantissa == 0) {
+            result = 0;
+        } else {
+            if (float.exponent > decimals) {
+                uint256 diff = uint(float.exponent - decimals);
+                result = int(uint(float.mantissa) / (10 ** diff));
+            } else {
+                uint256 diff = uint(decimals - float.exponent);
+                result = int(uint(float.mantissa) * (10 ** diff));
+            }
+        }
+    }
+
     function convertpackedFloatToDoubleWAD(packedFloat value) internal pure returns (int256 result) {
         Float memory float = value.convertToUnpackedFloat();
         float.exponent *= -1;
