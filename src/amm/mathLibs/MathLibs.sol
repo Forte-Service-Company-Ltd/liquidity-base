@@ -258,50 +258,26 @@ library MathLibs {
     }
 
     function convertpackedFloatToWAD(packedFloat value) internal pure returns (int256 result) {
-        Float memory float = value.convertToUnpackedFloat();
-        float.exponent *= -1;
-        if (float.mantissa == 0) {
-            result = 0;
-        } else {
-            if (float.exponent > 18) {
-                uint256 diff = uint(float.exponent - 18);
-                result = int(uint(float.mantissa) / (10 ** diff));
-            } else {
-                uint256 diff = uint(18 - float.exponent);
-                result = int(uint(float.mantissa) * (10 ** diff));
-            }
-        }
+        return convertpackedFloatToSpecificDecimals(value, 18);
     }
 
     function convertpackedFloatToSpecificDecimals(packedFloat value, int decimals) internal pure returns (int256 result) {
-        Float memory float = value.convertToUnpackedFloat();
-        float.exponent *= -1;
-        if (float.mantissa == 0) {
+        (int256 mantissa, int256 exponent) = value.decode();
+        exponent *= -1;
+        if (mantissa == 0) {
             result = 0;
         } else {
-            if (float.exponent > decimals) {
-                uint256 diff = uint(float.exponent - decimals);
-                result = int(uint(float.mantissa) / (10 ** diff));
+            if (exponent > decimals) {
+                uint256 diff = uint(exponent - decimals);
+                result = int(uint(mantissa) / (10 ** diff));
             } else {
-                uint256 diff = uint(decimals - float.exponent);
-                result = int(uint(float.mantissa) * (10 ** diff));
+                uint256 diff = uint(decimals - exponent);
+                result = int(uint(mantissa) * (10 ** diff));
             }
         }
     }
 
     function convertpackedFloatToDoubleWAD(packedFloat value) internal pure returns (int256 result) {
-        Float memory float = value.convertToUnpackedFloat();
-        float.exponent *= -1;
-        if (float.mantissa == 0) {
-            result = 0;
-        } else {
-            if (float.exponent > 36) {
-                uint256 diff = uint(float.exponent - 36);
-                result = int(uint(float.mantissa) / (10 ** diff));
-            } else {
-                uint256 diff = uint(36 - float.exponent);
-                result = int(uint(float.mantissa) * (10 ** diff));
-            }
-        }
+        return convertpackedFloatToSpecificDecimals(value, 36);
     }
 }

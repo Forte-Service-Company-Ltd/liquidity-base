@@ -36,12 +36,11 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
     }
 
     function _loadAdminAndAlice() internal startAsAdmin endWithStopPrank {
-        //TODO: Add extra for the extra WEI the pool takes for rounding issues.
-        GenericERC20(address(yToken)).mint(admin, 1e12 * ERC20_DECIMALS + 100);
-        GenericERC20(address(yToken)).mint(alice, 1e12 * ERC20_DECIMALS + 100);
-        stableCoin.mint(alice, 1e12 * STABLECOIN_DEC + 100);
-        stableCoin.mint(admin, 1e12 * STABLECOIN_DEC + 100);
-        fotCoin.mint(admin, 1e20 * ERC20_DECIMALS + 100);
+        GenericERC20(address(yToken)).mint(admin, 1e12 * ERC20_DECIMALS);
+        GenericERC20(address(yToken)).mint(alice, 1e12 * ERC20_DECIMALS);
+        stableCoin.mint(alice, 1e12 * STABLECOIN_DEC);
+        stableCoin.mint(admin, 1e12 * STABLECOIN_DEC);
+        fotCoin.mint(admin, 1e20 * ERC20_DECIMALS);
     }
 
     function _deployAllowLists() internal startAsAdmin endWithStopPrank {
