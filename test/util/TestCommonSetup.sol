@@ -48,11 +48,11 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         deployerAllowList = new AllowList();
     }
 
-    function _deployAndSetLPToken(PoolBase _pool) internal startAsAdmin endWithStopPrank {
+    function _deployAndSetLPToken() internal startAsAdmin endWithStopPrank {
         lpToken = new LPToken("LPToken", "LPT");
     }
 
-    function _deployLPToken(address _poolAddress) internal returns (LPToken LPTokenAddress) {
+    function _deployLPToken() internal returns (LPToken LPTokenAddress) {
         vm.startPrank(admin);
         LPTokenAddress = new LPToken("LPToken", "LPT");
     }
@@ -143,7 +143,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         GenericERC20FixedSupply xTokenWithFee = new GenericERC20FixedSupply("Fee token", "FEE", 10e3 * ERC20_DECIMALS);
         _approveFactory(address(xTokenWithFee));
         poolRet = PoolBase(_deployPool(address(xTokenWithFee), _yTokenAddress, 0, 10e3 * ERC20_DECIMALS, TBCInputOption.FORK));
-        _deployAndSetLPToken(poolRet);
+        _deployAndSetLPToken();
         _approvePool(poolRet, usdt);
         // _addInitialLiquidity(poolRet, 10e3 * ERC20_DECIMALS);
 

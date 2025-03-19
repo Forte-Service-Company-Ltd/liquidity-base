@@ -4,7 +4,7 @@ pragma solidity ^0.8.24;
 import "lib/openzeppelin-contracts/contracts/utils/Strings.sol";
 import "forge-std/console2.sol";
 import "forge-std/Test.sol";
-import {MathLibs} from "src/amm/mathLibs/MathLibs.sol";
+import {MathLibs, packedFloat, Float128} from "src/amm/mathLibs/MathLibs.sol";
 import {diffGreaterThanUint256, bytesLargerThanUint256} from "src/common/IErrors.sol";
 
 /**
@@ -13,6 +13,8 @@ import {diffGreaterThanUint256, bytesLargerThanUint256} from "src/common/IErrors
 abstract contract PythonUtils is Test {
     using Strings for uint256;
     using MathLibs for uint256;
+    using MathLibs for int256;
+    using MathLibs for packedFloat;
     bytes slice;
 
     function _buildFFIRecordVars(
@@ -149,75 +151,26 @@ abstract contract PythonUtils is Test {
         /// we calculate difference percentage as diff/(smaller number unless 0) to get the bigger difference "percentage".
         withinTolerance = true;
         if (diff != 0) {
-            (uint scaledLo, uint scaledHi) = diff.mul256x256(toleranceDenom);
-            uint relativeDiff = scaledLo.div512x256(
-                scaledHi,
-                x > y
-                    ? y == 0
-                        ? x
-                        : y
-                    : x == 0
-                        ? y
-                        : x
+            packedFloat scaled = int(diff).toPackedFloat(-18).mul(int(toleranceDenom).toPackedFloat(-18));
+            console2.log("first");
+            uint relativeDiff = uint(
+                scaled
+                    .div(
+                        int(
+                            x > y
+                                ? y == 0
+                                    ? x
+                                    : y
+                                : x == 0
+                                    ? y
+                                    : x
+                        ).toPackedFloat(-2)
+                    )
+                    .convertpackedFloatToWAD()
             );
+            console2.log("second");
             if (relativeDiff > maxTolerance) withinTolerance = false;
         }
-    }
-
-    /**
-     * compares if 2 uints are similar enough.
-     * @param x0 lower bits of x. Value to compare against *y*
-     * @param x1 higher bits of x. Value to compare against *y*
-     * @param y0 lower bits of y. Value to compare against *x*
-     * @param y1 higher bits of y. Value to compare against *x*
-     * @param maxTolerance the maximum allowed difference tolerance based on the precision
-     * @param toleranceDenom the denom of the tolerance value. For instance, 10 ** 11.
-     * @return true if the difference expressed as a normalized value is less or equal than the tolerance.
-     */
-    function areWithinTolerance512(
-        uint256 x0,
-        uint256 x1,
-        uint256 y0,
-        uint256 y1,
-        uint8 maxTolerance,
-        uint256 toleranceDenom
-    ) internal pure returns (bool) {
-        /// we calculate the absolute difference to avoid overflow/underflow
-        uint diff = absoluteDiff512(x0, x1, y0, y1);
-        console2.log("from areWithinTolerance512");
-        console2.log(diff);
-        /// we calculate difference percentage as diff/(smaller number unless 0) to get the bigger difference "percentage".
-        if (diff == 0) return true;
-        (uint diffXTolDenomL, uint diffXTolDenomH) = diff.mul256x256(toleranceDenom);
-        (uint greaterXTolNumerL, uint greaterXTolNumerH) = _getGreaterXToleranceNumerator(x0, x1, y0, y1, maxTolerance);
-        console2.log("from areWithinTolerance512");
-        console2.log(diffXTolDenomL, diffXTolDenomH);
-        console2.log(greaterXTolNumerL, greaterXTolNumerH);
-        return !(diffXTolDenomL.gt512(diffXTolDenomH, greaterXTolNumerL, greaterXTolNumerH));
-    }
-
-    /**
-     * helper function for areWithinTolerance512. It gets the result for the greater between x and y multiplied by the tolerance numerator
-     * @param x0 lower bits of x.
-     * @param x1 higher bits of x.
-     * @param y0 lower bits of y.
-     * @param y1 higher bits of y.
-     * @param maxTolerance the maximum allowed difference tolerance based on the precision. The numerator side
-     * @return greaterXTolNumerL lower bits of the result of the greater between x and y multiplied by the tolerance numerator
-     * @return greaterXTolNumerH higher bits of the result of the greater between x and y multiplied by the tolerance numerator
-     */
-    function _getGreaterXToleranceNumerator(
-        uint256 x0,
-        uint256 x1,
-        uint256 y0,
-        uint256 y1,
-        uint8 maxTolerance
-    ) internal pure returns (uint greaterXTolNumerL, uint greaterXTolNumerH) {
-        bool isXgtY = x0.gt512(x1, y0, y1);
-        bool dividingByX = !(isXgtY || x0.eq512(x1, 0, 0));
-        (greaterXTolNumerL, greaterXTolNumerH) = dividingByX
-            ? x0.mul512x256(x1, uint(maxTolerance))
-            : y0.mul512x256(y1, uint(maxTolerance));
     }
 
     /**
@@ -242,21 +195,6 @@ abstract contract PythonUtils is Test {
      */
     function absoluteDiff(uint x, uint y) public pure returns (uint diff) {
         diff = x > y ? x - y : y - x;
-    }
-
-    /**
-     * @dev calculates the difference between 2 512 uints without risk of overflow/underflow
-     * @param x0 uint lower bits of x
-     * @param x1 uint higher bits of x
-     * @param y0 uint lower bits of y
-     * @param y1 uint higher bits of y
-     * @return diff the absolute difference between *x* and *y*
-     */
-    function absoluteDiff512(uint x0, uint x1, uint y0, uint y1) public pure returns (uint diff) {
-        uint diffH;
-        if (x0.gt512(x1, y0, y1)) (diff, diffH) = x0.sub512x512(x1, y0, y1);
-        else (diff, diffH) = y0.sub512x512(y1, x0, x1);
-        if (diffH > 0) revert diffGreaterThanUint256();
     }
 
     /**
@@ -362,40 +300,6 @@ abstract contract PythonUtils is Test {
             uint units = (uint(uint8(bytesDecimal[i])) - ((uint(uint8(bytesDecimal[i])) / 16) * 16));
             if (i != bytesDecimal.length - 1) decodedUint += (tens + units) * (10 ** ((bytesDecimal.length - i - 1) * 2));
             else decodedUint += (tens + units);
-        }
-    }
-
-    /**
-     * @dev converts a possibly 512-bit long number expressed in hex. It handles numbers expressed
-     * as asciis and actual plain hex.
-     * @param bytesHex the byte variable to convert to uint.
-     * @return rL the lower 256 bits of the 512-bit number representing the uint
-     * @return rH the higher 256 bits of the 512-bit number representing the uint
-     */
-    function from512BytesToUint(bytes memory bytesHex) public returns (uint256 rL, uint256 rH) {
-        if (isPossiblyAnAsciiHex(bytesHex)) {
-            if (bytesHex.length > 66) {
-                for (uint i = 2; i < bytesHex.length - 64; i++) slice.push(bytesHex[i]);
-                rH = decodeAsciiUintHex(slice);
-                delete slice;
-                for (uint i = bytesHex.length - 64; i < bytesHex.length; i++) if (uint(uint8(bytesHex[i])) != 120) slice.push(bytesHex[i]);
-                rL = decodeAsciiUintHex(slice);
-            } else {
-                for (uint i = 2; i < bytesHex.length; i++) slice.push(bytesHex[i]);
-                rL = decodeAsciiUintHex(slice);
-            }
-        } else {
-            if (bytesHex.length > 32) {
-                for (uint i; i < bytesHex.length - 32; i++) slice.push(bytesHex[i]);
-                rH = fromBytesToUint(slice);
-                delete slice;
-                for (uint i = bytesHex.length - 32; i < bytesHex.length; i++) slice.push(bytesHex[i]);
-                rL = fromBytesToUint(slice);
-                console2.log(rL);
-            } else {
-                for (uint i; i < bytesHex.length; i++) slice.push(bytesHex[i]);
-                rL = fromBytesToUint(slice);
-            }
         }
     }
 

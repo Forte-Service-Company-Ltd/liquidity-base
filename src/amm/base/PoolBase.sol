@@ -7,11 +7,10 @@ import {IERC20} from "../../../lib/openzeppelin-contracts/contracts/token/ERC20/
 import {SafeERC20} from "../../../lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IPool} from "./IPool.sol";
 import "../../common/IErrors.sol";
-import {CalculatorBase} from "./CalculatorBase.sol";
+import {CalculatorBase, packedFloat} from "./CalculatorBase.sol";
 import {CumulativePrice} from "./CumulativePrice.sol";
-import {Constants} from "../../common/Constants.sol";
 import {FeeInfo, TBCType} from "../../common/TBC.sol";
-import {MathLibs, Float, packedFloat} from "../mathLibs/MathLibs.sol";
+import {MathLibs, Float} from "../mathLibs/MathLibs.sol";
 import {LPToken} from "../../../src/common/LPToken.sol";
 import {Descriptor} from "../../common/NFTSVG.sol";
 
@@ -46,12 +45,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      * @dev balance of x token that has been swapped out of the Pool
      */
     packedFloat public x;
-
-    /**
-     * @dev lifetime revenue accrued by the pool
-     */
-    // slither-disable-next-line constable-states // updated in child contract
-    uint256 public R;
 
     /**
      * @dev lifetime revenue accrued by the pool
@@ -305,7 +298,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         _validateLiquidityAdd(int(afterBalance).toPackedFloat(-18));
 
         _mintTokenAndUpdate(_msgSender(), (int(_amount / 1e18).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE)), 0, false, _amount, 0);
-
     }
 
     /**
@@ -394,25 +386,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     function collectedLPFeesPerLiquidityUnit() external view returns (uint256) {
         return _normalizeTokenDecimals(false, uint(_collectedLPFees.convertpackedFloatToWAD()));
     }
-
-    /**
-     * @dev This function returns the available revenue for the given token
-     * @param tokenId The ID of the LPToken
-     * @return revenue The amount of revenue available for the given token
-     */
-    /*function revenueAvailable(address lp, uint256 tokenId) external returns (uint256 revenue) {
-        revenue = _revenueAvailable(lp, tokenId);
-        revenue = _normalizeTokenDecimals(false, revenue);
-    }
-
-    /**
-     * @dev This function withdraws revenue for the given token
-     * @param tokenId the id of the LP token to withdraw revenue for
-     * @param Q the amount of revenue to withdraw
-     */
-    /*function withdrawRevenue(uint256 tokenId, uint256 Q) external {
-        _withdrawRevenue(_msgSender(), tokenId, _normalizeTokenDecimals(true, Q));
-    }*/
 
     /**
      * @dev A helper function to validate most of constructor's inputs.

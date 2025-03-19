@@ -65,22 +65,6 @@ abstract contract CalculatorBase is Constants {
     function _clearState() internal virtual;
 
     /**
-     * @dev This function returns the available revenue for the given token
-     * @param lp The address of the liquidity provider
-     * @param tokenId The ID of the LPToken
-     * @return uint256 amount of revenue available for the given token
-     */
-    function _revenueAvailable(address lp, uint256 tokenId) internal virtual returns (uint256);
-
-    /**
-     * @dev This function allows revenue to be withdrawn for the given token
-     * @param lp The address of the liquidity provider
-     * @param tokenId The ID of the LPToken being updated
-     * @param Q The amount of revenue to withdraw
-     */
-    function _withdrawRevenue(address lp, uint256 tokenId, uint256 Q) internal virtual;
-
-    /**
      * @dev This function validates the liquidity addition to ensure it does not exceed the max supply of xToken.
      * @param afterBalance the balance of xToken after the addition
      */
