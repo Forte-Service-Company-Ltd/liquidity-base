@@ -59,7 +59,7 @@ contract LPToken is ERC721, ERC721Enumerable {
             if(!inactiveCreated) {
                 inactiveCreated = true;
                 _mint(lp, INACTIVE_ID);
-                _updateLPTokenVarsDeposit(lp, 0, wj, hn);
+                _updateLPTokenVarsDeposit(lp, INACTIVE_ID, wj, hn);
             }
         } else {
             _mint(lp, currentTokenId);
