@@ -173,6 +173,12 @@ library MathLibs {
         return convertpackedFloatToSpecificDecimals(value, 18);
     }
 
+    /**
+     * @dev converts a packedFloat to a specific number of decimals
+     * @param value the packedFloat to convert
+     * @param decimals the number of decimals to convert to
+     * @return result the resulting number with the specified number of decimals
+     */
     function convertpackedFloatToSpecificDecimals(packedFloat value, int decimals) internal pure returns (int256 result) {
         (int256 mantissa, int256 exponent) = value.decode();
         exponent *= -1;
@@ -189,6 +195,11 @@ library MathLibs {
         }
     }
 
+    /**
+     * @dev converts a packedFloat to a double WAD number
+     * @param value the packedFloat to convert
+     * @return result the resulting double WAD number
+     */
     function convertpackedFloatToDoubleWAD(packedFloat value) internal pure returns (int256 result) {
         return convertpackedFloatToSpecificDecimals(value, 36);
     }
