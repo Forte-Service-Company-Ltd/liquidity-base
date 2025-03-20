@@ -13,6 +13,7 @@ import {TwentyTwoDecimalERC20} from "src/example/ERC20/TwentyTwoDecimalERC20.sol
 import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {TestCommonSetupAbs, TBCInputOption} from "test/util/TestCommonSetupAbs.sol";
 import {LPToken} from "src/common/LPToken.sol";
+import {Float128, Float, packedFloat, MathLibs} from "src/amm/mathLibs/MathLibs.sol";
 import "forge-std/console2.sol";
 
 /**
@@ -23,6 +24,10 @@ import "forge-std/console2.sol";
  * _create = deploy contract, return the contract
  */
 abstract contract TestCommonSetup is TestCommonSetupAbs {
+    using MathLibs for int256;
+    using MathLibs for uint256;
+    using MathLibs for packedFloat;
+
     function _setupCollateralToken() internal {
         _yToken = IERC20(pool.yToken());
         fullToken = address(_yToken) == address(stableCoin) ? STABLECOIN_DEC : ERC20_DECIMALS;
@@ -152,13 +157,19 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
 
     function _setupStressTestPool(bool withStableCoin) internal endWithStopPrank returns (PoolBase poolRet) {
         // the token supply is the same value used in the stress test simulation and must match
-        uint256 maxX = 10e3 * ERC20_DECIMALS;
+        uint256 maxX = uint(int(1000).toPackedFloat(0).convertpackedFloatToWAD());
         _setUpTokensAndFactories(maxX);
         _approveFactory(address(xToken));
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
         // the pool config values are the same config values used in the stress test simulation and must match
-        /// fee: 0.0%, supply: 10K tokens, y-intersect: 10, minPrice: 1, maxPrice: 100
-        poolRet = _deployPool(address(xToken), yTokenAddress, 0, maxX, TBCInputOption.FORK);
+        /// phi: 5.0%, supply: 10K tokens, y-intersect: 10, minPrice: 1, maxPrice: 100
+        poolRet = _deployPool(
+            address(xToken),
+            yTokenAddress,
+            5, // phi
+            maxX,
+            TBCInputOption.FORK
+        );
         _approvePool(poolRet, false);
         // _addInitialLiquidity(poolRet, 10e3 * ERC20_DECIMALS);
     }
