@@ -83,6 +83,10 @@ library MathLibs {
         r = a.div(b);
     }
 
+    function divL(packedFloat a, packedFloat b) internal pure returns (packedFloat r) {
+        r = a.divL(b);
+    }
+
     /**
      * @dev gets the square root of a signed floating point
      * @notice only positive numbers can get its square root calculated through this function
@@ -149,6 +153,10 @@ library MathLibs {
      */
     function toPackedFloat(int mantissa, int exponent) internal pure returns (packedFloat float) {
         float = mantissa.toPackedFloat(exponent);
+    }
+
+    function ln(int mantissa, int exponent) internal pure returns (packedFloat float) {
+        float = mantissa.ln(exponent);
     }
 
     /**
