@@ -10,7 +10,7 @@ import "../../common/IErrors.sol";
 import {CalculatorBase} from "./CalculatorBase.sol";
 import {CumulativePrice} from "./CumulativePrice.sol";
 import {FeeInfo, TBCType} from "../../common/TBC.sol";
-import {MathLibs, Float, packedFloat} from "../mathLibs/MathLibs.sol";
+import {MathLibs, packedFloat} from "../mathLibs/MathLibs.sol";
 import {LPToken} from "../../../src/common/LPToken.sol";
 import {Descriptor} from "../../common/NFTSVG.sol";
 
