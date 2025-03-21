@@ -7,10 +7,10 @@ import {IERC20} from "../../../lib/openzeppelin-contracts/contracts/token/ERC20/
 import {SafeERC20} from "../../../lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IPool} from "./IPool.sol";
 import "../../common/IErrors.sol";
-import {CalculatorBase, packedFloat} from "./CalculatorBase.sol";
+import {CalculatorBase} from "./CalculatorBase.sol";
 import {CumulativePrice} from "./CumulativePrice.sol";
 import {FeeInfo, TBCType} from "../../common/TBC.sol";
-import {MathLibs} from "../mathLibs/MathLibs.sol";
+import {MathLibs, Float, packedFloat} from "../mathLibs/MathLibs.sol";
 import {LPToken} from "../../../src/common/LPToken.sol";
 import {Descriptor} from "../../common/NFTSVG.sol";
 
@@ -50,6 +50,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      * @dev lifetime revenue accrued by the pool
      */
     // slither-disable-next-line constable-states // updated in child contract
+    // TODO Figure out if we need to keep this global or calculate h when needed as we do now. If we keep this, it needs to be set in the initializer
     packedFloat public h;
 
     /**
@@ -81,7 +82,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     /**
      * @dev currently claimable fee balance
      */
-    packedFloat _collectedLPFees;
+    packedFloat public _collectedLPFees;
 
     /**
      * @dev currently claimable protocol fee balance
