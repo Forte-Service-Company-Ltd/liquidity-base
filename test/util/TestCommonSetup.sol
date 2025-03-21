@@ -111,6 +111,16 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         _setupCollateralToken();
     }
 
+    function _setupDuplicatePools(bool withStableCoin) internal endWithStopPrank returns (PoolBase pool1, PoolBase pool2) {
+        _setUpTokensAndFactories(X_TOKEN_MAX_SUPPLY);
+        _approveFactory(address(xToken));
+        address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
+        pool1 = _deployPool(address(xToken), yTokenAddress, 30, X_TOKEN_MAX_SUPPLY, TBCInputOption.BASE);
+        _approvePool(pool1, false);
+        pool2 = _deployPool(address(xToken), yTokenAddress, 30, X_TOKEN_MAX_SUPPLY, TBCInputOption.BASE);
+        _approvePool(pool2, false);
+    }
+
     function _setupPoolWithFee(bool withStableCoin, uint16 fee) internal endWithStopPrank returns (PoolBase poolRet) {
         poolRet = _setupPoolWithFee(withStableCoin, address(xToken), fee);
     }
