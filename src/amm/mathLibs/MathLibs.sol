@@ -4,7 +4,7 @@ pragma solidity ^0.8.24;
 import "solady/utils/FixedPointMathLib.sol";
 import "./lib/MathUtils.sol";
 import {LN} from "./lib/LN.sol";
-import {Float128, Float, packedFloat} from "../../../lib/float128/src/Float128.sol";
+import {Float128, packedFloat} from "../../../lib/float128/src/Float128.sol";
 
 /**
  * @title Abstraction Layer between Equations and the underlying Math libraries
@@ -18,7 +18,6 @@ library MathLibs {
     using MathUtils for uint256;
     using LN for uint256;
     using Float128 for int256;
-    using Float128 for Float;
     using Float128 for packedFloat;
 
     uint256 constant WAD = FixedPointMathLib.WAD;
@@ -96,61 +95,6 @@ library MathLibs {
     }
 
     /**
-     * @dev adds 2 signed floating point numbers
-     * @param a the first addend
-     * @param b the second addend
-     * @return r the result of a + b
-     * @notice this version of the function uses only the Float type
-     */
-    function add(Float memory a, Float memory b) internal pure returns (Float memory r) {
-        r = a.add(b);
-    }
-
-    /**
-     * @dev gets the difference between 2 signed floating point numbers
-     * @param a the minuend
-     * @param b the subtrahend
-     * @return r the result of a - b
-     * @notice this version of the function uses only the Float type
-     */
-    function sub(Float memory a, Float memory b) internal pure returns (Float memory r) {
-        r = a.sub(b);
-    }
-
-    /**
-     * @dev gets the multiplication of 2 signed floating point numbers
-     * @param a the first factor
-     * @param b the second factor
-     * @return r the result of a * b
-     * @notice this version of the function uses only the Float type
-     */
-    function mul(Float memory a, Float memory b) internal pure returns (Float memory r) {
-        r = a.mul(b);
-    }
-
-    /**
-     * @dev gets the division of 2 signed floating point numbers
-     * @param a the numerator
-     * @param b the denominator
-     * @return r the result of a / b
-     * @notice this version of the function uses only the Float type
-     */
-    function div(Float memory a, Float memory b) internal pure returns (Float memory r) {
-        r = a.div(b);
-    }
-
-    /**
-     * @dev gets the square root of a signed floating point
-     * @notice only positive numbers can get its square root calculated through this function
-     * @param a the numerator to get the square root of
-     * @return r the result of √a
-     * @notice this version of the function uses only the Float type
-     */
-    function sqrt(Float memory a) internal pure returns (Float memory r) {
-        r = a.sqrt();
-    }
-
-    /**
      * @dev performs a greater than comparison
      * @param a the first term
      * @param b the second term
@@ -215,46 +159,6 @@ library MathLibs {
      */
     function decode(packedFloat float) internal pure returns (int mantissa, int exponent) {
         (mantissa, exponent) = float.decode();
-    }
-
-    /**
-     * @dev shifts the exponent enough times to have a mantissa with exactly 38 digits
-     * @notice this is a VITAL STEP to ensure the highest precision of the calculations
-     * @param x the Float number to normalize
-     * @return float the normalized version of x
-     */
-    function normalize(Float memory x) internal pure returns (Float memory float) {
-        float = x.normalize();
-    }
-
-    /**
-     * @dev packs a pair of signed integer values describing a floating-point number into a Float struct.
-     * Examples: 1234.567 can be expressed as: 123456 x 10**(-3), or 1234560 x 10**(-4), or 12345600 x 10**(-5), etc.
-     * @notice the mantissa can hold a maximum of 38 digits. Any number with more digits will lose precision.
-     * @param _mantissa the integer that holds the mantissa digits (38 digits max)
-     * @param _exponent the exponent of the floating point number (between -16384 and +16383)
-     * @return float the normalized version of the floating-point number packed in a Float struct.
-     */
-    function toFloat(int _mantissa, int _exponent) internal pure returns (Float memory float) {
-        float = _mantissa.toFloat(_exponent);
-    }
-
-    /**
-     * @dev from Float to packedFloat
-     * @param _float the Float number to encode into a packedFloat
-     * @return float the packed version of Float
-     */
-    function convertToPackedFloat(Float memory _float) internal pure returns (packedFloat float) {
-        float = _float.convertToPackedFloat();
-    }
-
-    /**
-     * @dev from packedFloat to Float
-     * @param _float the encoded floating-point number to unpack into a Float
-     * @return float the unpacked version of packedFloat
-     */
-    function convertToUnpackedFloat(packedFloat _float) internal pure returns (Float memory float) {
-        float = _float.convertToUnpackedFloat();
     }
 
     function convertpackedFloatToWAD(packedFloat value) internal pure returns (int256 result) {
