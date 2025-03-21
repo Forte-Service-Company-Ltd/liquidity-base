@@ -152,7 +152,6 @@ abstract contract PythonUtils is Test {
         withinTolerance = true;
         if (diff != 0) {
             packedFloat scaled = int(diff).toPackedFloat(-18).mul(int(toleranceDenom).toPackedFloat(-18));
-            console2.log("first");
             uint relativeDiff = uint(
                 scaled
                     .div(
@@ -168,7 +167,6 @@ abstract contract PythonUtils is Test {
                     )
                     .convertpackedFloatToWAD()
             );
-            console2.log("second");
             if (relativeDiff > maxTolerance) withinTolerance = false;
         }
     }

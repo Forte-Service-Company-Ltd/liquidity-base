@@ -157,7 +157,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
 
     function _setupStressTestPool(bool withStableCoin) internal endWithStopPrank returns (PoolBase poolRet) {
         // the token supply is the same value used in the stress test simulation and must match
-        uint256 maxX = uint(int(1000).toPackedFloat(0).convertpackedFloatToWAD());
+        uint256 maxX = uint(int(10000000000000000000000000000000000000).toPackedFloat(-34).convertpackedFloatToWAD());
         _setUpTokensAndFactories(maxX);
         _approveFactory(address(xToken));
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
@@ -168,10 +168,11 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
             yTokenAddress,
             5, // phi
             maxX,
-            TBCInputOption.FORK
+            TBCInputOption.STRESS
         );
         _approvePool(poolRet, false);
-        // _addInitialLiquidity(poolRet, 10e3 * ERC20_DECIMALS);
+        vm.startPrank(address(0xb0b));
+        poolRet.setProtocolFee(1);
     }
 
     function _setupPrecisionPools(
