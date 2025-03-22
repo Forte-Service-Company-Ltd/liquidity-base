@@ -194,8 +194,6 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         vm.startPrank(admin);
         uint amount = X_TOKEN_MAX_SUPPLY;
         initialBalance = _xToken.balanceOf(address(_pool));
-        vm.expectEmit(true, true, true, true, address(_pool));
-        emit IPoolEvents.LiquidityXTokenAdded(address(_xToken), amount);
         PoolBase(address(_pool)).addXSupply(amount);
         updatedBalance = _xToken.balanceOf(address(_pool));
     }
@@ -652,8 +650,6 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         assertGt(spotPrice, 0, "spotPrice should initially be 0");
 
         (uint expected, , ) = pool.simSwap(address(_yToken), fullToken);
-        vm.expectEmit(true, true, true, true, address(pool));
-        emit IPoolEvents.CumulativePriceUpdated(vm.getBlockTimestamp(), spotPrice * vm.getBlockTimestamp());
         pool.swap(address(_yToken), fullToken, getAmountSubFee(expected));
 
         uint cumulativePrice1 = CumulativePrice(address(pool)).cumulativePrice();
@@ -669,11 +665,6 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         spotPrice = pool.spotPrice();
         (expected, , ) = pool.simSwap(address(_yToken), fullToken);
 
-        vm.expectEmit(true, true, true, true, address(pool));
-        emit IPoolEvents.CumulativePriceUpdated(
-            vm.getBlockTimestamp(),
-            spotPrice * (vm.getBlockTimestamp() - lastBlockTimestamp1) + cumulativePrice1
-        );
         pool.swap(address(_yToken), fullToken, getAmountSubFee(expected));
 
         uint cumulativePrice2 = CumulativePrice(address(pool)).cumulativePrice();
@@ -690,11 +681,6 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         spotPrice = pool.spotPrice();
         (expected, , ) = pool.simSwap(address(_yToken), fullToken);
 
-        vm.expectEmit(true, true, true, true, address(pool));
-        emit IPoolEvents.CumulativePriceUpdated(
-            vm.getBlockTimestamp(),
-            spotPrice * (vm.getBlockTimestamp() - lastBlockTimestamp2) + cumulativePrice2
-        );
         pool.swap(address(_yToken), fullToken, getAmountSubFee(expected));
 
         uint cumulativePrice3 = CumulativePrice(address(pool)).cumulativePrice();

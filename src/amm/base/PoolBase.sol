@@ -151,7 +151,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         uint256 _minOut
     ) external whenNotPaused returns (uint256 amountOut, uint256 lpFeeAmount, uint256 protocolFeeAmount) {
         _updateCumulativePrice(spotPrice(), block.timestamp);
-        emit CumulativePriceUpdated(lastBlockTimestamp, cumulativePrice);
 
         bool sellingX = _tokenIn == xToken;
         //slither-disable-start reentrancy-benign // the recipient of the transfer is this contract
@@ -288,7 +287,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      * @param _amount the amount of X token to transfer from the sender to the pool
      */
     function addXSupply(uint256 _amount) external virtual onlyOwner {
-        emit LiquidityXTokenAdded(xToken, _amount);
         // slither-disable-start reentrancy-benign // the transfer doesn't update any state variable directly and the pool is the recipient
         uint256 beforeBalance = IERC20(xToken).balanceOf(address(this));
         IERC20(xToken).safeTransferFrom(_msgSender(), address(this), _amount);

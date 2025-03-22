@@ -22,7 +22,6 @@ interface CommonEvents {
  * @notice any change in this interface most likely means a breaking change with monitoring services
  */
 interface IPoolEvents is CommonEvents {
-    event LiquidityXTokenAdded(address indexed _token, uint256 amount);
     event PoolClosed(uint256 indexed amountOutTokenX, uint256 indexed amountOutTokenY);
     event Swap(address indexed _tokenIn, uint256 indexed _amountIn, uint256 indexed _amountOut, uint256 _minOut);
     event LPFeeSet(uint16 indexed _fee);
@@ -31,7 +30,6 @@ interface IPoolEvents is CommonEvents {
     event LPFeesCollected(address indexed _collector, uint256 indexed _amount);
     event ProtocolFeesCollected(address indexed _collector, uint256 indexed _amount);
     event RevenueWithdrawn(address indexed _collector, uint256 indexed tokenId, uint256 indexed _amount);
-    event CumulativePriceUpdated(uint256 indexed blockTimestamp, uint cumulativePrice);
     event LiquidityWithdrawn(address lp, uint indexed tokenId, uint256 indexed amountOutXToken, uint256 indexed amountOutYToken, uint256 revenue);
     event LPTokenMinted(address indexed lp, uint256 indexed tokenId, uint256 amountXToken, uint256 amountYToken);
     event LPTokenBurned(address indexed lp, uint256 indexed tokenId, uint256 indexed initialLiquidityWj);
