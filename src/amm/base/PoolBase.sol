@@ -13,6 +13,7 @@ import {FeeInfo, TBCType} from "../../common/TBC.sol";
 import {MathLibs, packedFloat} from "../mathLibs/MathLibs.sol";
 import {LPToken} from "../../../src/common/LPToken.sol";
 import {Descriptor} from "../../common/NFTSVG.sol";
+import "forge-std/console2.sol";
 
 /**
  * @title Pool Base
@@ -168,7 +169,8 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         x = sellingX ? x.sub(int(_amountIn).toPackedFloat(-18)) : x.add(int(amountOut).toPackedFloat(-18));
         // slither-disable-end reentrancy-benign
         // slither-disable-start reentrancy-events // the recipient of the initial transfer is this contract
-        _updateParameters(xOld);
+        _updateParameters(x);
+
         _collectedLPFees = _collectedLPFees.add(int(lpFeeAmount).toPackedFloat(int(yDecimalDiff) - int(POOL_NATIVE_DECIMALS)).div(_w));
         collectedProtocolFees += protocolFeeAmount;
         emit FeesGenerated(lpFeeAmount, protocolFeeAmount, uint((h.mul(_w)).sub(oldh).convertpackedFloatToWAD()));
@@ -200,7 +202,9 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         if (!sellingX) {
             lpFeeAmount = _determineFeeAmountSell(_amountIn, lpFee);
             protocolFeeAmount = _determineFeeAmountSell(_amountIn, protocolFee);
+            console2.log("amount in before normalization, before fees", _amountIn);
             _amountIn -= (lpFeeAmount + protocolFeeAmount); // fees are always coming out from the pool
+            console2.log("amount in before normalization, after fees", _amountIn);
             _amountIn = _normalizeTokenDecimals(true, _amountIn);
         }
         packedFloat rawAmountOut = sellingX
@@ -413,7 +417,8 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      *
      */
     function _determineFeeAmountSell(uint256 amountOfY, uint16 _fee) private pure returns (uint256 feeAmount) {
-        if (_fee > 0) feeAmount = (amountOfY * _fee) / PERCENTAGE_DENOM + 1;
+        // TODO Round up again here once the python stress test conforms to this rounding
+        if (_fee > 0) feeAmount = (amountOfY * _fee) / PERCENTAGE_DENOM; // + 1
     }
 
     /**
