@@ -23,7 +23,6 @@ interface CommonEvents {
  * @notice any change in this interface most likely means a breaking change with monitoring services
  */
 interface IPoolEvents is CommonEvents {
-    event PoolClosed(uint256 indexed amountOutTokenX, uint256 indexed amountOutTokenY);
     event Swap(address indexed _tokenIn, uint256 indexed _amountIn, uint256 indexed _amountOut, uint256 _minOut);
     event LPFeeSet(uint16 indexed _fee);
     event LPFeeGenerated(uint256 indexed _amount);
