@@ -27,4 +27,4 @@ jobs:
 
       - name: Build
         run: |
-          forge clean && forge build --optimize --via-ir
+          forge clean && forge build --optimize
