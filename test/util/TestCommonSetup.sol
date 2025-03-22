@@ -166,13 +166,13 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         poolRet = _deployPool(
             address(xToken),
             yTokenAddress,
-            5, // phi
+            50, // phi
             maxX,
             TBCInputOption.STRESS
         );
         _approvePool(poolRet, false);
         vm.startPrank(address(0xb0b));
-        poolRet.setProtocolFee(1);
+        poolRet.setProtocolFee(10);
     }
 
     function _setupPrecisionPools(
