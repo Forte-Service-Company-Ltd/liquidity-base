@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
+import {packedFloat} from "../amm/mathLibs/MathLibs.sol";
 /**
  * @dev File that contains all the events for the project
  * @author  @oscarsernarosero @mpetersoCode55 @cirsteve @palmerg4
@@ -31,8 +32,9 @@ interface IPoolEvents is CommonEvents {
     event ProtocolFeesCollected(address indexed _collector, uint256 indexed _amount);
     event RevenueWithdrawn(address indexed _collector, uint256 indexed tokenId, uint256 indexed _amount);
     event LiquidityWithdrawn(address lp, uint indexed tokenId, uint256 indexed amountOutXToken, uint256 indexed amountOutYToken, uint256 revenue);
-    event LPTokenMinted(address indexed lp, uint256 indexed tokenId, uint256 amountXToken, uint256 amountYToken);
+    event LPTokenMinted(address indexed lp, uint256 indexed tokenId, packedFloat wj, packedFloat hn);
     event LPTokenBurned(address indexed lp, uint256 indexed tokenId, uint256 indexed initialLiquidityWj);
+    event RevenueAccrued();
 }
 
 /**
