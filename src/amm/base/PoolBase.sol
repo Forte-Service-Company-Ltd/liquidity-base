@@ -162,11 +162,13 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         _amountIn = afterBalance - beforeBalance;
 
         if (_minOut == 0) revert ZeroValueNotAllowed();
-        (amountOut, lpFeeAmount, protocolFeeAmount) = simSwap(_tokenIn, _amountIn);
+        packedFloat lastSwappedx;
+        (amountOut, lpFeeAmount, protocolFeeAmount, lastSwappedx) = simSwapInternal(_tokenIn, _amountIn);
         _checkSlippage(amountOut, _minOut);
         packedFloat xOld = x;
 
-        x = sellingX ? x.sub(int(_amountIn).toPackedFloat(-18)) : x.add(int(amountOut).toPackedFloat(-18));
+        // x = sellingX ? x.sub(int(_amountIn).toPackedFloat(-18)) : x.add(int(amountOut).toPackedFloat(-18));
+        x = sellingX ? x.sub(int(_amountIn).toPackedFloat(-18)) : x.add(lastSwappedx);
         // slither-disable-end reentrancy-benign
         // slither-disable-start reentrancy-events // the recipient of the initial transfer is this contract
         _updateParameters(x);
@@ -190,7 +192,14 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     function simSwap(
         address _tokenIn,
         uint256 _amountIn
-    ) public view returns (uint256 amountOut, uint256 lpFeeAmount, uint256 protocolFeeAmount) {
+    ) public returns (uint256 amountOut, uint256 lpFeeAmount, uint256 protocolFeeAmount) {
+        (amountOut, lpFeeAmount, protocolFeeAmount, ) = simSwapInternal(_tokenIn, _amountIn);
+    }
+
+    function simSwapInternal(
+        address _tokenIn,
+        uint256 _amountIn
+    ) public returns (uint256 amountOut, uint256 lpFeeAmount, uint256 protocolFeeAmount, packedFloat rawAmountOut) {
         bool sellingX = _tokenIn == xToken;
         if (!sellingX && _tokenIn != yToken) revert InvalidToken();
 
@@ -207,14 +216,15 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
             console2.log("amount in before normalization, after fees", _amountIn);
             _amountIn = _normalizeTokenDecimals(true, _amountIn);
         }
-        packedFloat rawAmountOut = sellingX
+        rawAmountOut = sellingX
             ? _calculateAmountOfYReceivedSellingX(int(_amountIn).toPackedFloat(-18))
             : _calculateAmountOfXReceivedSellingY(int(_amountIn).toPackedFloat(-18));
+            
         amountOut = uint(rawAmountOut.convertpackedFloatToWAD());
         if (sellingX) {
             amountOut = _normalizeTokenDecimals(false, amountOut);
             // slither-disable-start incorrect-equality
-            if (amountOut == 0) return (0, 0, 0);
+            if (amountOut == 0) return (0, 0, 0, packedFloat.wrap(0));
             // slither-disable-end incorrect-equality
             lpFeeAmount = _determineFeeAmountSell(amountOut, lpFee);
             protocolFeeAmount = _determineFeeAmountSell(amountOut, protocolFee);
@@ -418,7 +428,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      */
     function _determineFeeAmountSell(uint256 amountOfY, uint16 _fee) private pure returns (uint256 feeAmount) {
         // TODO Round up again here once the python stress test conforms to this rounding
-        if (_fee > 0) feeAmount = (amountOfY * _fee) / PERCENTAGE_DENOM; // + 1
+        if (_fee > 0) feeAmount = (amountOfY * _fee) / PERCENTAGE_DENOM + 1;
     }
 
     /**
