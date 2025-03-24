@@ -13,7 +13,7 @@ import {IAllowList} from "../allowList/IAllowList.sol";
  */
 
 abstract contract FactoryBase is Ownable2Step, IFactory {
-    string public constant VERSION = "v0.2.0";
+    string public constant VERSION = "v0.3.0";
     uint16 public constant MAX_PROTOCOL_FEE = 20;
 
     address yTokenAllowList;
