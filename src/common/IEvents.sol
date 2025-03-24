@@ -8,14 +8,20 @@ import {packedFloat} from "../amm/mathLibs/MathLibs.sol";
  * @notice this file should be then inherited in the contract interfaces to use the events.
  */
 
+
+
 /**
  * @dev events common for the pool and the factory contract
  * @notice any change in this interface most likely means a breaking change with monitoring services
  */
 interface CommonEvents {
-    event ProtocolFeeSet(uint16 indexed _protocolFee);
+    enum FeeCollectionType {
+        LP,
+        PROTOCOL
+    }
     event ProtocolFeeCollectorProposed(address indexed _collector);
     event ProtocolFeeCollectorConfirmed(address indexed _collector);
+    event FeeSet(FeeCollectionType indexed _feeType, uint16 indexed _fee);
 }
 
 /**
@@ -23,17 +29,13 @@ interface CommonEvents {
  * @notice any change in this interface most likely means a breaking change with monitoring services
  */
 interface IPoolEvents is CommonEvents {
+    event FeesCollected(FeeCollectionType indexed _feeType, address indexed _collector, uint256 indexed _amount);
     event Swap(address indexed _tokenIn, uint256 indexed _amountIn, uint256 indexed _amountOut, uint256 _minOut);
-    event LPFeeSet(uint16 indexed _fee);
-    event LPFeeGenerated(uint256 indexed _amount);
-    event ProtocolFeeGenerated(uint256 indexed _amount);
-    event LPFeesCollected(address indexed _collector, uint256 indexed _amount);
-    event ProtocolFeesCollected(address indexed _collector, uint256 indexed _amount);
     event RevenueWithdrawn(address indexed _collector, uint256 indexed tokenId, uint256 indexed _amount);
     event LiquidityWithdrawn(address lp, uint indexed tokenId, uint256 indexed amountOutXToken, uint256 indexed amountOutYToken, uint256 revenue);
     event LPTokenMinted(address indexed lp, uint256 indexed tokenId, packedFloat wj, packedFloat hn);
     event LPTokenBurned(address indexed lp, uint256 indexed tokenId, uint256 indexed initialLiquidityWj);
-    event RevenueAccrued(uint256 revenue);
+    event FeesGenerated(uint256 indexed lpFee, uint256 indexed protocolFee, uint256 indexed revenue);
 }
 
 /**

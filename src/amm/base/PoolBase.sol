@@ -168,12 +168,9 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         // slither-disable-end reentrancy-benign
         // slither-disable-start reentrancy-events // the recipient of the initial transfer is this contract
         _updateParameters(xOld);
-        emit RevenueAccrued(uint(h.sub(oldh).convertpackedFloatToWAD()));
         _collectedLPFees = _collectedLPFees.add(int(lpFeeAmount).toPackedFloat(int(yDecimalDiff) - int(POOL_NATIVE_DECIMALS)).div(_w));
-        emit LPFeeGenerated(lpFeeAmount);
         collectedProtocolFees += protocolFeeAmount;
-        emit ProtocolFeeGenerated(protocolFeeAmount);
-
+        emit FeesGenerated(lpFeeAmount, protocolFeeAmount, uint(h.sub(oldh).convertpackedFloatToWAD()));
         emit Swap(_tokenIn, _amountIn, amountOut, _minOut);
         // slither-disable-end reentrancy-events
         IERC20(sellingX ? yToken : xToken).safeTransfer(_msgSender(), amountOut);
@@ -268,7 +265,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     function setLPFee(uint16 _fee) public onlyOwner {
         if (_fee > MAX_LP_FEE) revert LPFeeAboveMax(_fee, MAX_LP_FEE);
         lpFee = _fee;
-        emit LPFeeSet(_fee);
+        emit FeeSet(FeeCollectionType.LP, _fee);
     }
 
     /**
@@ -279,7 +276,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     function setProtocolFee(uint16 _protocolFee) public onlyProtocolFeeCollector {
         if (_protocolFee > MAX_PROTOCOL_FEE) revert ProtocolFeeAboveMax({proposedFee: _protocolFee, maxFee: MAX_PROTOCOL_FEE});
         protocolFee = _protocolFee;
-        emit ProtocolFeeSet(_protocolFee);
+        emit FeeSet(FeeCollectionType.PROTOCOL, _protocolFee);
     }
 
     /**
@@ -303,7 +300,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     function collectProtocolFees() external onlyProtocolFeeCollector {
         uint256 collectedAmount = collectedProtocolFees;
         delete collectedProtocolFees;
-        emit ProtocolFeesCollected(_msgSender(), collectedAmount);
+        emit FeesCollected(FeeCollectionType.PROTOCOL, _msgSender(), collectedAmount);
         IERC20(yToken).safeTransfer(_msgSender(), collectedAmount);
     }
 

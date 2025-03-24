@@ -5,7 +5,7 @@ import {Ownable2Step, Ownable} from "@openzeppelin/contracts/access/Ownable2Step
 import "../common/IErrors.sol";
 import {IFactory} from "../factory/IFactory.sol";
 import {IAllowList} from "../allowList/IAllowList.sol";
-
+import {CommonEvents, IPoolEvents} from "../common/IEvents.sol";
 /**
  * @title Pool Factory
  * @dev creates the pools in an automated and permissioned fashion
@@ -85,7 +85,7 @@ abstract contract FactoryBase is Ownable2Step, IFactory {
     function setProtocolFee(uint16 _protocolFee) public onlyOwner {
         if (_protocolFee > MAX_PROTOCOL_FEE) revert ProtocolFeeAboveMax({proposedFee: _protocolFee, maxFee: MAX_PROTOCOL_FEE});
         protocolFee = _protocolFee;
-        emit ProtocolFeeSet(_protocolFee);
+        emit CommonEvents.FeeSet(CommonEvents.FeeCollectionType.PROTOCOL, _protocolFee);
     }
 
     /**

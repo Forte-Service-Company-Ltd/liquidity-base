@@ -93,7 +93,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         uint16 feeUpdate = 500;
         uint16 updatedFee = feeUpdate + initialFee;
         vm.expectEmit(true, true, true, true, address(pool));
-        emit IPoolEvents.LPFeeSet(updatedFee);
+        emit CommonEvents.FeeSet(CommonEvents.FeeCollectionType.LP, updatedFee);
         pool.setLPFee(updatedFee);
         uint16 fee = pool.lpFee();
         assertTrue(fee == updatedFee, "Fee should equal updatedFee");
@@ -105,7 +105,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         // Max Total Fee 50%: 4_980(LP) + 20(Protocol) = 5_000
         uint16 feeUpdate = 4_980;
         vm.expectEmit(true, true, true, true, address(pool));
-        emit IPoolEvents.LPFeeSet(feeUpdate);
+        emit CommonEvents.FeeSet(CommonEvents.FeeCollectionType.LP, feeUpdate);
         pool.setLPFee(feeUpdate);
         uint16 fee = pool.lpFee();
         assertTrue(fee == feeUpdate, "Fee should equal updatedFee");
@@ -131,7 +131,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         uint16 feeUpdate = uint16(bound(_fee, 0, 20));
         vm.startPrank(bob);
         vm.expectEmit(true, true, true, true, address(pool));
-        emit CommonEvents.ProtocolFeeSet(feeUpdate);
+        emit CommonEvents.FeeSet(CommonEvents.FeeCollectionType.PROTOCOL, feeUpdate);
         pool.setProtocolFee(feeUpdate);
         assertTrue(pool.protocolFee() == feeUpdate, "Fee should equal updatedFee");
     }
@@ -327,11 +327,9 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         amount = bound(amount, 1 * ERC20_DECIMALS, 10_000 * ERC20_DECIMALS);
         (uint expectedIn, uint estimatedFees, ) = pool.simSwapReversed(address(pool.xToken()), amount);
         _yToken.approve(address(pool), expectedIn);
-        vm.expectEmit(true, false, false, false, address(pool));
-        emit IPoolEvents.LPFeeGenerated(estimatedFees);
-        vm.expectEmit(true, false, false, false, address(pool));
         (uint256 expectedOut, , uint256 protocolFeeAmount) = pool.simSwap(address(_yToken), expectedIn);
-        emit IPoolEvents.ProtocolFeeGenerated(protocolFeeAmount);
+        vm.expectEmit(true, true, false, false, address(pool));
+        emit IPoolEvents.FeesGenerated(estimatedFees, protocolFeeAmount, 0);
         (, uint fees, ) = pool.swap(address(_yToken), expectedIn, expectedOut);
         assertLe(fees, estimatedFees + 1); // we add 1 to account for rounding issues
         assertGe(fees, estimatedFees - 1); // we subtract 1 to account for rounding issues
@@ -354,9 +352,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         console2.log("expected fees LP", estimatedFees);
         IERC20(pool.xToken()).approve(address(pool), expectedIn);
         vm.expectEmit(address(_yToken) == address(stableCoin), false, false, false, address(pool)); // Fees generated might be off by 1 unit in WETH case
-        emit IPoolEvents.LPFeeGenerated(estimatedFees);
-        vm.expectEmit(false, false, false, false, address(pool));
-        emit IPoolEvents.ProtocolFeeGenerated(0);
+        emit IPoolEvents.FeesGenerated(estimatedFees, 0, 0);
         (, uint fees, ) = pool.swap(_xToken, expectedIn, getAmountSubFee(amount) - 1); // TODO look into the - 1 with fees
         assertLe(fees, estimatedFees + 1); // we add 1 to account for rounding issues
         assertGe(fees, estimatedFees - 1); // we subtract 1 to account for rounding issues
@@ -376,10 +372,8 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         (uint expectedIn, uint lpFees, uint protocolFees) = pool.simSwapReversed(address(_yToken), amount);
         // todo: this looks fishy for FOT, we should investigate this
         IERC20(pool.xToken()).approve(address(pool), expectedIn);
-        vm.expectEmit(false, false, false, false, address(pool)); // Fees generated might be off by 1 unit
-        emit IPoolEvents.LPFeeGenerated(lpFees);
-        vm.expectEmit(false, false, false, false, address(pool)); // Fees generated might be off by 1 unit
-        emit IPoolEvents.ProtocolFeeGenerated(protocolFees);
+        vm.expectEmit(true, true, false, false, address(pool)); // Fees generated might be off by 1 unit
+        emit IPoolEvents.FeesGenerated(lpFees, protocolFees, 0);
         (, uint realLPFees, uint realProtocolFees) = pool.swap(_xToken, expectedIn, getAmountSubFee(amount - 1));
         if (transferFee == 0) {
             assertLe(realLPFees, lpFees + 1); // we add 1 to account for rounding issues
