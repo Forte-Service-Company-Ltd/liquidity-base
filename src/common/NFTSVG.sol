@@ -340,7 +340,7 @@ library Descriptor {
         address poolManager;
     }
 
-    /// @notice Constructs the token URI for a Forte ALTBC NFT
+    /// @notice Constructs the token URI for a ALTBC NFT
     /// @param params Parameters needed to construct the token URI
     /// @return The token URI as a string
     function constructTokenURI(ConstructTokenURIParams memory params) external pure returns (string memory) {
@@ -410,7 +410,7 @@ library Descriptor {
         return symbol;
     }
 
-    /// @notice Generates the first part of the description for a Forte ALTBC NFT
+    /// @notice Generates the first part of the description for a ALTBC NFT
     /// @param xTokenSymbol The symbol of the x token
     /// @param yTokenSymbol The symbol of the y token
     /// @param poolManager The address of the pool manager
@@ -437,7 +437,7 @@ library Descriptor {
         );
     }
 
-    /// @notice Generates the second part of the description for a Forte ALTBC NFT
+    /// @notice Generates the second part of the description for a ALTBC NFT
     /// @param tokenId The token ID
     /// @param baseCurrencySymbol The symbol of the base currency
     /// @param quoteCurrency The address of the quote currency
@@ -469,7 +469,7 @@ library Descriptor {
         );
     }
 
-    /// @notice Generates the name for a Forte ALTBC NFT
+    /// @notice Generates the name for a ALTBC NFT
     /// @param params Parameters needed to generate the name
     /// @param feeTier The fee tier of the pool
     /// @return The name of the NFT

@@ -488,6 +488,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
 
     /**
      * @dev returns the quantity of the deployer's inactive liquidity units at launch
+     * @dev This value can change if the deployer withdraws partial or full liquidity from the inactive
      * @return wInactive
      */
     function wInactive() external view returns (uint256) {
