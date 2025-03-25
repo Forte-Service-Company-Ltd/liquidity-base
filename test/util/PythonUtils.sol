@@ -142,7 +142,7 @@ abstract contract PythonUtils is Test {
      * @param x value to compare against *y*
      * @param y value to compare against *x*
      * @param maxTolerance the maximum allowed difference tolerance based on the precision
-     * @param tolerancePrecision the denom of the tolerance value. For instance, 10 ** 11.
+     * @param tolerancePrecision the number of decimals of the tolerance. For instance, 11 will mean maxTolerance / 10 ** 11.
      * @return withinTolerance true if the difference expressed as a normalized value is less or equal than the tolerance.
      */
     function areWithinTolerance(uint x, uint y, uint8 maxTolerance, uint256 tolerancePrecision) internal pure returns (bool withinTolerance) {
