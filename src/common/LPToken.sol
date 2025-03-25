@@ -52,11 +52,11 @@ contract LPToken is ERC721, ERC721Enumerable {
      * @param wj The amount of liquidity provided by the liquidity provider
      * @param hn The revenue parameter of the pool associated with the lpToken contract
      */
-    function _mintTokenAndUpdate(address lp, packedFloat wj, packedFloat hn, uint256 tokenXAmount, uint256 tokenYAmount) internal {
+    function _mintTokenAndUpdate(address lp, packedFloat wj, packedFloat hn) internal {
         currentTokenId++;
         _mint(lp, currentTokenId);
         _updateLPTokenVarsDeposit(lp, currentTokenId, wj, hn);
-        emit IPoolEvents.LPTokenMinted(lp, currentTokenId, tokenXAmount, tokenYAmount);
+        emit IPoolEvents.LPTokenMinted(lp, currentTokenId, wj, hn);
     }
 
     /**

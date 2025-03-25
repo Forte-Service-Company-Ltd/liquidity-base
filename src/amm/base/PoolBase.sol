@@ -151,8 +151,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         uint256 _minOut
     ) external whenNotPaused returns (uint256 amountOut, uint256 lpFeeAmount, uint256 protocolFeeAmount) {
         _updateCumulativePrice(spotPrice(), block.timestamp);
-        emit CumulativePriceUpdated(lastBlockTimestamp, cumulativePrice);
-
+        packedFloat oldh = h.mul(_w);
         bool sellingX = _tokenIn == xToken;
         //slither-disable-start reentrancy-benign // the recipient of the transfer is this contract
         uint256 beforeBalance = IERC20(sellingX ? xToken : yToken).balanceOf(address(this));
@@ -169,12 +168,9 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         // slither-disable-end reentrancy-benign
         // slither-disable-start reentrancy-events // the recipient of the initial transfer is this contract
         _updateParameters(xOld);
-
         _collectedLPFees = _collectedLPFees.add(int(lpFeeAmount).toPackedFloat(int(yDecimalDiff) - int(POOL_NATIVE_DECIMALS)).div(_w));
-        emit LPFeeGenerated(lpFeeAmount);
         collectedProtocolFees += protocolFeeAmount;
-        emit ProtocolFeeGenerated(protocolFeeAmount);
-
+        emit FeesGenerated(lpFeeAmount, protocolFeeAmount, uint((h.mul(_w)).sub(oldh).convertpackedFloatToWAD()));
         emit Swap(_tokenIn, _amountIn, amountOut, _minOut);
         // slither-disable-end reentrancy-events
         IERC20(sellingX ? yToken : xToken).safeTransfer(_msgSender(), amountOut);
@@ -269,7 +265,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     function setLPFee(uint16 _fee) public onlyOwner {
         if (_fee > MAX_LP_FEE) revert LPFeeAboveMax(_fee, MAX_LP_FEE);
         lpFee = _fee;
-        emit LPFeeSet(_fee);
+        emit FeeSet(FeeCollectionType.LP, _fee);
     }
 
     /**
@@ -280,7 +276,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     function setProtocolFee(uint16 _protocolFee) public onlyProtocolFeeCollector {
         if (_protocolFee > MAX_PROTOCOL_FEE) revert ProtocolFeeAboveMax({proposedFee: _protocolFee, maxFee: MAX_PROTOCOL_FEE});
         protocolFee = _protocolFee;
-        emit ProtocolFeeSet(_protocolFee);
+        emit FeeSet(FeeCollectionType.PROTOCOL, _protocolFee);
     }
 
     /**
@@ -288,7 +284,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      * @param _amount the amount of X token to transfer from the sender to the pool
      */
     function addXSupply(uint256 _amount) external virtual onlyOwner {
-        emit LiquidityXTokenAdded(xToken, _amount);
         // slither-disable-start reentrancy-benign // the transfer doesn't update any state variable directly and the pool is the recipient
         uint256 beforeBalance = IERC20(xToken).balanceOf(address(this));
         IERC20(xToken).safeTransferFrom(_msgSender(), address(this), _amount);
@@ -296,7 +291,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         // slither-disable-end reentrancy-benign
         _amount = afterBalance - beforeBalance;
         _validateLiquidityAdd(int(afterBalance).toPackedFloat(-18));
-        _mintTokenAndUpdate(_msgSender(), (int(_amount).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE)), packedFloat.wrap(0), _amount, 0);
+        _mintTokenAndUpdate(_msgSender(), (int(_amount).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE)), packedFloat.wrap(0));
     }
 
     /**
@@ -305,7 +300,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     function collectProtocolFees() external onlyProtocolFeeCollector {
         uint256 collectedAmount = collectedProtocolFees;
         delete collectedProtocolFees;
-        emit ProtocolFeesCollected(_msgSender(), collectedAmount);
+        emit FeesCollected(FeeCollectionType.PROTOCOL, _msgSender(), collectedAmount);
         IERC20(yToken).safeTransfer(_msgSender(), collectedAmount);
     }
 

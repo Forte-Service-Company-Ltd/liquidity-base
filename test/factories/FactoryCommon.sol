@@ -113,7 +113,7 @@ abstract contract FactoryCommon is TestCommonSetup {
         uint16 feeUpdate = uint16(bound(_fee, 0, 20));
         vm.startPrank(admin);
         vm.expectEmit(true, true, true, true, address(factory));
-        emit CommonEvents.ProtocolFeeSet(feeUpdate);
+        emit CommonEvents.FeeSet(CommonEvents.FeeCollectionType.PROTOCOL, feeUpdate);
         factory.setProtocolFee(feeUpdate);
         assertTrue(factory.protocolFee() == feeUpdate, "Fee should equal updatedFee");
     }
