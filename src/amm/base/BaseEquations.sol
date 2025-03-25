@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
-import {MathLibs, packedFloat, Float} from "../mathLibs/MathLibs.sol";
+import {MathLibs, packedFloat} from "../mathLibs/MathLibs.sol";
 import "forge-std/console2.sol";
 
 /**
@@ -25,11 +25,6 @@ library BaseEquations {
         packedFloat r_hat,
         packedFloat w_hat
     ) internal pure returns (packedFloat) {
-        packedFloat r = hn.mul(wj).add(r_hat.mul(w_hat)).div(w_hat.add(wj));
-        Float memory rf = r.convertToUnpackedFloat();
-        packedFloat one = int(1).toPackedFloat(rf.exponent);
-        console2.log(rf.exponent);
-        console2.log(packedFloat.unwrap(r), packedFloat.unwrap(r.sub(one)));
-        return r; //.sub(one);
+        return hn.mul(wj).add(r_hat.mul(w_hat)).div(w_hat.add(wj));
     }
 }
