@@ -49,10 +49,8 @@ abstract contract PoolFeeComparisonTest is TestCommonSetup {
         vm.startPrank(admin);
         for (uint j = 0; j < 100; j++) {
             (uint expected, uint expectedFeeAmount, uint expectedProtocolFee) = poolWFee.simSwap(address(_yToken), (1 * fullToken) / 1_000);
-            vm.expectEmit(true, false, false, false, address(poolWFee));
-            emit IPoolEvents.FeesGenerated(expectedFeeAmount, 0, 0);
-            vm.expectEmit(false, true, false, false, address(poolWFee));
-            emit IPoolEvents.FeesGenerated(0, expectedProtocolFee, 0);
+            vm.expectEmit(true, true, false, false, address(poolWFee));
+            emit IPoolEvents.FeesGenerated(expectedFeeAmount, expectedProtocolFee, 0);
             (uint actual, uint actualFeeAmount, uint actualProtocolFee) = poolWFee.swap(
                 address(_yToken),
                 (1 * fullToken) / 1_000,
@@ -93,10 +91,9 @@ abstract contract PoolFeeComparisonTest is TestCommonSetup {
         (uint expectedIn, uint lpFees, uint protocolFees) = pool.simSwapReversed(address(pool.xToken()), amount);
         _yToken.approve(address(pool), expectedIn);
         (uint256 expectedAmount, uint256 lpFeeAmount, uint256 protocolFeeAmount) = pool.simSwap(address(_yToken), expectedIn);
+
         vm.expectEmit(false, false, false, false, address(pool)); // Fees generated might be off by 1 unit
-        emit IPoolEvents.FeesGenerated(lpFeeAmount, 0, 0);
-        vm.expectEmit(false, false, false, false, address(pool)); // Fees generated might be off by 1 unit
-        emit IPoolEvents.FeesGenerated(0, protocolFeeAmount, 0);
+        emit IPoolEvents.FeesGenerated(lpFeeAmount, protocolFeeAmount, 0);
         (, uint realLPFees, uint realProtocolFees) = pool.swap(address(_yToken), expectedIn, expectedAmount);
         assertLe(realLPFees, lpFees + 1); // we add 1 to account for rounding issues
         assertGe(realLPFees, lpFees - 1); // we add 1 to account for rounding issues

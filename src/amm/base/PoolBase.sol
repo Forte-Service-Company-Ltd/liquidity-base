@@ -151,7 +151,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         uint256 _minOut
     ) external whenNotPaused returns (uint256 amountOut, uint256 lpFeeAmount, uint256 protocolFeeAmount) {
         _updateCumulativePrice(spotPrice(), block.timestamp);
-        packedFloat oldh = h;
+        packedFloat oldh = h.mul(_w);
         bool sellingX = _tokenIn == xToken;
         //slither-disable-start reentrancy-benign // the recipient of the transfer is this contract
         uint256 beforeBalance = IERC20(sellingX ? xToken : yToken).balanceOf(address(this));
@@ -170,7 +170,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         _updateParameters(xOld);
         _collectedLPFees = _collectedLPFees.add(int(lpFeeAmount).toPackedFloat(int(yDecimalDiff) - int(POOL_NATIVE_DECIMALS)).div(_w));
         collectedProtocolFees += protocolFeeAmount;
-        emit FeesGenerated(lpFeeAmount, protocolFeeAmount, uint(h.sub(oldh).convertpackedFloatToWAD()));
+        emit FeesGenerated(lpFeeAmount, protocolFeeAmount, uint((h.mul(_w)).sub(oldh).convertpackedFloatToWAD()));
         emit Swap(_tokenIn, _amountIn, amountOut, _minOut);
         // slither-disable-end reentrancy-events
         IERC20(sellingX ? yToken : xToken).safeTransfer(_msgSender(), amountOut);
