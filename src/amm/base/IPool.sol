@@ -81,12 +81,6 @@ interface IPool is IPoolEvents {
     function enableSwaps(bool _enable) external;
 
     /**
-     * @dev This is the function to add XToken liquidity to the pool.
-     * @param _amount the amount of X token to transfer from the sender to the pool
-     */
-    function addXSupply(uint256 _amount) external;
-
-    /**
      * @dev This is the function to update the LP fees per trading.
      * @param _fee percentage of the transaction that will get collected as fees (in percentage basis points:
      * 10000 -> 100.00%; 500 -> 5.00%; 1 -> 0.01%)
