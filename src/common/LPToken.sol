@@ -5,6 +5,7 @@ import {ERC721} from "../../lib/openzeppelin-contracts/contracts/token/ERC721/ER
 import {ERC721Enumerable} from "../../lib/openzeppelin-contracts/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import {IPoolEvents} from "./IEvents.sol";
 import {packedFloat, MathLibs} from "../amm/mathLibs/MathLibs.sol";
+import "forge-std/console2.sol";
 
 /**
  * @title Liquidity provider token
@@ -14,6 +15,7 @@ import {packedFloat, MathLibs} from "../amm/mathLibs/MathLibs.sol";
  */
 contract LPToken is ERC721, ERC721Enumerable {
     using MathLibs for packedFloat;
+    using MathLibs for int256;
 
     uint256 public currentTokenId = 2;
     uint256 public constant INACTIVE_ID = 1;
@@ -54,12 +56,22 @@ contract LPToken is ERC721, ERC721Enumerable {
      * @param wj The amount of liquidity provided by the liquidity provider
      * @param hn The revenue parameter of the pool associated with the lpToken contract
      */
-    function _mintTokenAndUpdate(address lp, packedFloat wj, packedFloat hn, bool inactive, uint256 tokenXAmount, uint256 tokenYAmount) internal {
-        if(inactive) {
-            if(!inactiveCreated) {
+    function _mintTokenAndUpdate(
+        address lp,
+        packedFloat wj,
+        packedFloat hn,
+        bool inactive,
+        uint256 tokenXAmount,
+        uint256 tokenYAmount
+    ) internal {
+        if (inactive) {
+            if (!inactiveCreated) {
                 inactiveCreated = true;
                 _mint(lp, INACTIVE_ID);
                 _updateLPTokenVarsDeposit(lp, INACTIVE_ID, wj, hn);
+                (int man, int exp) = wj.decode();
+                console2.log("w man - _mintTokenAndUpdate", man);
+                console2.log("w exp - _mintTokenAndUpdate", exp);
             }
         } else {
             _mint(lp, currentTokenId);
@@ -79,7 +91,18 @@ contract LPToken is ERC721, ERC721Enumerable {
      */
     function _updateLPTokenVarsDeposit(address lp, uint256 tokenId, packedFloat wj, packedFloat rj) internal {
         lpToken[lp][tokenId].rj = rj;
-        lpToken[lp][tokenId].wj =  lpToken[lp][tokenId].wj.add(wj);
+        (int man, int exp) = lpToken[lp][tokenId].wj.decode();
+        console2.log("w man - in _updateLPTokenVarsDeposit", man);
+        console2.log("w exp - in _updateLPTokenVarsDeposit", exp);
+        lpToken[lp][tokenId].wj = lpToken[lp][tokenId].wj.add(wj);
+
+        (man, exp) = lpToken[lp][tokenId].wj.decode();
+        console2.log("w man - in _updateLPTokenVarsDeposit, after update", man);
+        console2.log("w exp - in _updateLPTokenVarsDeposit, after update", exp);
+
+        (man, exp) = wj.decode();
+        console2.log("wj in man", man);
+        console2.log("wj in exp", exp);
     }
 
     /**
@@ -116,7 +139,7 @@ contract LPToken is ERC721, ERC721Enumerable {
         if (wj.lt(_uj)) revert("LPToken: withdrawal amount exceeds allowance");
 
         if (wj.gt(_uj)) {
-            lpToken[_lp][_tokenId].wj =  lpToken[_lp][_tokenId].wj.sub(_uj);
+            lpToken[_lp][_tokenId].wj = lpToken[_lp][_tokenId].wj.sub(_uj);
         } else {
             _burn(_tokenId);
             lpToken[_lp][_tokenId].wj = packedFloat.wrap(0);

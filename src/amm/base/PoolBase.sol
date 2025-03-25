@@ -163,14 +163,15 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         _amountIn = afterBalance - beforeBalance;
 
         if (_minOut == 0) revert ZeroValueNotAllowed();
-        (amountOut, lpFeeAmount, protocolFeeAmount) = simSwap(_tokenIn, _amountIn);
+        packedFloat xRaw;
+        (amountOut, lpFeeAmount, protocolFeeAmount, xRaw) = simSwapInternal(_tokenIn, _amountIn);
         _checkSlippage(amountOut, _minOut);
         packedFloat xOld = x;
 
-        x = sellingX ? x.sub(int(_amountIn).toPackedFloat(-18)) : x.add(int(amountOut).toPackedFloat(-18));
+        x = sellingX ? x.sub(int(_amountIn).toPackedFloat(-18)) : x.add(xRaw);
         // slither-disable-end reentrancy-benign
         // slither-disable-start reentrancy-events // the recipient of the initial transfer is this contract
-        _updateParameters(x);
+        _updateParameters(xOld);
 
         _collectedLPFees = _collectedLPFees.add(int(lpFeeAmount).toPackedFloat(int(yDecimalDiff) - int(POOL_NATIVE_DECIMALS)).div(_w));
         emit LPFeeGenerated(lpFeeAmount);
@@ -194,6 +195,13 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         address _tokenIn,
         uint256 _amountIn
     ) public view returns (uint256 amountOut, uint256 lpFeeAmount, uint256 protocolFeeAmount) {
+        (amountOut, lpFeeAmount, protocolFeeAmount, ) = simSwapInternal(_tokenIn, _amountIn);
+    }
+
+    function simSwapInternal(
+        address _tokenIn,
+        uint256 _amountIn
+    ) internal view returns (uint256 amountOut, uint256 lpFeeAmount, uint256 protocolFeeAmount, packedFloat rawAmountOut) {
         bool sellingX = _tokenIn == xToken;
         if (!sellingX && _tokenIn != yToken) revert InvalidToken();
 
@@ -210,14 +218,14 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
             console2.log("amount in before normalization, after fees", _amountIn);
             _amountIn = _normalizeTokenDecimals(true, _amountIn);
         }
-        packedFloat rawAmountOut = sellingX
+        rawAmountOut = sellingX
             ? _calculateAmountOfYReceivedSellingX(int(_amountIn).toPackedFloat(-18))
             : _calculateAmountOfXReceivedSellingY(int(_amountIn).toPackedFloat(-18));
         amountOut = uint(rawAmountOut.convertpackedFloatToWAD());
         if (sellingX) {
             amountOut = _normalizeTokenDecimals(false, amountOut);
             // slither-disable-start incorrect-equality
-            if (amountOut == 0) return (0, 0, 0);
+            if (amountOut == 0) return (0, 0, 0, packedFloat.wrap(0));
             // slither-disable-end incorrect-equality
             lpFeeAmount = _determineFeeAmountSell(amountOut, lpFee);
             protocolFeeAmount = _determineFeeAmountSell(amountOut, protocolFee);
