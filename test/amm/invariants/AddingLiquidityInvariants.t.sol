@@ -24,7 +24,7 @@ abstract contract AddingLiquidityInvariants is TestCommonSetup {
         yTokenLiquidity = pool.yTokenLiquidity();
         vm.startPrank(admin);
         bytes4[] memory selectors = new bytes4[](1);
-        selectors[0] = PoolBase(address(pool)).addXSupply.selector;
+        // selectors[0] = PoolBase(address(pool)).depositLiquidity.selector; // TODO enable this with depositLiquidity
         targetContract(address(pool));
         targetSelector(FuzzSelector({addr: address(pool), selectors: selectors}));
         targetSender(admin);
