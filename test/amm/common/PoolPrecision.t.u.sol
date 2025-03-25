@@ -92,8 +92,8 @@ abstract contract PoolPrecisionTest is TestCommonSetup {
             console2.log("x wad pool: ", wadPool.x().convertpackedFloatToWAD());
             console2.log("x sd pool: ", sdPool.x().convertpackedFloatToWAD());
 
-            assertTrue(areWithinTolerance(xBalanceWad, xBalanceSd, 9, 10 ** 9), "x balances should be within tolerance after buy");
-            assertTrue(areWithinTolerance(yBalanceSd * 10 ** 12, yBalanceWad, MAX_TOLERANCE_X, TOLERANCE_DEN_X), "x out of tolerance");
+            assertTrue(areWithinTolerance(xBalanceWad, xBalanceSd, 9, 9), "x balances should be within tolerance after buy");
+            assertTrue(areWithinTolerance(yBalanceSd * 10 ** 12, yBalanceWad, MAX_TOLERANCE_X, TOLERANCE_PRECISION_X), "x out of tolerance");
         }
 
         xBalanceAdminWad = wadXToken.balanceOf(address(admin)) - xBalanceAdminWad;
@@ -115,7 +115,7 @@ abstract contract PoolPrecisionTest is TestCommonSetup {
             uint yBalanceSd = sdYToken.balanceOf(address(sdPool));
             uint xBalanceSd = sdXToken.balanceOf(address(sdPool));
 
-            assertTrue(areWithinTolerance(xBalanceWad, xBalanceSd, 9, 10 ** 9), "x pool balances should be within tolerance");
+            assertTrue(areWithinTolerance(xBalanceWad, xBalanceSd, 9, 9), "x pool balances should be within tolerance");
             assertTrue(yBalanceWad <= (yBalanceSd * 10 ** 12), "y balance in six decimal should not exceed amount out in wad");
         }
     }
