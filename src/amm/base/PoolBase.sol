@@ -93,12 +93,12 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     /**
      * @dev inactive liquidity share
      */
-    packedFloat _wInactive;
+    packedFloat public _wInactive;
 
     /**
      * @dev total liquidity share
      */
-    packedFloat _w;
+    packedFloat public _w;
 
     modifier onlyProtocolFeeCollector() {
         if (_msgSender() != protocolFeeCollector) revert NotProtocolFeeCollector();
@@ -162,18 +162,17 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         _amountIn = afterBalance - beforeBalance;
 
         if (_minOut == 0) revert ZeroValueNotAllowed();
-        packedFloat lastSwappedx;
-        (amountOut, lpFeeAmount, protocolFeeAmount, lastSwappedx) = simSwapInternal(_tokenIn, _amountIn);
+        (amountOut, lpFeeAmount, protocolFeeAmount) = simSwap(_tokenIn, _amountIn);
         _checkSlippage(amountOut, _minOut);
-        packedFloat xOld = x;
 
-        // x = sellingX ? x.sub(int(_amountIn).toPackedFloat(-18)) : x.add(int(amountOut).toPackedFloat(-18));
-        x = sellingX ? x.sub(int(_amountIn).toPackedFloat(-18)) : x.add(lastSwappedx);
+        x = sellingX ? x.sub(int(_amountIn).toPackedFloat(-18)) :x.add(int(amountOut).toPackedFloat(-18));
         // slither-disable-end reentrancy-benign
         // slither-disable-start reentrancy-events // the recipient of the initial transfer is this contract
         _updateParameters(x);
 
-        _collectedLPFees = _collectedLPFees.add(int(lpFeeAmount).toPackedFloat(int(yDecimalDiff) - int(POOL_NATIVE_DECIMALS)).div(_w));
+        _collectedLPFees = _collectedLPFees.add(int(lpFeeAmount).toPackedFloat(int(-4)).div(_w));
+        emit LPFeeGenerated(lpFeeAmount);
+
         collectedProtocolFees += protocolFeeAmount;
         emit FeesGenerated(lpFeeAmount, protocolFeeAmount, uint((h.mul(_w)).sub(oldh).convertpackedFloatToWAD()));
         emit Swap(_tokenIn, _amountIn, amountOut, _minOut);
@@ -182,7 +181,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     }
 
     /**
-     * @dev This is a simulation of the swap function. Useful to get marginal prices
+     * @dev This is a wrapper around the simSwapInternal function that only contains the user facing returns
      * @param _tokenIn the address of the token being sold
      * @param _amountIn the amount of the ERC20 _tokenIn to sell to the Pool
      * @return amountOut the amount of the token coming out of the Pool as result of the swap (main returned value)
@@ -192,15 +191,8 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     function simSwap(
         address _tokenIn,
         uint256 _amountIn
-    ) public returns (uint256 amountOut, uint256 lpFeeAmount, uint256 protocolFeeAmount) {
-        (amountOut, lpFeeAmount, protocolFeeAmount, ) = simSwapInternal(_tokenIn, _amountIn);
-    }
-
-    function simSwapInternal(
-        address _tokenIn,
-        uint256 _amountIn
-    ) public returns (uint256 amountOut, uint256 lpFeeAmount, uint256 protocolFeeAmount, packedFloat rawAmountOut) {
-        bool sellingX = _tokenIn == xToken;
+    ) public view returns (uint256 amountOut, uint256 lpFeeAmount, uint256 protocolFeeAmount) {
+                bool sellingX = _tokenIn == xToken;
         if (!sellingX && _tokenIn != yToken) revert InvalidToken();
 
         uint minAmountIn = 1;
@@ -211,12 +203,10 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         if (!sellingX) {
             lpFeeAmount = _determineFeeAmountSell(_amountIn, lpFee);
             protocolFeeAmount = _determineFeeAmountSell(_amountIn, protocolFee);
-            console2.log("amount in before normalization, before fees", _amountIn);
             _amountIn -= (lpFeeAmount + protocolFeeAmount); // fees are always coming out from the pool
-            console2.log("amount in before normalization, after fees", _amountIn);
             _amountIn = _normalizeTokenDecimals(true, _amountIn);
         }
-        rawAmountOut = sellingX
+        packedFloat rawAmountOut = sellingX
             ? _calculateAmountOfYReceivedSellingX(int(_amountIn).toPackedFloat(-18))
             : _calculateAmountOfXReceivedSellingY(int(_amountIn).toPackedFloat(-18));
             
@@ -224,13 +214,23 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         if (sellingX) {
             amountOut = _normalizeTokenDecimals(false, amountOut);
             // slither-disable-start incorrect-equality
-            if (amountOut == 0) return (0, 0, 0, packedFloat.wrap(0));
+            if (amountOut == 0) return (0, 0, 0);
             // slither-disable-end incorrect-equality
             lpFeeAmount = _determineFeeAmountSell(amountOut, lpFee);
             protocolFeeAmount = _determineFeeAmountSell(amountOut, protocolFee);
             amountOut -= (lpFeeAmount + protocolFeeAmount);
         }
     }
+
+    /**
+     * @dev This is a simulation of the swap function. Useful to get marginal prices
+     * @param _tokenIn the address of the token being sold
+     * @param _amountIn the amount of the ERC20 _tokenIn to sell to the Pool
+     * @return amountOut the amount of the token coming out of the Pool as result of the swap (main returned value)
+     * @return lpFeeAmount the amount of the Y token that's being dedicated to fees for the LP
+     * @return protocolFeeAmount the amount of the Y token that's being dedicated to fees for the protocol
+     * @return rawAmountOut the packedFloat version of the amount out, only used when selling Y
+     */
 
     /**
      * @dev This is a simulation of the swap function from the perspective of purchasing a specific amount. Useful to get marginal price.
@@ -427,7 +427,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      *
      */
     function _determineFeeAmountSell(uint256 amountOfY, uint16 _fee) private pure returns (uint256 feeAmount) {
-        // TODO Round up again here once the python stress test conforms to this rounding
         if (_fee > 0) feeAmount = (amountOfY * _fee) / PERCENTAGE_DENOM + 1;
     }
 
