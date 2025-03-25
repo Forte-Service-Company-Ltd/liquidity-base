@@ -164,14 +164,14 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         if (_minOut == 0) revert ZeroValueNotAllowed();
         (amountOut, lpFeeAmount, protocolFeeAmount) = simSwap(_tokenIn, _amountIn);
         _checkSlippage(amountOut, _minOut);
+        packedFloat xOld = x;
 
         x = sellingX ? x.sub(int(_amountIn).toPackedFloat(-18)) :x.add(int(amountOut).toPackedFloat(-18));
         // slither-disable-end reentrancy-benign
         // slither-disable-start reentrancy-events // the recipient of the initial transfer is this contract
-        _updateParameters(x);
+        _updateParameters(xOld);
 
         _collectedLPFees = _collectedLPFees.add(int(lpFeeAmount).toPackedFloat(int(-4)).div(_w));
-        emit LPFeeGenerated(lpFeeAmount);
 
         collectedProtocolFees += protocolFeeAmount;
         emit FeesGenerated(lpFeeAmount, protocolFeeAmount, uint((h.mul(_w)).sub(oldh).convertpackedFloatToWAD()));
@@ -356,7 +356,12 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     function yTokenLiquidity() external view returns (uint256) {
         uint revenue = _totalRevenue();
         revenue = _normalizeTokenDecimals(false, revenue);
-        return (IERC20(yToken).balanceOf(address(this)) + r) - (collectedProtocolFees + revenue);
+        uint balance = IERC20(yToken).balanceOf(address(this)) + r;
+        if(balance > 0) {
+            return (IERC20(yToken).balanceOf(address(this)) + r) - (collectedProtocolFees + revenue);
+        } else {
+            return 0;
+        }
     }
 
     /**
