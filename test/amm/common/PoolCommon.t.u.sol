@@ -26,7 +26,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
     using MathLibs for int256;
 
     function testLiquidity_Pool_version() public view {
-        assertEq(pool.VERSION(), "v0.2.0");
+        assertEq(pool.VERSION(), "v0.3.0");
     }
 
     function testLiquidity_Pool_TokensMustNotBeTheSame() public {
@@ -222,8 +222,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
 
         uint256 originalBalance = IERC20(_yToken).balanceOf(address(admin));
 
-
-        ( , packedFloat rj) = pool.getLPToken(admin, 2);
+        (, packedFloat rj) = pool.getLPToken(admin, 2);
         uint256 amount = pool.withdrawRevenue(2, uint(rj.convertpackedFloatToWAD()));
         uint256 updatedBalance = IERC20(_yToken).balanceOf(address(admin));
         uint256 expectedBalance = originalBalance + amount;
