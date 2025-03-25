@@ -24,6 +24,8 @@ import "forge-std/console2.sol";
 abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, CumulativePrice, LPToken {
     using SafeERC20 for IERC20;
     using MathLibs for int256;
+    using MathLibs for int16;
+    using MathLibs for uint256;
     using MathLibs for packedFloat;
 
     address public immutable xToken;
@@ -153,8 +155,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         uint256 _minOut
     ) external whenNotPaused returns (uint256 amountOut, uint256 lpFeeAmount, uint256 protocolFeeAmount) {
         _updateCumulativePrice(spotPrice(), block.timestamp);
-        emit CumulativePriceUpdated(lastBlockTimestamp, cumulativePrice);
-
+        packedFloat oldh = h.mul(_w);
         bool sellingX = _tokenIn == xToken;
         //slither-disable-start reentrancy-benign // the recipient of the transfer is this contract
         uint256 beforeBalance = IERC20(sellingX ? xToken : yToken).balanceOf(address(this));
@@ -163,21 +164,17 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         _amountIn = afterBalance - beforeBalance;
 
         if (_minOut == 0) revert ZeroValueNotAllowed();
-        packedFloat xRaw;
-        (amountOut, lpFeeAmount, protocolFeeAmount, xRaw) = simSwapInternal(_tokenIn, _amountIn);
+        (amountOut, lpFeeAmount, protocolFeeAmount) = simSwap(_tokenIn, _amountIn);
         _checkSlippage(amountOut, _minOut);
         packedFloat xOld = x;
 
-        x = sellingX ? x.sub(int(_amountIn).toPackedFloat(-18)) : x.add(xRaw);
+        x = sellingX ? x.sub(int(_amountIn).toPackedFloat(-18)) : x.add(int(amountOut).toPackedFloat(-18));
         // slither-disable-end reentrancy-benign
         // slither-disable-start reentrancy-events // the recipient of the initial transfer is this contract
         _updateParameters(xOld);
-
         _collectedLPFees = _collectedLPFees.add(int(lpFeeAmount).toPackedFloat(int(yDecimalDiff) - int(POOL_NATIVE_DECIMALS)).div(_w));
-        emit LPFeeGenerated(lpFeeAmount);
         collectedProtocolFees += protocolFeeAmount;
-        emit ProtocolFeeGenerated(protocolFeeAmount);
-
+        //emit FeesGenerated(lpFeeAmount, protocolFeeAmount, uint((h.mul(_w)).sub(oldh).convertpackedFloatToWAD()));
         emit Swap(_tokenIn, _amountIn, amountOut, _minOut);
         // slither-disable-end reentrancy-events
         IERC20(sellingX ? yToken : xToken).safeTransfer(_msgSender(), amountOut);
@@ -221,7 +218,12 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         rawAmountOut = sellingX
             ? _calculateAmountOfYReceivedSellingX(int(_amountIn).toPackedFloat(-18))
             : _calculateAmountOfXReceivedSellingY(int(_amountIn).toPackedFloat(-18));
+        (int man, int exp) = rawAmountOut.decode();
+        console2.log("amount out man", man);
+        console2.log("amount out exp", exp);
+
         amountOut = uint(rawAmountOut.convertpackedFloatToWAD());
+        console2.log("wad amount out", amountOut);
         if (sellingX) {
             amountOut = _normalizeTokenDecimals(false, amountOut);
             // slither-disable-start incorrect-equality
@@ -232,6 +234,46 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
             amountOut -= (lpFeeAmount + protocolFeeAmount);
         }
     }
+
+    /*function simSwapInternal(
+        address _tokenIn,
+        uint256 _amountIn
+    ) internal view returns (uint256 amountOut, uint256 lpFeeAmount, uint256 protocolFeeAmount, packedFloat rawAmountOut) {
+        bool sellingX = _tokenIn == xToken;
+        if (!sellingX && _tokenIn != yToken) revert InvalidToken();
+
+        uint minAmountIn = 1;
+        if (lpFee > 0 && !sellingX) ++minAmountIn;
+        if (protocolFee > 0 && !sellingX) ++minAmountIn;
+        if (_amountIn < minAmountIn) revert ZeroValueNotAllowed();
+
+        packedFloat rawAmountIn = int(_amountIn).toPackedFloat(-18);
+        packedFloat rawAmountInLPFee;
+        packedFloat rawAmountInProFee;
+
+        if (!sellingX) {
+            lpFeeAmount = _determineFeeAmountSell(_amountIn, lpFee);
+            protocolFeeAmount = _determineFeeAmountSell(_amountIn, protocolFee);
+            console2.log("amount in before normalization, before fees", _amountIn);
+            _amountIn -= (lpFeeAmount + protocolFeeAmount); // fees are always coming out from the pool
+            console2.log("amount in before normalization, after fees", _amountIn);
+            _amountIn = _normalizeTokenDecimals(true, _amountIn);
+            rawAmountInLPFee = _determineFeeAmountSellPacked(rawAmountIn, int16(lpFee).toPackedFloat(-4));
+            rawAmountInProFee = _determineFeeAmountSellPacked(rawAmountIn, int16(protocolFee).toPackedFloat(-4));
+            rawAmountIn = _normalizeTokenDecimalsFloat(true, rawAmountIn);
+        }
+        rawAmountOut = sellingX ? _calculateAmountOfYReceivedSellingX(rawAmountIn) : _calculateAmountOfXReceivedSellingY(rawAmountIn);
+        amountOut = uint(rawAmountOut.convertpackedFloatToWAD());
+        if (sellingX) {
+            amountOut = _normalizeTokenDecimals(false, amountOut);
+            // slither-disable-start incorrect-equality
+            if (amountOut == 0) return (0, 0, 0, packedFloat.wrap(0));
+            // slither-disable-end incorrect-equality
+            lpFeeAmount = _determineFeeAmountSell(amountOut, lpFee);
+            protocolFeeAmount = _determineFeeAmountSell(amountOut, protocolFee);
+            amountOut -= (lpFeeAmount + protocolFeeAmount);
+        }
+    }*/
 
     /**
      * @dev This is a simulation of the swap function from the perspective of purchasing a specific amount. Useful to get marginal price.
@@ -429,6 +471,15 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         else normalizedAmount = isInput ? rawAmount * (10 ** yDecimalDiff) : rawAmount / (10 ** yDecimalDiff);
     }
 
+    function _normalizeTokenDecimalsFloat(bool isInput, packedFloat rawAmount) internal view returns (packedFloat normalizedAmount) {
+        //(int man, int exp) = rawAmount.decode();
+        if (yDecimalDiff == 0) normalizedAmount = rawAmount;
+        else
+            normalizedAmount = isInput
+                ? rawAmount.mul(int(10 ** yDecimalDiff).toPackedFloat(0))
+                : rawAmount.div(int(10 ** yDecimalDiff).toPackedFloat(0));
+    }
+
     /**
      * @dev This function determines the amount of fees when doing a simSwap (Sell simulation).
      * @param amountOfY the amount to calculate the fees from
@@ -437,7 +488,14 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      */
     function _determineFeeAmountSell(uint256 amountOfY, uint16 _fee) private pure returns (uint256 feeAmount) {
         // TODO Round up again here once the python stress test conforms to this rounding
-        if (_fee > 0) feeAmount = (amountOfY * _fee) / PERCENTAGE_DENOM; // + 1
+        if (_fee > 0) feeAmount = (amountOfY * _fee) / PERCENTAGE_DENOM + 1;
+    }
+
+    function _determineFeeAmountSellPacked(packedFloat amountOfY, packedFloat _fee) private pure returns (packedFloat feeAmount) {
+        // TODO Round up again here once the python stress test conforms to this rounding
+        packedFloat FLOAT_0 = packedFloat.wrap(0); // encoded previously to save gas
+        packedFloat FLOAT_1 = packedFloat.wrap(0x7f6c00000000000000000000000000000785ee10d5da46d900f436a000000000);
+        if (_fee.lt(FLOAT_0)) feeAmount = (amountOfY.mul(_fee)).div(int(PERCENTAGE_DENOM).toPackedFloat(0).add(FLOAT_1));
     }
 
     /**
