@@ -18,7 +18,6 @@ contract LPToken is ERC721, ERC721Enumerable {
     uint256 public currentTokenId = 2;
     uint256 public constant INACTIVE_ID = 1;
     bool private inactiveCreated = false;
-
     mapping(address lp => mapping(uint256 tokenId => LPTokenS lpToken)) public lpToken;
 
     struct LPTokenS {

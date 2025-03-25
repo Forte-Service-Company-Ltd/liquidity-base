@@ -284,7 +284,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     }
 
     /**
-     * @dev This is the function to add XToken liquidity to the pool.
+     * @dev This is the function to add XToken liquidity to the pool, an NFT will be minted to the sender.
      * @param _amount the amount of X token to transfer from the sender to the pool
      */
     function addXSupply(uint256 _amount) external virtual onlyOwner {
@@ -486,6 +486,11 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         return uint(_w.convertpackedFloatToWAD());
     }
 
+    /**
+     * @dev returns the quantity of the deployer's inactive liquidity units at launch
+     * @dev This value can change if the deployer withdraws partial or full liquidity from the inactive
+     * @return wInactive
+     */
     function wInactive() external view returns (uint256) {
         return uint(_wInactive.convertpackedFloatToWAD());
     }

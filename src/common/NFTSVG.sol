@@ -19,9 +19,10 @@ library SVGLinesPart1 {
             '<path d="M523.522 56.0082C509.246 53.7467 498.681 50.5775 490.195 48.0318C476.22 43.8364 466.984 41.0658 453.869 45.6875C444.851 48.8646 436.504 56.1424 429.731 66.7316C423.771 76.0499 419.118 87.8546 416.632 99.9712C414.378 110.608 419.11 116.773 424.584 123.904C428.022 128.38 431.914 133.455 434.459 140.319C437.088 147.419 437.427 152.988 437.186 162.796C436.673 183.871 428.014 199.189 420.377 212.702C413.309 225.206 407.207 236.004 409.895 247.872C412.211 258.102 420.792 268.02 433.437 275.081C443.233 280.555 454.307 283.527 464.324 283.527C466.925 283.527 469.455 283.326 471.875 282.915C486.359 280.46 492.899 271.462 500.477 261.042C507.687 251.124 515.861 239.88 532.797 231.469C551.615 222.123 567.122 222.913 580.801 223.607C594.414 224.302 606.167 224.898 617.301 215.228C618.714 214.001 619.669 212.841 620.182 212.213C620.273 212.103 620.352 212.008 620.415 211.933C634.801 195.096 632.46 172.911 630.199 151.457C629.769 147.38 629.323 143.161 629.015 139.099C626.793 110.004 631.714 91.8724 634.974 79.8703C638.092 68.3853 639.975 61.4548 633.597 54.5795C625.372 45.7111 614.132 48.2015 597.113 51.9707C579.688 55.8306 555.826 61.1114 523.53 56.0003L523.522 56.0082ZM633.009 55.1281C639.091 61.6837 637.252 68.4563 634.205 79.677C630.933 91.7264 625.988 109.941 628.221 139.17C628.533 143.243 628.979 147.466 629.409 151.551C631.655 172.84 633.98 194.855 619.811 211.436C619.744 211.514 619.665 211.609 619.57 211.728C619.073 212.335 618.141 213.464 616.78 214.648C605.887 224.109 594.275 223.517 580.837 222.834C567.059 222.131 551.441 221.338 532.442 230.775C515.332 239.272 507.099 250.599 499.833 260.589C492.358 270.866 485.905 279.746 471.74 282.146C460.184 284.103 446.011 281.206 433.82 274.398C421.372 267.444 412.93 257.715 410.66 247.702C408.04 236.13 414.074 225.454 421.06 213.093C428.744 199.497 437.455 184.088 437.972 162.815C438.213 152.905 437.869 147.265 435.193 140.047C432.608 133.069 428.677 127.946 425.208 123.423C419.852 116.445 415.227 110.414 417.401 100.129C421.557 79.8624 433.67 53.6402 454.126 46.4295C458.83 44.7718 463.038 44.0851 467.154 44.0851C474.302 44.0851 481.189 46.1532 489.963 48.7857C498.472 51.3392 509.065 54.5203 523.396 56.7857C555.838 61.9244 579.787 56.62 597.271 52.7482C614.021 49.0383 625.088 46.5913 633.005 55.1242L633.009 55.1281Z" fill="white"/>'
             '<path d="M467.375 492.373C475.355 524.283 487.539 546.772 503.587 559.212C513.469 566.821 525.894 571.502 538.563 572.386C540.086 572.493 541.602 572.544 543.102 572.544C554.527 572.544 565.247 569.477 574.328 563.569L574.447 563.49C595.601 549.55 634.978 523.596 639.079 496.162C641.853 477.589 628.79 458.775 617.261 442.179C611.929 434.498 606.889 427.244 604.434 421.206C598.115 405.667 589.634 393.661 581.429 382.054C579.739 379.662 577.991 377.191 576.286 374.721C574.826 372.581 573.354 370.363 571.929 368.22C563.621 355.721 555.033 342.795 542.825 335.214C529.86 327.415 512.514 325.062 484.824 327.344C475.573 328.105 463.724 325.56 452.267 323.101C433.544 319.079 415.858 315.282 412.543 326.799L412.397 327.304H412.448C409.804 339.16 425.934 363.784 441.54 387.611C450.408 401.148 458.783 413.932 462.56 422.851C468.362 436.558 467.348 449.543 466.361 462.102C465.591 471.937 464.794 482.104 467.363 492.377L467.375 492.373ZM467.158 462.161C468.149 449.508 469.171 436.424 463.294 422.543C459.486 413.561 451.091 400.749 442.207 387.181C427.205 364.281 410.202 338.324 413.344 327.016L413.419 326.669C416.809 316.293 433.962 319.979 452.113 323.874C463.63 326.349 475.533 328.907 484.903 328.133C512.416 325.868 529.619 328.188 542.427 335.888C554.48 343.371 563.025 356.226 571.281 368.658C572.706 370.805 574.182 373.023 575.643 375.167C577.352 377.645 579.1 380.116 580.789 382.511C589.342 394.616 597.421 406.054 603.708 421.505C606.198 427.623 611.258 434.913 616.618 442.632C628.06 459.11 641.033 477.786 638.301 496.052C634.252 523.138 595.065 548.962 574.013 562.835L573.894 562.914C563.763 569.501 551.563 572.508 538.614 571.601C526.099 570.728 513.829 566.107 504.068 558.588C488.163 546.259 476.078 523.916 468.141 492.184C465.603 482.037 466.396 471.933 467.158 462.161Z" fill="white"/>';
 
-        function getSVGLinesPart1() public pure returns (string memory svg) {
-            svg = SVG_LINES_PART_1;
-        }
+    /// @notice returns part 1 of the gradient of the SVG
+    function getSVGLinesPart1() public pure returns (string memory svg) {
+        svg = SVG_LINES_PART_1;
+    }
 }
 
 library SVGLinesPart2 {
@@ -37,10 +38,10 @@ library SVGLinesPart2 {
             '<path d="M14.2479 253.863C14.6268 271.3 15.8503 288.579 17.0383 305.29C18.2105 321.799 19.4221 338.869 19.8128 356.085C19.9273 361.882 24.1109 366.046 28.1523 370.072C29.7824 371.698 31.4716 373.375 32.8845 375.147C36.1524 379.272 41.7805 383.041 51.4303 383.041C57.8596 383.041 66.0728 381.364 76.5633 377.002C96.9286 368.529 117.041 359.392 136.341 349.837C142.372 346.845 148.13 343.258 149.456 337.334C150.009 334.78 147.297 327.005 143.859 317.158C139.175 303.735 133.349 287.032 135.429 281.057C137.576 274.9 137.114 267.989 136.669 261.307C136.365 256.721 136.045 251.981 136.594 247.588C140.035 219.657 141.622 189.437 127.303 177.107C121.316 171.949 115.719 166.056 109.791 159.816C99.1072 148.568 88.0642 136.941 74.6136 130.046C63.1443 124.173 37.1273 139.7 29.2101 149.811C27.5603 151.927 24.9239 154.626 22.1335 157.484C14.8794 164.907 5.85316 174.151 5.99919 181.164C6.27546 192.953 8.23305 205.409 10.1235 217.451C12.0259 229.544 13.9874 242.051 14.2479 253.863ZM22.6979 158.036C25.5041 155.163 28.1563 152.448 29.8337 150.301C36.4524 141.851 55.8586 129.513 68.3817 129.513C70.5879 129.513 72.585 129.896 74.2584 130.752C87.5905 137.584 98.5862 149.164 109.223 160.361C115.163 166.612 120.771 172.521 126.79 177.703C133.408 183.402 137.178 194.027 137.995 209.281C138.67 221.828 137.343 235.061 135.812 247.489C135.256 251.957 135.575 256.737 135.883 261.358C136.325 267.965 136.779 274.793 134.687 280.796C132.513 287.032 138.145 303.174 143.118 317.414C146.243 326.369 149.192 334.827 148.686 337.16C147.944 340.471 145.896 344.209 135.99 349.126C116.706 358.67 96.6089 367.802 76.2594 376.268C50.4831 386.992 38.781 381.308 33.5042 374.65C32.0636 372.843 30.3586 371.145 28.7128 369.504C24.6003 365.411 20.7127 361.543 20.6061 356.061C20.2115 338.825 18.9998 321.744 17.8276 305.227C16.6436 288.528 15.4162 271.257 15.0412 253.84C14.7847 241.976 12.8152 229.445 10.909 217.324C9.01846 205.307 7.06876 192.878 6.79248 181.141C6.65435 174.459 15.5503 165.35 22.7019 158.028L22.6979 158.036Z" fill="white"/>'
             '<path d="M22.7728 252.763C23.2267 268.798 24.6002 284.664 25.9263 300.009C26.913 311.427 27.9352 323.236 28.5746 335.064C28.8074 339.797 32.2293 343.278 35.5367 346.648C36.8352 347.97 38.1731 349.336 39.3137 350.765C43.4578 355.955 49.5595 357.782 56.0993 357.778C62.3786 357.778 69.0644 356.093 74.7951 354.088C91.6398 348.247 108.007 340.799 123.447 331.954C127.042 329.902 132.481 326.804 133.507 321.543C133.985 319.104 131.703 312.292 129.067 304.41C126.277 296.07 123.111 286.618 122.582 280.465C122.425 278.645 122.511 277.181 122.839 276.123C124.489 271.147 124.209 265.609 123.932 260.258C123.743 256.571 123.549 252.763 123.999 249.211C125.195 239.837 126.352 228.865 125.866 218.548C125.29 206.238 122.389 197.401 117.254 192.282C113.825 188.865 110.47 185.151 106.914 181.22C96.5259 169.731 85.7868 157.851 72.1705 152.254C65.9425 149.681 56.8452 153.616 51.9789 156.193C44.8865 159.947 38.1257 165.295 34.6842 169.869H34.6408L34.5224 170.031C33.2041 171.834 31.0808 174.1 28.8351 176.499C23.3806 182.329 16.5883 189.579 16.6475 195.172C16.7698 204.821 18.2735 215.008 19.7299 224.859C21.0994 234.122 22.5163 243.701 22.765 252.763H22.7728ZM29.4192 177.036C31.6175 174.688 33.6975 172.47 35.0473 170.654H35.0867L35.2051 170.492C41.4529 162.035 61.9286 148.868 71.8784 152.981C85.329 158.506 96.0089 170.319 106.334 181.745C109.894 185.683 113.256 189.405 116.702 192.839C128.85 204.948 124.903 235.89 123.218 249.108C122.76 252.727 122.957 256.571 123.147 260.293C123.415 265.574 123.695 271.036 122.089 275.879C121.726 277.043 121.631 278.606 121.797 280.528C122.334 286.772 125.515 296.272 128.321 304.655C130.815 312.11 133.172 319.151 132.737 321.385C131.853 325.916 127.658 328.643 123.06 331.26C107.664 340.081 91.3399 347.505 74.5425 353.33C63.0771 357.344 47.7677 360.071 39.9334 350.259C38.7691 348.799 37.4114 347.418 36.1011 346.084C32.7503 342.67 29.581 339.445 29.3639 335.013C28.7246 323.173 27.7024 311.36 26.7117 299.934C25.3856 284.601 24.0121 268.751 23.5622 252.735C23.3136 243.63 21.8927 234.027 20.5193 224.741C19.0668 214.917 17.5631 204.758 17.4447 195.16C17.3895 189.883 24.0595 182.759 29.4192 177.036Z" fill="white"/>';
 
-
-        function getSVGLinesPart2() public pure returns (string memory) {
-            return SVG_LINES;
-        }
+    /// @notice returns part 2 of the gradient of the SVG
+    function getSVGLinesPart2() public pure returns (string memory) {
+        return SVG_LINES;
+    }
 }
 
 library SVGLinesPart3 {
@@ -68,6 +69,7 @@ library SVGLinesPart3 {
             '<path d="M185.62 324.025C179.163 323.457 170.678 325.39 167.311 330.987C165.997 333.173 164.951 336.801 165.965 340.416C166.328 341.71 167.765 345.996 170.95 346.687C171.211 346.742 171.467 346.774 171.724 346.774C174.04 346.774 176.341 344.453 181.212 339.547C192.669 328.003 192.606 327.83 192.243 326.882C191.678 325.41 189.2 324.345 185.612 324.029L185.62 324.025ZM180.655 338.987C175.074 344.611 173.208 346.367 171.12 345.914C168.294 345.298 166.964 341.047 166.727 340.199C165.78 336.824 166.759 333.438 167.99 331.39C170.019 328.015 175.516 324.7 183.149 324.7C183.927 324.7 184.728 324.735 185.553 324.806C188.734 325.087 191.075 326.01 191.517 327.159C191.706 327.656 190.305 329.27 180.663 338.983L180.655 338.987Z" fill="white"/>'
             '</g>';
 
+    /// @notice returns part 3 of the gradient of the SVG
     function getSVGLinesPart3() public pure returns (string memory) {
         return SVG_LINES;
     }
@@ -128,6 +130,7 @@ library SVG {
 
     /// @notice Generate the SVG associated with a Uniswap v4 NFT
     /// @param params The SVGParams struct containing the parameters for the SVG
+    /// @dev this is the main function that generates the SVG, if you modify this and run into stack too deep errors, consider splitting it up into smaller functions
     /// @return svg The SVG string associated with the NFT
     function generateSVG(SVGParams memory params) external pure returns (string memory svg) {
         return string(
@@ -140,7 +143,11 @@ library SVG {
             )
         );
     }
-
+    
+    /// @notice returns the main card of the SVG
+    /// @dev this is called "the main card" because it contains the bulk of the SVG done in a way to avoid stack too deep errors
+    /// @param params The SVGParams struct containing the parameters for the SVG
+    /// @return svg The SVG string associated with the NFT
     function getMainCard(SVGParams memory params) private pure returns (string memory svg) {
         return string(
             abi.encodePacked(
@@ -157,6 +164,9 @@ library SVG {
         );
     }
 
+    /// @notice returns the token pair header of the SVG
+    /// @param params The SVGParams struct containing the parameters for the SVG
+    /// @return svg The SVG string associated with the NFT
     function generateSVGTokenPairHeader(SVGParams memory params) private pure returns (string memory svg) {
         string memory pairText = string(abi.encodePacked(params.xTokenSymbol, " / ", params.yTokenSymbol));
         uint width = (bytes(pairText).length) * 18 + 20;
@@ -182,6 +192,9 @@ library SVG {
         );
     }
 
+    /// @notice returns the token ID of the SVG
+    /// @param params The SVGParams struct containing the parameters for the SVG
+    /// @return svg The SVG string associated with the NFT
     function generateSVGTokenId(SVGParams memory params) private pure returns (string memory svg) {
         svg = string(
             abi.encodePacked(
@@ -194,6 +207,9 @@ library SVG {
         );
     }
 
+    /// @notice returns the x token of the SVG
+    /// @param params The SVGParams struct containing the parameters for the SVG
+    /// @return svg The SVG string associated with the NFT
     function generateXToken(SVGParams memory params) private pure returns (string memory svg) {
         svg = string(
             abi.encodePacked(
@@ -208,6 +224,9 @@ library SVG {
         );
     }
 
+    /// @notice returns the y token of the SVG
+    /// @param params The SVGParams struct containing the parameters for the SVG
+    /// @return svg The SVG string associated with the NFT
     function generateYToken(SVGParams memory params) private pure returns (string memory svg) {
         svg = string(
             abi.encodePacked(
@@ -272,6 +291,9 @@ library SVG {
         );
     }
 
+    /// @notice returns the second part of the gradient of the SVG
+    /// @param params The SVGParams struct containing the parameters for the SVG
+    /// @return svg The SVG string associated with the NFT
     function generateSVGDefsCoordinatesAndColor2(SVGParams memory params) private pure returns (string memory svg) {
         svg = string(
             abi.encodePacked(
@@ -287,6 +309,11 @@ library SVG {
         );
     }
 
+    /// @notice Substring of a string
+    /// @param str The string to substring
+    /// @param startIndex The start index of the substring
+    /// @param endIndex The end index of the substring
+    /// @return The substring of str from startIndex to endIndex
     function substring(string memory str, uint256 startIndex, uint256 endIndex) internal pure returns (string memory) {
         bytes memory strBytes = bytes(str);
         bytes memory result = new bytes(endIndex - startIndex);
@@ -313,7 +340,7 @@ library Descriptor {
         address poolManager;
     }
 
-    /// @notice Constructs the token URI for a Uniswap v4 NFT
+    /// @notice Constructs the token URI for a ALTBC NFT
     /// @param params Parameters needed to construct the token URI
     /// @return The token URI as a string
     function constructTokenURI(ConstructTokenURIParams memory params) external pure returns (string memory) {
@@ -355,6 +382,8 @@ library Descriptor {
     }
 
     /// @notice Escapes special characters in a string if they are present
+    /// @param symbol The string to escape special characters from
+    /// @return The string with special characters escaped
     function escapeSpecialCharacters(string memory symbol) internal pure returns (string memory) {
         bytes memory symbolBytes = bytes(symbol);
         uint8 specialCharCount = 0;
@@ -381,7 +410,7 @@ library Descriptor {
         return symbol;
     }
 
-    /// @notice Generates the first part of the description for a Uniswap v4 NFT
+    /// @notice Generates the first part of the description for a ALTBC NFT
     /// @param xTokenSymbol The symbol of the x token
     /// @param yTokenSymbol The symbol of the y token
     /// @param poolManager The address of the pool manager
@@ -408,7 +437,7 @@ library Descriptor {
         );
     }
 
-    /// @notice Generates the second part of the description for a Uniswap v4 NFTs
+    /// @notice Generates the second part of the description for a ALTBC NFT
     /// @param tokenId The token ID
     /// @param baseCurrencySymbol The symbol of the base currency
     /// @param quoteCurrency The address of the quote currency
@@ -440,7 +469,7 @@ library Descriptor {
         );
     }
 
-    /// @notice Generates the name for a Uniswap v4 NFT
+    /// @notice Generates the name for a ALTBC NFT
     /// @param params Parameters needed to generate the name
     /// @param feeTier The fee tier of the pool
     /// @return The name of the NFT
@@ -469,6 +498,11 @@ library Descriptor {
         return uint256(x >= 0 ? x : -x);
     }
 
+    /// @notice Substring of a string
+    /// @param str The string to substring
+    /// @param startIndex The start index of the substring
+    /// @param endIndex The end index of the substring
+    /// @return The substring of str from startIndex to endIndex
     function substring(string memory str, uint256 startIndex, uint256 endIndex) internal pure returns (string memory) {
         bytes memory strBytes = bytes(str);
         bytes memory result = new bytes(endIndex - startIndex);
@@ -480,6 +514,7 @@ library Descriptor {
 
     /// @notice Converts fee amount in hundredths of a percent (where 100 = 1%) to decimal string with percent sign
     /// @param fee fee amount as uint16 where 100 = 1%, 1 = 0.01%
+    /// @param tokenId The token ID, if tokenId is 1, the fee is set to INACTIVE as it is the inactive position
     /// @return fee as a decimal string with percent sign
     function feeToPercentString(uint16 fee, uint256 tokenId) internal pure returns (string memory) {
         if(tokenId == 1) {
@@ -518,6 +553,9 @@ library Descriptor {
         }
     }
 
+    /// @notice Converts an address to a string
+    /// @param addr The address to convert
+    /// @return The string representation of the address
     function addressToString(address addr) internal pure returns (string memory) {
         return (uint256(uint160(addr))).toHexString(20);
     }
@@ -545,10 +583,20 @@ library Descriptor {
         return SVG.generateSVG(svgParams);
     }
 
+    /// @notice Checks if a character is a special character
+    /// @param b The character to check
+    /// @return True if the character is a special character, false otherwise
     function isSpecialCharacter(bytes1 b) private pure returns (bool) {
         return b == '"' || b == "\u000c" || b == "\n" || b == "\r" || b == "\t";
     }
 
+    /// @notice Scales a number from one range to another
+    /// @param n The number to scale
+    /// @param inMn The minimum value of the input range
+    /// @param inMx The maximum value of the input range
+    /// @param outMn The minimum value of the output range
+    /// @param outMx The maximum value of the output range
+    /// @return The scaled number as a string
     function scale(uint256 n, uint256 inMn, uint256 inMx, uint256 outMn, uint256 outMx)
         private
         pure
