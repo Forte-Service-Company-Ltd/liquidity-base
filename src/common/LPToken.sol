@@ -15,9 +15,8 @@ import {packedFloat, MathLibs} from "../amm/mathLibs/MathLibs.sol";
 contract LPToken is ERC721, ERC721Enumerable {
     using MathLibs for packedFloat;
 
-    uint256 public currentTokenId = 2;
+    uint256 public currentTokenId;
     uint256 public constant INACTIVE_ID = 1;
-    bool private inactiveCreated = false;
     mapping(address lp => mapping(uint256 tokenId => LPTokenS lpToken)) public lpToken;
 
     struct LPTokenS {
@@ -53,18 +52,10 @@ contract LPToken is ERC721, ERC721Enumerable {
      * @param wj The amount of liquidity provided by the liquidity provider
      * @param hn The revenue parameter of the pool associated with the lpToken contract
      */
-    function _mintTokenAndUpdate(address lp, packedFloat wj, packedFloat hn, bool inactive, uint256 tokenXAmount, uint256 tokenYAmount) internal {
-        if(inactive) {
-            if(!inactiveCreated) {
-                inactiveCreated = true;
-                _mint(lp, INACTIVE_ID);
-                _updateLPTokenVarsDeposit(lp, INACTIVE_ID, wj, hn);
-            }
-        } else {
-            _mint(lp, currentTokenId);
-            _updateLPTokenVarsDeposit(lp, currentTokenId, wj, hn);
-            currentTokenId += 1;
-        }
+    function _mintTokenAndUpdate(address lp, packedFloat wj, packedFloat hn, uint256 tokenXAmount, uint256 tokenYAmount) internal {
+        currentTokenId++;
+        _mint(lp, currentTokenId);
+        _updateLPTokenVarsDeposit(lp, currentTokenId, wj, hn);
         emit IPoolEvents.LPTokenMinted(lp, currentTokenId, tokenXAmount, tokenYAmount);
     }
 
