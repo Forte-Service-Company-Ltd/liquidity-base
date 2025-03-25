@@ -50,7 +50,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      * @dev lifetime revenue accrued by the pool
      */
     // slither-disable-next-line constable-states // updated in child contract
-    packedFloat public h;
+    packedFloat _h;
 
     /**
      * @dev lifetime revenue claimed from the pool
@@ -504,6 +504,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      * @return revenue The revenue in the pool for yToken in WAD
      */
     function _totalRevenue() internal view returns (uint256 revenue) {
-        revenue = uint((h.mul(_w)).convertpackedFloatToWAD());
+        revenue = uint((_h.mul(_w)).convertpackedFloatToWAD());
     }
 }
