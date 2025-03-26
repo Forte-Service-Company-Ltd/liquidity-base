@@ -33,7 +33,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      * @dev difference in decimal precision between y token and x token
      */
 
-    uint256 public immutable yDecimalDiff;
+    uint256 immutable yDecimalDiff;
 
     /**
      * @dev the lower bound of x
