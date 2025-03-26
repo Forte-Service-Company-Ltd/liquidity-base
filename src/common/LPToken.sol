@@ -69,7 +69,7 @@ contract LPToken is ERC721, ERC721Enumerable {
      */
     function _updateLPTokenVarsDeposit(address lp, uint256 tokenId, packedFloat wj, packedFloat rj) internal {
         lpToken[lp][tokenId].rj = rj;
-        lpToken[lp][tokenId].wj =  lpToken[lp][tokenId].wj.add(wj);
+        lpToken[lp][tokenId].wj.add(wj);
     }
 
     /**
@@ -79,7 +79,7 @@ contract LPToken is ERC721, ERC721Enumerable {
      * @param addedRj The amount of revenue claimed to add to the lpToken being updated
      */
     function _updateLPTokenLastRevenueClaim(address lp, uint256 tokenId, packedFloat addedRj) internal {
-        lpToken[lp][tokenId].rj = lpToken[lp][tokenId].rj.add(addedRj);
+        lpToken[lp][tokenId].rj.add(addedRj);
     }
 
     /**
@@ -106,7 +106,7 @@ contract LPToken is ERC721, ERC721Enumerable {
         if (wj.lt(_uj)) revert("LPToken: withdrawal amount exceeds allowance");
 
         if (wj.gt(_uj)) {
-            lpToken[_lp][_tokenId].wj =  lpToken[_lp][_tokenId].wj.sub(_uj);
+            lpToken[_lp][_tokenId].wj.sub(_uj);
         } else {
             _burn(_tokenId);
             lpToken[_lp][_tokenId].wj = packedFloat.wrap(0);
