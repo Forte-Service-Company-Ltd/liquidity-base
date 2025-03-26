@@ -3,7 +3,7 @@ pragma solidity ^0.8.24;
 
 import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
-
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 /**
  * @title Test all invariants in relation to adding liquidity to the pool.
  * @dev unit test
@@ -20,8 +20,8 @@ abstract contract AddingLiquidityInvariants is TestCommonSetup {
         vm.startPrank(admin);
         (uint _expected, , ) = pool.simSwap(pool.yToken(), amountToTrade);
         pool.swap(pool.yToken(), amountToTrade, _expected);
-        xTokenLiquidity = pool.xTokenLiquidity();
-        yTokenLiquidity = pool.yTokenLiquidity();
+        xTokenLiquidity = IERC20(pool.xToken()).balanceOf(address(pool));
+        yTokenLiquidity = IERC20(pool.yToken()).balanceOf(address(pool)) + pool.totalRevenue() - pool.collectedLPFees();
         vm.startPrank(admin);
         bytes4[] memory selectors = new bytes4[](1);
         // selectors[0] = PoolBase(address(pool)).depositLiquidity.selector; // TODO enable this with depositLiquidity
@@ -31,15 +31,15 @@ abstract contract AddingLiquidityInvariants is TestCommonSetup {
     }
 
     function invariant_liquidityCanNeverDecreaseCallingAddLiquidity_TokenX() public startAsAdmin {
-        assertGe(pool.xTokenLiquidity(), xTokenLiquidity);
+        assertGe(IERC20(pool.xToken()).balanceOf(address(pool)), xTokenLiquidity);
     }
 
     function invariant_liquidityCanNeverDecreaseCallingAddLiquidity_TokenY() public view {
-        assertGe(pool.yTokenLiquidity(), yTokenLiquidity);
+        assertGe(IERC20(pool.yToken()).balanceOf(address(pool)) + pool.totalRevenue() - pool.collectedLPFees(), yTokenLiquidity);
     }
 
     function invariant_liquidityCanNeverIncreasePastMaxSupply() public {
         uint maxTokenSupply = _getMaxXTokenSupply();
-        assertLe(pool.xTokenLiquidity(), maxTokenSupply);
+        assertLe(IERC20(pool.xToken()).balanceOf(address(pool)), maxTokenSupply);
     }
 }
