@@ -2,6 +2,7 @@
 pragma solidity ^0.8.24;
 
 import {SwapHandler} from "test/amm/invariants/SwapHandler.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
 import "forge-std/console2.sol";
 import {CumulativePrice} from "src/amm/base/CumulativePrice.sol";
@@ -29,7 +30,7 @@ abstract contract SwapInvariants is TestCommonSetup {
         pool.swap(address(pool.yToken()), 1_000_000_000_000_000_000, expected);
     }
     function invariant_verifyAmountOutNeverExceedsLiquidity_TokenX() public view {
-        assertLt(_handler.trackedAmountOutX(), pool.xTokenLiquidity());
+        assertLt(_handler.trackedAmountOutX(), IERC20(pool.xToken()).balanceOf(address(pool)));
     }
     function invariant_verifyFeesIncreaseTokenX() public {
         assertLt(lastFees, pool.collectedLPFees());

@@ -235,7 +235,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
     function testLiquidity_Pool_buyGameToken_Positive() public startAsAdmin endWithStopPrank {
         uint256 previous;
         uint256 amountIn = 2 * 1e7 * (address(_yToken) == address(stableCoin) ? STABLECOIN_DEC : ERC20_DECIMALS);
-        uint256 startingLiquidity = pool.xTokenLiquidity();
+        uint256 startingLiquidity = IERC20(pool.xToken()).balanceOf(address(pool));
         uint256 totalOut;
         uint counter;
         uint minSwapCount = 844;
@@ -268,7 +268,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
 
         // get the price of a single token
         uint256 amountIn = pool.spotPrice();
-        uint256 startingLiquidity = pool.xTokenLiquidity();
+        uint256 startingLiquidity = IERC20(pool.xToken()).balanceOf(address(pool));
         uint256 totalOut;
         uint counter = 1;
         uint minimumSwapCount = 9;
@@ -410,7 +410,9 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         console2.log("yBalance", yBalance);
         uint fees = pool.collectedLPFees();
         console2.log("fees", fees);
-        uint yliq = pool.yTokenLiquidity();
+        uint revenue = pool.totalRevenue(); // todo: normalize this
+        //_normalizeTokenDecimals(false, pool.totalRevenue());
+        uint yliq = IERC20(pool.yToken()).balanceOf(address(pool)) + revenue - fees;
         console2.log("yliq", yliq);
         console2.log("yBalance - fees", yBalance - fees);
         /// we check that the pool would have enough liquidity to buy back all the x tokens
@@ -421,7 +423,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         }
         IERC20(pool.xToken()).approve(address(pool), adminXBalance);
         pool.swap(address(pool.xToken()), adminXBalance, getAmountSubFee(expected));
-        yliq = pool.yTokenLiquidity();
+        yliq = IERC20(pool.yToken()).balanceOf(address(pool)) + pool.totalRevenue() - pool.collectedLPFees();
         console2.log("yliq", yliq);
     }
 
@@ -464,7 +466,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         console2.log("yBalance", yBalance);
         uint fees = pool.collectedLPFees();
         console2.log("fees", fees);
-        uint yliq = pool.yTokenLiquidity();
+        uint yliq = IERC20(pool.yToken()).balanceOf(address(pool)) + pool.totalRevenue() - pool.collectedLPFees();
         console2.log("yliq", yliq);
         console2.log("yBalance - fees:", yBalance - fees);
         _checkLiquidityExcessState();
@@ -508,7 +510,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         console2.log("yBalance", yBalance);
         uint fees = pool.collectedLPFees();
         console2.log("fees", fees);
-        uint yliq = pool.yTokenLiquidity();
+        uint yliq = IERC20(pool.yToken()).balanceOf(address(pool)) + pool.totalRevenue() - pool.collectedLPFees();
         console2.log("yliq", yliq);
         console2.log("yBalance - fees", yBalance - fees);
         _checkBackAndForthSwapsState();

@@ -124,13 +124,13 @@ interface IPool is IPoolEvents {
      * @dev This function gets the liquidity in the pool for xToken in WAD.
      * @return the liquidity in the pool for xToken in WAD
      */
-    function xTokenLiquidity() external returns (uint256);
+    // function xTokenLiquidity() external returns (uint256);
 
     /**
      * @dev This function gets the liquidity in the pool for yToken in WAD
      * @return the liquidity in the pool for yToken in WAD
      */
-    function yTokenLiquidity() external returns (uint256);
+    // function yTokenLiquidity() external returns (uint256);
 
     /**
      * @dev fee percentage for swaps for the LP
