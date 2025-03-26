@@ -49,6 +49,7 @@ error CCannotBeZero();
 error VCannotBeZero();
 error xMinCannotBeZero();
 error MaxSlippageReached();
+error LPTokenWithdrawalAmountExceedsAllowance();
 
 /**** URQTBCErrors ****/
 error VOutOfBounds();
