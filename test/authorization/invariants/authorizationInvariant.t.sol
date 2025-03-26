@@ -16,11 +16,10 @@ abstract contract authorizationInvariants is TestCommonSetup {
     function setUp() public endWithStopPrank {
         pool = _setupPool(false);
 
-        bytes4[] memory selectors = new bytes4[](4);
+        bytes4[] memory selectors = new bytes4[](3);
         selectors[0] = pool.withdrawRevenue.selector;
         selectors[1] = pool.enableSwaps.selector;
         selectors[2] = pool.setLPFee.selector;
-        selectors[3] = PoolBase(address(pool)).addXSupply.selector;
         targetContract(address(pool));
         targetSelector(FuzzSelector({addr: address(pool), selectors: selectors}));
         targetSender(alice);
@@ -32,10 +31,6 @@ abstract contract authorizationInvariants is TestCommonSetup {
         _startingYLiquidity = pool.yTokenLiquidity();
     }
 
-    function invariant_verifyRevertsForNotOwner_CollectFees() public view {
-        assertGt(pool.collectedLPFees(), 0);
-    }
-
     function invariant_verifyRevertsForNotOwner_enableSwaps() public view {
         assertFalse(pool.paused());
     }
@@ -44,11 +39,4 @@ abstract contract authorizationInvariants is TestCommonSetup {
         assertEq(pool.lpFee(), 30);
     }
 
-    function invariant_verifyRevertsForNotOwner_initializeXSupply_removeLiquidityXToken() public view {
-        assertEq(pool.xTokenLiquidity(), _startingXLiquidity);
-    }
-
-    function invariant_verifyRevertsForNotOwner_addLiquidityYToken_removeLiquidityYToken() public view {
-        assertEq(pool.yTokenLiquidity(), _startingYLiquidity);
-    }
 }

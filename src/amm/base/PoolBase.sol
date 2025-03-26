@@ -280,21 +280,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     }
 
     /**
-     * @dev This is the function to add XToken liquidity to the pool, an NFT will be minted to the sender.
-     * @param _amount the amount of X token to transfer from the sender to the pool
-     */
-    function addXSupply(uint256 _amount) external virtual onlyOwner {
-        // slither-disable-start reentrancy-benign // the transfer doesn't update any state variable directly and the pool is the recipient
-        uint256 beforeBalance = IERC20(xToken).balanceOf(address(this));
-        IERC20(xToken).safeTransferFrom(_msgSender(), address(this), _amount);
-        uint256 afterBalance = IERC20(xToken).balanceOf(address(this));
-        // slither-disable-end reentrancy-benign
-        _amount = afterBalance - beforeBalance;
-        _validateLiquidityAdd(int(afterBalance).toPackedFloat(-18));
-        _mintTokenAndUpdate(_msgSender(), (int(_amount).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE)), packedFloat.wrap(0));
-    }
-
-    /**
      * @dev This function collects the protocol fees from the Pool.
      */
     function collectProtocolFees() external onlyProtocolFeeCollector {

@@ -91,10 +91,6 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         IERC20(_xToken).approve(_getFactoryAddress(), X_TOKEN_MAX_SUPPLY); // approve factory
     }
 
-    function _addInitialLiquidity(PoolBase poolRet, uint _amount) internal startAsAdmin endWithStopPrank {
-        PoolBase(address(poolRet)).addXSupply(_amount);
-    }
-
     function _setUpTokensAndFactories(uint _tokenSupply) internal {
         _setUpTokens(_tokenSupply);
         _loadAdminAndAlice();

@@ -142,34 +142,18 @@ abstract contract PythonUtils is Test {
      * @param x value to compare against *y*
      * @param y value to compare against *x*
      * @param maxTolerance the maximum allowed difference tolerance based on the precision
-     * @param toleranceDenom the denom of the tolerance value. For instance, 10 ** 11.
+     * @param tolerancePrecision the number of decimals of the tolerance. For instance, 11 will mean maxTolerance / 10 ** 11.
      * @return withinTolerance true if the difference expressed as a normalized value is less or equal than the tolerance.
      */
-    function areWithinTolerance(uint x, uint y, uint8 maxTolerance, uint256 toleranceDenom) internal pure returns (bool withinTolerance) {
+    function areWithinTolerance(uint x, uint y, uint8 maxTolerance, uint256 tolerancePrecision) internal pure returns (bool withinTolerance) {
         /// we calculate the absolute difference to avoid overflow/underflow
         uint diff = absoluteDiff(x, y);
         /// we calculate difference percentage as diff/(smaller number unless 0) to get the bigger difference "percentage".
         withinTolerance = true;
         if (diff != 0) {
-            packedFloat scaled = int(diff).toPackedFloat(-18).mul(int(toleranceDenom).toPackedFloat(-18));
-            console2.log("first");
-            uint relativeDiff = uint(
-                scaled
-                    .div(
-                        int(
-                            x > y
-                                ? y == 0
-                                    ? x
-                                    : y
-                                : x == 0
-                                    ? y
-                                    : x
-                        ).toPackedFloat(-2)
-                    )
-                    .convertpackedFloatToWAD()
-            );
-            console2.log("second");
-            if (relativeDiff > maxTolerance) withinTolerance = false;
+            packedFloat relativeDiff = int(diff).toPackedFloat(0).div(int(y).toPackedFloat(0));
+            packedFloat _maxTolerance = int(uint(maxTolerance)).toPackedFloat(0 - int(tolerancePrecision));
+            if (relativeDiff.gt(_maxTolerance)) withinTolerance = false;
         }
     }
 

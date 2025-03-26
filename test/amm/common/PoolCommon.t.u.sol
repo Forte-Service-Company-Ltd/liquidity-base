@@ -186,18 +186,6 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         pool.confirmProtocolFeeCollector();
     }
 
-    function _buildAddLiquidityGameToken() internal startAsAdmin endWithStopPrank returns (uint256 initialBalance, uint updatedBalance) {
-        GenericERC20FixedSupply _xToken = new GenericERC20FixedSupply("X token", "X", X_TOKEN_MAX_SUPPLY);
-        vm.stopPrank();
-        PoolBase _pool = PoolBase(_deployPool(address(_xToken), address(_yToken), 30, X_TOKEN_MAX_SUPPLY, TBCInputOption.BASE));
-        _approvePool(_pool, false);
-        vm.startPrank(admin);
-        uint amount = X_TOKEN_MAX_SUPPLY;
-        initialBalance = _xToken.balanceOf(address(_pool));
-        PoolBase(address(_pool)).addXSupply(amount);
-        updatedBalance = _xToken.balanceOf(address(_pool));
-    }
-
     function _buildLiquidityRemovalNotAllowed() internal returns (PoolBase _pool) {
         GenericERC20FixedSupply _xToken = new GenericERC20FixedSupply("X token", "X", X_TOKEN_MAX_SUPPLY);
         _pool = _deployPool(address(_xToken), address(_yToken), 30, X_TOKEN_MAX_SUPPLY, TBCInputOption.BASE);

@@ -43,7 +43,7 @@ contract MathLibTests is TestCommon {
         console2.log("returnValLo: ", solVal);
 
         console2.log("Res: ", resUint);
-        if (!areWithinTolerance(resUint, solVal, 1, 1e27)) {
+        if (!areWithinTolerance(resUint, solVal, 1, 27)) {
             revert("out of tolerance");
         }
     }
