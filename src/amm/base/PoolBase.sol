@@ -8,7 +8,6 @@ import {SafeERC20} from "../../../lib/openzeppelin-contracts/contracts/token/ERC
 import {IPool} from "./IPool.sol";
 import "../../common/IErrors.sol";
 import {CalculatorBase, packedFloat} from "./CalculatorBase.sol";
-import {CumulativePrice} from "./CumulativePrice.sol";
 import {FeeInfo, TBCType} from "../../common/TBC.sol";
 import {MathLibs} from "../mathLibs/MathLibs.sol";
 import {LPToken} from "../../../src/common/LPToken.sol";
@@ -20,7 +19,7 @@ import {Descriptor} from "../../common/NFTSVG.sol";
  * Any pool implementation must inherits this contract and implement all the functions from CalculatorBase.
  * @author  @oscarsernarosero @mpetersoCode55 @cirsteve
  */
-abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, CumulativePrice, LPToken {
+abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPToken {
     using SafeERC20 for IERC20;
     using MathLibs for int256;
     using MathLibs for packedFloat;
@@ -150,7 +149,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         uint256 _amountIn,
         uint256 _minOut
     ) external whenNotPaused returns (uint256 amountOut, uint256 lpFeeAmount, uint256 protocolFeeAmount) {
-        _updateCumulativePrice(spotPrice(), block.timestamp);
         packedFloat oldh = h.mul(_w);
         bool sellingX = _tokenIn == xToken;
         //slither-disable-start reentrancy-benign // the recipient of the transfer is this contract
