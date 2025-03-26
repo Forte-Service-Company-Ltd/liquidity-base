@@ -482,21 +482,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      */
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         if (_ownerOf(tokenId) == address(0)) revert URIQueryForNonexistentToken();
-
-        string memory xTokenSymbol = IERC20Metadata(xToken).symbol();
-        string memory yTokenSymbol = IERC20Metadata(yToken).symbol();
-
-        Descriptor.ConstructTokenURIParams memory params = Descriptor.ConstructTokenURIParams({
-            tokenId: tokenId,
-            xTokenAddress: xToken,
-            yTokenAddress: yToken,
-            xTokenSymbol: xTokenSymbol,
-            yTokenSymbol: yTokenSymbol,
-            fee: lpFee,
-            poolManager: address(this)
-        });
-
-        return Descriptor.constructTokenURI(params);
+        return Descriptor.constructTokenURI(tokenId);
     }
 
     /**

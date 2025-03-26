@@ -65,14 +65,14 @@ interface IPool is IPoolEvents {
      * @return the address of the x token of the pool
      * @notice this value is immutable
      */
-    function xToken() external returns (address);
+    function xToken() external view returns (address);
 
     /**
      * @dev A function to get the address of the Y token of the pool.
      * @return the address of the Y token of the pool
      * @notice this value is immutable
      */
-    function yToken() external returns (address);
+    function yToken() external view returns (address);
 
     /**
      * @dev This is the function to activate/deactivate trading.
@@ -136,7 +136,7 @@ interface IPool is IPoolEvents {
      * @dev fee percentage for swaps for the LP
      * @return the percentage for swaps in basis points that will go towards the LP
      */
-    function lpFee() external returns (uint16);
+    function lpFee() external view returns (uint16);
 
     /**
      * @dev fee percentage for swaps for the protocol
