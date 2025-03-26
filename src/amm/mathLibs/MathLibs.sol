@@ -155,8 +155,13 @@ library MathLibs {
         float = mantissa.toPackedFloat(exponent);
     }
 
-    function ln(int mantissa, int exponent) internal pure returns (packedFloat float) {
-        float = mantissa.ln(exponent);
+     /**
+     * @dev calculates the natural logarithm of a positive number
+     * @param x the number to get the natural logarithm from
+     * @return float the result of the natural logarithm of x as a float number
+     */
+    function ln(packedFloat x) internal pure returns (packedFloat float) {
+        float = x.ln();
     }
 
     /**
