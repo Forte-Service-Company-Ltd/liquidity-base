@@ -82,7 +82,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
 
     function testLiquidity_Pool_checkActiveLiquidityNFTAmount() public {
         uint256 ACTIVE_LIQUIDITY_NFT_ID = 2;
-        (packedFloat wj,) = pool.getLPToken(address(admin), ACTIVE_LIQUIDITY_NFT_ID);
+        (packedFloat wj,) = pool.getLPToken(ACTIVE_LIQUIDITY_NFT_ID);
         uint256 w = pool.w();
         uint256 wInactive = pool.wInactive();
         assertEq(w - wInactive, uint256(wj.convertpackedFloatToWAD()), "Active Liquidity NFT wj should equal active liquidity");
@@ -119,8 +119,8 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
     }
 
     function testLiquidity_Pool_setLPFee_ExcessFee() public startAsAdmin {
-        (, bytes memory result) = address(pool).call(abi.encodeWithSignature("MAX_LP_FEE()"));
-        uint16 maxFee = abi.decode(result, (uint16));
+        (, bytes memory result) = address(pool).call(abi.encodeWithSignature("getPoolConstants()"));
+        (, , , ,uint16 maxFee) = abi.decode(result, (uint256, uint256, uint256, uint16, uint16));
         uint16 excessFee = maxFee + 1;
         vm.expectRevert(abi.encodeWithSignature("LPFeeAboveMax(uint16,uint16)", excessFee, maxFee));
         pool.setLPFee(excessFee);
@@ -208,7 +208,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
 
         uint256 originalBalance = IERC20(_yToken).balanceOf(address(admin));
 
-        (, packedFloat rj) = pool.getLPToken(admin, 2);
+        (, packedFloat rj) = pool.getLPToken(2);
         uint256 amount = pool.withdrawRevenue(2, uint(rj.convertpackedFloatToWAD()));
         uint256 updatedBalance = IERC20(_yToken).balanceOf(address(admin));
         uint256 expectedBalance = originalBalance + amount;

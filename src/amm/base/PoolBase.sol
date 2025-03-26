@@ -89,11 +89,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     uint256 public collectedProtocolFees;
 
     /**
-     * @dev inactive liquidity share
-     */
-    packedFloat _wInactive;
-
-    /**
      * @dev total liquidity share
      */
     packedFloat _w;
@@ -472,7 +467,11 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      * @return wInactive
      */
     function wInactive() external view returns (uint256) {
-        return uint(_wInactive.convertpackedFloatToWAD());
+        return uint(_wInactive().convertpackedFloatToWAD());
+    }
+
+    function _wInactive() internal view returns (packedFloat wI) {
+        (wI, ) = getLPToken(1);
     }
 
     /**
