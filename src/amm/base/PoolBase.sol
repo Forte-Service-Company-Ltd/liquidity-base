@@ -213,7 +213,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
             console2.log("amount in before normalization, before fees", _amountIn);
             _amountIn -= (lpFeeAmount + protocolFeeAmount); // fees are always coming out from the pool
             console2.log("amount in before normalization, after fees", _amountIn);
-            _amountIn = _normalizeTokenDecimals(true, _amountIn);
+            _amountIn = _normalizeTokenDecimals(true, _amountIn - 1);
         }
         rawAmountOut = sellingX
             ? _calculateAmountOfYReceivedSellingX(int(_amountIn).toPackedFloat(-18))
