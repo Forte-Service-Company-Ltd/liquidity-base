@@ -16,8 +16,8 @@ contract LPToken is ERC721, ERC721Enumerable {
     using MathLibs for packedFloat;
 
     uint256 public currentTokenId;
-    uint256 public constant INACTIVE_ID = 1;
-    mapping(uint256 tokenId => LPTokenS lpToken) public lpToken;
+    uint256 constant INACTIVE_ID = 1;
+    mapping(uint256 tokenId => LPTokenS lpToken) lpToken;
 
     struct LPTokenS {
         packedFloat wj;
