@@ -450,7 +450,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      * @param _minOut the expected amount out to compare against
      */
     function _checkSlippage(uint256 _amountOut, uint256 _minOut) internal pure {
-        if (_amountOut < (_minOut - 1)) revert("max slippage reached");
+        if (_amountOut < (_minOut - 1)) revert MaxSlippageReached();
     }
 
     /**

@@ -5,7 +5,6 @@ import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
 import {IPool} from "src/amm/base/IPool.sol";
 import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
-import {console} from "forge-std/console.sol";
 
 
 library SVGLinesPart1 {
@@ -348,14 +347,6 @@ library Descriptor {
     /// @return The token URI as a string
     function constructTokenURI(uint256 tokenId, address poolAddress) external view returns (string memory) {
         IPool pool = IPool(poolAddress);
-        // console.log("address(msg.sender)", address(msg.sender));
-        // console.log("Hi!");
-        // console.log("pool.xToken()", pool.xToken());
-        // console.log("pool.yToken()", pool.yToken());
-        // console.log("pool.lpFee()", pool.lpFee());
-        // console.log("pool.poolManager()", address(pool));
-        // console.log("pool.xTokenSymbol()", IERC20Metadata(pool.xToken()).symbol());
-        // console.log("pool.yTokenSymbol()", IERC20Metadata(pool.yToken()).symbol());
 
         ConstructTokenURIParams memory params = ConstructTokenURIParams({
             tokenId: tokenId,

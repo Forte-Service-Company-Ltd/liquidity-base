@@ -48,7 +48,9 @@ error NoInitialLiquidity();
 error CCannotBeZero();
 error VCannotBeZero();
 error xMinCannotBeZero();
-
+error MaxSlippageReached();
+error LPTokenWithdrawalAmountExceedsAllowance();
+error QTooHigh();
 /**** URQTBCErrors ****/
 error VOutOfBounds();
 

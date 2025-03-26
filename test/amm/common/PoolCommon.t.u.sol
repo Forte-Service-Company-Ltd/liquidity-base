@@ -228,7 +228,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         (uint expected, , ) = pool.simSwap(address(_yToken), amountIn);
         // we adjust expected to be higher than the actual amount expected inflated beyond slippage to force the reversion
         expected = (expected * pctDenom) / (pctDenom - uint(maxSlippage + 2)); // looks like + 1 didn't do the trick
-        vm.expectRevert("max slippage reached");
+        vm.expectRevert(abi.encodeWithSelector(MaxSlippageReached.selector));
         pool.swap(address(_yToken), amountIn, expected);
     }
 
