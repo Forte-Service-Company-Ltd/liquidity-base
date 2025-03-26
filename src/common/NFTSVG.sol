@@ -3,6 +3,9 @@ pragma solidity ^0.8.0;
 
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
+import {IPool} from "src/amm/base/IPool.sol";
+import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import {console} from "forge-std/console.sol";
 
 
 library SVGLinesPart1 {
@@ -341,9 +344,28 @@ library Descriptor {
     }
 
     /// @notice Constructs the token URI for a ALTBC NFT
-    /// @param params Parameters needed to construct the token URI
+    /// @param tokenId The token ID
     /// @return The token URI as a string
-    function constructTokenURI(ConstructTokenURIParams memory params) external pure returns (string memory) {
+    function constructTokenURI(uint256 tokenId, address poolAddress) external view returns (string memory) {
+        IPool pool = IPool(poolAddress);
+        // console.log("address(msg.sender)", address(msg.sender));
+        // console.log("Hi!");
+        // console.log("pool.xToken()", pool.xToken());
+        // console.log("pool.yToken()", pool.yToken());
+        // console.log("pool.lpFee()", pool.lpFee());
+        // console.log("pool.poolManager()", address(pool));
+        // console.log("pool.xTokenSymbol()", IERC20Metadata(pool.xToken()).symbol());
+        // console.log("pool.yTokenSymbol()", IERC20Metadata(pool.yToken()).symbol());
+
+        ConstructTokenURIParams memory params = ConstructTokenURIParams({
+            tokenId: tokenId,
+            xTokenAddress: pool.xToken(),
+            yTokenAddress: pool.yToken(),
+            xTokenSymbol: IERC20Metadata(pool.xToken()).symbol(),
+            yTokenSymbol: IERC20Metadata(pool.yToken()).symbol(),
+            fee: pool.lpFee(),
+            poolManager: address(pool)
+        });
         string memory name = generateName(params, feeToPercentString(params.fee, params.tokenId));
         string memory descriptionPartOne = generateDescriptionPartOne(
             escapeSpecialCharacters(params.xTokenSymbol),
