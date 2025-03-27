@@ -3,6 +3,7 @@ pragma solidity ^0.8.24;
 
 import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @title Test all invariants in relation to authorization requirements for AMM transactions.
@@ -27,7 +28,7 @@ abstract contract authorizationInvariants is TestCommonSetup {
         (uint expected, , ) = pool.simSwap(address(yToken), 1_000_000_000_000_000_000);
         pool.swap(address(yToken), 1_000_000_000_000_000_000, expected);
 
-        _startingXLiquidity = pool.xTokenLiquidity();
+        _startingXLiquidity = IERC20(pool.xToken()).balanceOf(address(pool));
         _startingYLiquidity = pool.yTokenLiquidity();
     }
 

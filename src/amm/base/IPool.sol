@@ -121,12 +121,6 @@ interface IPool is IPoolEvents {
     function collectProtocolFees() external;
 
     /**
-     * @dev This function gets the liquidity in the pool for xToken in WAD.
-     * @return the liquidity in the pool for xToken in WAD
-     */
-    function xTokenLiquidity() external returns (uint256);
-
-    /**
      * @dev This function gets the liquidity in the pool for yToken in WAD
      * @return the liquidity in the pool for yToken in WAD
      */

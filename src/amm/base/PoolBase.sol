@@ -307,14 +307,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     }
 
     /**
-     * @dev This function gets the liquidity in the pool for xToken in WAD.
-     * @return the liquidity in the pool for xToken in WAD
-     */
-    function xTokenLiquidity() external view returns (uint256) {
-        return IERC20(xToken).balanceOf(address(this));
-    }
-
-    /**
      * @dev This function gets the liquidity in the pool for yToken in WAD
      * @return the liquidity in the pool for yToken in WAD
      */

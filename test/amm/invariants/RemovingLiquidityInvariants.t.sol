@@ -22,7 +22,7 @@ abstract contract RemovingLiquidityInvariants is TestCommonSetup {
     }
 
     function invariant_liquidityCanNeverIncreaseCallingRemoveLiquidity_TokenX() public view {
-        assertLe(pool.xTokenLiquidity(), xTokenLiquidity);
+        assertLe(IERC20(pool.xToken()).balanceOf(address(pool)), xTokenLiquidity);
     }
 
     function invariant_liquidityCanNeverIncreaseCallingRemoveLiquidity_TokenY() public view {
