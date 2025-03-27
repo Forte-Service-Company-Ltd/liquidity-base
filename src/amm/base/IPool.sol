@@ -163,13 +163,6 @@ interface IPool is IPoolEvents {
     function collectedProtocolFees() external returns (uint256);
 
     /**
-     * @dev This function returns the available revenue for the given token
-     * @param tokenId The ID of the LPToken
-     * @return uint256 amount of revenue available for the given token
-     */
-    function revenueAvailable(uint256 tokenId) external returns (uint256);
-
-    /**
      * @dev returns the current total liquidity in the Pool
      * @return w
      */
