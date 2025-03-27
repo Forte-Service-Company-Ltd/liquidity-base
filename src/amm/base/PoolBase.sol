@@ -12,6 +12,7 @@ import {FeeInfo, TBCType} from "../../common/TBC.sol";
 import {MathLibs} from "../mathLibs/MathLibs.sol";
 import {LPToken} from "../../../src/common/LPToken.sol";
 import {Descriptor} from "../../common/NFTSVG.sol";
+import "forge-std/console2.sol";
 
 /**
  * @title Pool Base
@@ -311,7 +312,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
         return _normalizeTokenDecimals(false, uint(_collectedLPFees.convertpackedFloatToWAD()));
     }
 
-    function getFeeInfo() external view returns(uint16, uint16, address, address, uint256){
+    function getFeeInfo() external view returns (uint16, uint16, address, address, uint256) {
         return (lpFee, protocolFee, protocolFeeCollector, proposedProtocolFeeCollector, collectedProtocolFees);
     }
 
