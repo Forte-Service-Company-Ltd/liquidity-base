@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 import {MathLibs, packedFloat} from "../mathLibs/MathLibs.sol";
-import "forge-std/console2.sol";
 
 /**
  * @title Equations used by multiple TBC types
