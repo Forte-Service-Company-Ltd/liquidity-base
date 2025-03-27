@@ -25,21 +25,16 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     using MathLibs for int256;
     using MathLibs for packedFloat;
 
+    int256 constant POOL_NATIVE_DECIMALS_NEGATIVE = 0 - int(POOL_NATIVE_DECIMALS);
+
     address public immutable xToken;
     address public immutable yToken;
-    int256 constant POOL_NATIVE_DECIMALS_NEGATIVE = 0 - int(POOL_NATIVE_DECIMALS);
 
     /**
      * @dev difference in decimal precision between y token and x token
      */
 
     uint256 immutable yDecimalDiff;
-
-    /**
-     * @dev the lower bound of x
-     */
-    // slither-disable-next-line constable-states // updated in child contract
-    packedFloat public xMin;
 
     /**
      * @dev balance of x token that has been swapped out of the Pool
