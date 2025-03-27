@@ -7,7 +7,7 @@ import {MathLibs, packedFloat} from "../mathLibs/MathLibs.sol";
  * @author  @oscarsernarosero @mpetersoCode55 @cirsteve @palmerg4
  */
 library BaseEquations {
-    using MathLibs for uint256;
+    using MathLibs for int256;
     using MathLibs for packedFloat;
 
     /**

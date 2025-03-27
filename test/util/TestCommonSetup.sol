@@ -37,7 +37,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
 
     function _loadAdminAndAlice() internal startAsAdmin endWithStopPrank {
         GenericERC20(address(yToken)).mint(admin, 1e12 * ERC20_DECIMALS);
-        GenericERC20(address(yToken)).mint(alice, 1e12 * ERC20_DECIMALS);
+        GenericERC20(address(yToken)).mint(alice, 1e20 * ERC20_DECIMALS);
         stableCoin.mint(alice, 1e12 * STABLECOIN_DEC);
         stableCoin.mint(admin, 1e12 * STABLECOIN_DEC);
         fotCoin.mint(admin, 1e20 * ERC20_DECIMALS);
@@ -109,6 +109,16 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         amountMinBound = 2;
         pool = poolRet;
         _setupCollateralToken();
+    }
+
+    function _setupDuplicatePools(bool withStableCoin, uint16 lpFee) internal endWithStopPrank returns (PoolBase pool1, PoolBase pool2) {
+        _setUpTokensAndFactories(X_TOKEN_MAX_SUPPLY);
+        _approveFactory(address(xToken));
+        address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
+        pool1 = _deployPool(address(xToken), yTokenAddress, lpFee, X_TOKEN_MAX_SUPPLY, TBCInputOption.BASE);
+        _approvePool(pool1, false);
+        pool2 = _deployPool(address(xToken), yTokenAddress, lpFee, X_TOKEN_MAX_SUPPLY, TBCInputOption.BASE);
+        _approvePool(pool2, false);
     }
 
     function _setupPoolWithFee(bool withStableCoin, uint16 fee) internal endWithStopPrank returns (PoolBase poolRet) {
