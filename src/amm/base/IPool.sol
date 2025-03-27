@@ -164,11 +164,10 @@ interface IPool is IPoolEvents {
 
     /**
      * @dev This function returns the available revenue for the given token
-     * @param lp The address of the liquidity provider
      * @param tokenId The ID of the LPToken
      * @return uint256 amount of revenue available for the given token
      */
-    function revenueAvailable(address lp, uint256 tokenId) external returns (uint256);
+    function revenueAvailable(uint256 tokenId) external returns (uint256);
 
     /**
      * @dev returns the current total liquidity in the Pool
