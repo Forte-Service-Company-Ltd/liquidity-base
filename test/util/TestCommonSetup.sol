@@ -75,7 +75,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
     function _approvePool(PoolBase poolRet, bool usdt) internal startAsAdmin endWithStopPrank {
         IERC20 _xToken = IERC20(poolRet.xToken());
         IERC20 _yToken = IERC20(poolRet.yToken());
-        _xToken.approve(address(poolRet), X_TOKEN_MAX_SUPPLY * 10);
+        _xToken.approve(address(poolRet), X_TOKEN_MAX_SUPPLY);
         _xToken.approve(_getFactoryAddress(), X_TOKEN_MAX_SUPPLY); // approve factory
         if (!usdt) {
             _yToken.approve(address(poolRet), _yToken.balanceOf(admin));
@@ -83,7 +83,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         vm.startPrank(alice);
         _xToken.approve(address(poolRet), X_TOKEN_MAX_SUPPLY);
         if (!usdt) {
-            _yToken.approve(address(poolRet), _yToken.balanceOf(alice) * 1000000);
+            _yToken.approve(address(poolRet), _yToken.balanceOf(alice));
         }
     }
 
