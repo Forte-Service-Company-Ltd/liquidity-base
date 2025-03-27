@@ -56,22 +56,22 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     /**
      * @dev fee percentage for swaps for the LP
      */
-    uint16 public lpFee;
+    uint16 lpFee;
 
     /**
      * @dev fee percentage for swaps for the protocol
      */
-    uint16 public protocolFee;
+    uint16 protocolFee;
 
     /**
      * @dev protocol-fee collector address
      */
-    address public protocolFeeCollector;
+    address protocolFeeCollector;
 
     /**
      * @dev proposed protocol-fee collector address
      */
-    address public proposedProtocolFeeCollector;
+    address proposedProtocolFeeCollector;
 
     /**
      * @dev currently claimable fee balance
@@ -81,7 +81,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     /**
      * @dev currently claimable protocol fee balance
      */
-    uint256 public collectedProtocolFees;
+    uint256 collectedProtocolFees;
 
     /**
      * @dev total liquidity share
@@ -346,6 +346,10 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
      */
     function collectedLPFeesPerLiquidityUnit() external view returns (uint256) {
         return _normalizeTokenDecimals(false, uint(_collectedLPFees.convertpackedFloatToWAD()));
+    }
+
+    function getFeeInfo() external view returns(uint16, uint16, address, address, uint256){
+        return (lpFee, protocolFee, protocolFeeCollector, proposedProtocolFeeCollector, collectedProtocolFees);
     }
 
     /**

@@ -347,6 +347,7 @@ library Descriptor {
     /// @return The token URI as a string
     function constructTokenURI(uint256 tokenId, address poolAddress) external view returns (string memory) {
         IPool pool = IPool(poolAddress);
+        (uint16 _fee, , , , ) = pool.getFeeInfo();
 
         ConstructTokenURIParams memory params = ConstructTokenURIParams({
             tokenId: tokenId,
@@ -354,7 +355,7 @@ library Descriptor {
             yTokenAddress: pool.yToken(),
             xTokenSymbol: IERC20Metadata(pool.xToken()).symbol(),
             yTokenSymbol: IERC20Metadata(pool.yToken()).symbol(),
-            fee: pool.lpFee(),
+            fee: _fee,
             poolManager: address(pool)
         });
         string memory name = generateName(params, feeToPercentString(params.fee, params.tokenId));

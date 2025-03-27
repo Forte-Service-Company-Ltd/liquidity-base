@@ -127,28 +127,26 @@ interface IPool is IPoolEvents {
     function yTokenLiquidity() external returns (uint256);
 
     /**
-     * @dev fee percentage for swaps for the LP
-     * @return the percentage for swaps in basis points that will go towards the LP
+     * @dev fee percentage for swaps for the LPs and for the protocol
+     * @return lpFee the percentage for swaps in basis points that will go towards the LPs
+     * @return protocolFee the percentage for swaps in basis points that will go towards the protocol
+     * @return protocolFeeCollector address of the account with the privilage of collecting the the protocol fees
+     * @return proposedProtocolFeeCollector the address proposed to be the new protocolFeeCollector
+     * @return collectedProtocolFees the available amount of protocol fees to be collected
      */
-    function lpFee() external view returns (uint16);
+    function getFeeInfo() external view returns(uint16 lpFee, uint16 protocolFee, address protocolFeeCollector, address proposedProtocolFeeCollector, uint256 collectedProtocolFees);
 
-    /**
-     * @dev fee percentage for swaps for the protocol
-     * @return the percentage for swaps in basis points that will go towards the protocol
-     */
-    function protocolFee() external returns (uint16);
+    // /**
+    //  * @dev protocol-fee collector address
+    //  * @return the current protocolFeeCollector address
+    //  */
+    // function protocolFeeCollector() external returns (address);
 
-    /**
-     * @dev protocol-fee collector address
-     * @return the current protocolFeeCollector address
-     */
-    function protocolFeeCollector() external returns (address);
-
-    /**
-     * @dev proposed protocol-fee collector address
-     * @return the current proposedProtocolFeeCollector address
-     */
-    function proposedProtocolFeeCollector() external returns (address);
+    // /**
+    //  * @dev proposed protocol-fee collector address
+    //  * @return the current proposedProtocolFeeCollector address
+    //  */
+    // function proposedProtocolFeeCollector() external returns (address);
 
     /**
      * @dev tells current LP fees accumulated in the pool
@@ -160,7 +158,7 @@ interface IPool is IPoolEvents {
      * @dev tells current protocol fees accumulated in the pool
      * @return currently claimable protocol fee balance
      */
-    function collectedProtocolFees() external returns (uint256);
+    // function collectedProtocolFees() external returns (uint256);
 
     /**
      * @dev returns the current total liquidity in the Pool

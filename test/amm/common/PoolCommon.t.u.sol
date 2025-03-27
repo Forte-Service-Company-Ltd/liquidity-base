@@ -89,25 +89,25 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
     }
 
     function testLiquidity_Pool_setLPFee_Positive() public startAsAdmin {
-        uint16 initialFee = pool.lpFee();
+        (uint16 initialFee, , , , ) = pool.getFeeInfo();
         uint16 feeUpdate = 500;
         uint16 updatedFee = feeUpdate + initialFee;
         vm.expectEmit(true, true, true, true, address(pool));
         emit CommonEvents.FeeSet(CommonEvents.FeeCollectionType.LP, updatedFee);
         pool.setLPFee(updatedFee);
-        uint16 fee = pool.lpFee();
+        (uint16 fee, , , , )= pool.getFeeInfo();
         assertTrue(fee == updatedFee, "Fee should equal updatedFee");
         assertTrue(initialFee != fee, "Fee should not equal initialFee");
     }
 
     function testLiquidity_Pool_setLPFee_PositiveMax() public startAsAdmin {
-        uint16 initialFee = pool.lpFee();
+        (uint16 initialFee, , , , ) = pool.getFeeInfo();
         // Max Total Fee 50%: 4_980(LP) + 20(Protocol) = 5_000
         uint16 feeUpdate = 4_980;
         vm.expectEmit(true, true, true, true, address(pool));
         emit CommonEvents.FeeSet(CommonEvents.FeeCollectionType.LP, feeUpdate);
         pool.setLPFee(feeUpdate);
-        uint16 fee = pool.lpFee();
+        (uint16 fee, , , , ) = pool.getFeeInfo();
         assertTrue(fee == feeUpdate, "Fee should equal updatedFee");
         assertTrue(initialFee != fee, "Fee should not equal initialFee");
     }
@@ -133,7 +133,8 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         vm.expectEmit(true, true, true, true, address(pool));
         emit CommonEvents.FeeSet(CommonEvents.FeeCollectionType.PROTOCOL, feeUpdate);
         pool.setProtocolFee(feeUpdate);
-        assertTrue(pool.protocolFee() == feeUpdate, "Fee should equal updatedFee");
+        (, uint16 protocolFee, , , ) = pool.getFeeInfo();
+        assertTrue(protocolFee == feeUpdate, "Fee should equal updatedFee");
     }
 
     function testLiquidity_Pool_setProtocolFee_NotProtocolCollector() public {
@@ -143,7 +144,8 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
     }
 
     function testLiquidity_Pool_setProtocolFee_OverMax() public {
-        address protocolFeeCollector = pool.protocolFeeCollector();
+
+       (, , address protocolFeeCollector, , ) = pool.getFeeInfo();
         console2.log(protocolFeeCollector);
         vm.prank(bob);
         vm.expectRevert(abi.encodeWithSignature("ProtocolFeeAboveMax(uint16,uint16)", 21, 20));
@@ -159,7 +161,8 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
 
     function testLiquidity_Pool_proposeNewProtocolFeeCollector_Positive() public {
         _build_proposeNewProtocolFeeCollector();
-        assertEq(pool.proposedProtocolFeeCollector(), address(0xbabe));
+        (, , , address proposedProtocolFeeCollector, ) = pool.getFeeInfo();
+        assertEq(proposedProtocolFeeCollector, address(0xbabe));
     }
 
     function testLiquidity_Pool_proposeNewProtocolFeeCollector_NotProtocolFeeCollector(address proposer) public {
@@ -175,7 +178,8 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         vm.expectEmit(true, false, false, false, address(pool));
         emit CommonEvents.ProtocolFeeCollectorConfirmed(address(0xbabe));
         pool.confirmProtocolFeeCollector();
-        assertEq(pool.protocolFeeCollector(), address(0xbabe));
+        (, , address protocolFeeCollector, , ) = pool.getFeeInfo();
+        assertEq(protocolFeeCollector, address(0xbabe));
     }
 
     function testLiquidity_Pool_confirmNewProtocolFeeCollector_NotProposedProtocolFeeCollector(address confirmer) public {
@@ -371,7 +375,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         }
         vm.startPrank(bob);
         uint yBalanceBefore = _yToken.balanceOf(bob);
-        uint protocolFeesCollected = pool.collectedProtocolFees();
+        ( , , , , uint protocolFeesCollected) = pool.getFeeInfo();
         pool.collectProtocolFees();
         assertEq(protocolFeesCollected, (_yToken.balanceOf(bob) - yBalanceBefore));
     }

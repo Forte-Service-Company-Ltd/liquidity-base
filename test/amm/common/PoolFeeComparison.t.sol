@@ -78,7 +78,7 @@ abstract contract PoolFeeComparisonTest is TestCommonSetup {
         }
         vm.startPrank(bob);
         uint yBalanceBefore = _yToken.balanceOf(bob);
-        uint protocolFeesCollected = poolWFee.collectedProtocolFees();
+        ( , , , , uint protocolFeesCollected) = pool.getFeeInfo();
         console2.log("protocolFeesCollected", protocolFeesCollected);
         poolWFee.collectProtocolFees();
         assertEq(protocolFeesCollected, (_yToken.balanceOf(bob) - yBalanceBefore));
@@ -101,7 +101,7 @@ abstract contract PoolFeeComparisonTest is TestCommonSetup {
         assertGe(realProtocolFees, protocolFees - 1); // we add 1 to account for rounding issues
         vm.startPrank(bob);
         uint yBalanceBefore = _yToken.balanceOf(bob);
-        uint protocolFeesCollected = pool.collectedProtocolFees();
+        ( , , , , uint protocolFeesCollected) = pool.getFeeInfo();
         console2.log("protocolFeesCollected", protocolFeesCollected);
         vm.expectEmit(true, true, false, false, address(pool)); // Fees generated might be off by 1 unit
         emit IPoolEvents.FeesCollected(CommonEvents.FeeCollectionType.PROTOCOL, bob, protocolFeesCollected);

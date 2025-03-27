@@ -37,7 +37,9 @@ abstract contract authorizationInvariants is TestCommonSetup {
     }
 
     function invariant_verifyRevertsForNotOwner_setLPFee() public view {
-        assertEq(pool.lpFee(), 30);
+        (uint16 fee, , , , ) = pool.getFeeInfo(); 
+        assertEq(fee, 30);
+
     }
 
 }
