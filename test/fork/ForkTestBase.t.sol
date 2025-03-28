@@ -23,7 +23,7 @@ abstract contract ForkTestBase is TestCommonSetup {
 
     function testTransferZeroCollateralB() public startAsAdmin {
         uint expected = ERC20_DECIMALS;
-        vm.expectRevert("max slippage reached");
+        vm.expectRevert(abi.encodeWithSignature("MaxSlippageReached()"));
         pool.swap(address(_yToken), 1, expected);
     }
 
