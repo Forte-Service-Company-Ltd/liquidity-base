@@ -24,13 +24,13 @@ abstract contract pausedAuthorizationInvariants is TestCommonSetup {
         vm.startPrank(admin);
         pool.enableSwaps(false);
         _startingXLiquidity = IERC20(pool.xToken()).balanceOf(address(pool));
-        _startingYLiquidity = pool.yTokenLiquidity();
+        _startingYLiquidity = IERC20(pool.yToken()).balanceOf(address(pool));
     }
     function invariant_verifyRevertsWhilePaused_removeLiquidityXToken() public view {
         // First argument is XToken Liquidity
         assertEq(IERC20(pool.xToken()).balanceOf(address(pool)), _startingXLiquidity);
     }
     function invariant_verifyRevertsWhilePaused_removeLiquidityYToken() public view {
-        assertEq(pool.yTokenLiquidity(), _startingYLiquidity);
+        assertEq(IERC20(pool.yToken()).balanceOf(address(pool)), _startingYLiquidity);
     }
 }

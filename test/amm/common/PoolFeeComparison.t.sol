@@ -30,7 +30,7 @@ abstract contract PoolFeeComparisonTest is TestCommonSetup {
         for (uint j = 0; j < 100; j++) {
             (uint expected, uint expectedFeeAmount, ) = poolWFee.simSwap(address(_yToken), (1 * fullToken) / 1_000);
             vm.expectEmit(true, false, false, false, address(poolWFee));
-            emit IPoolEvents.FeesGenerated(expectedFeeAmount, 0, 0);
+            emit IPoolEvents.FeesGenerated(expectedFeeAmount, 0);
             (uint actual, uint actualFeeAmount, ) = poolWFee.swap(address(_yToken), (1 * fullToken) / 1_000, expected);
             assertEq(actual, expected);
             assertEq(expectedFeeAmount, actualFeeAmount);
@@ -50,7 +50,7 @@ abstract contract PoolFeeComparisonTest is TestCommonSetup {
         for (uint j = 0; j < 100; j++) {
             (uint expected, uint expectedFeeAmount, uint expectedProtocolFee) = poolWFee.simSwap(address(_yToken), (1 * fullToken) / 1_000);
             vm.expectEmit(true, true, false, false, address(poolWFee));
-            emit IPoolEvents.FeesGenerated(expectedFeeAmount, expectedProtocolFee, 0);
+            emit IPoolEvents.FeesGenerated(expectedFeeAmount, expectedProtocolFee);
             (uint actual, uint actualFeeAmount, uint actualProtocolFee) = poolWFee.swap(
                 address(_yToken),
                 (1 * fullToken) / 1_000,
@@ -93,7 +93,7 @@ abstract contract PoolFeeComparisonTest is TestCommonSetup {
         (uint256 expectedAmount, uint256 lpFeeAmount, uint256 protocolFeeAmount) = pool.simSwap(address(_yToken), expectedIn);
 
         vm.expectEmit(false, false, false, false, address(pool)); // Fees generated might be off by 1 unit
-        emit IPoolEvents.FeesGenerated(lpFeeAmount, protocolFeeAmount, 0);
+        emit IPoolEvents.FeesGenerated(lpFeeAmount, protocolFeeAmount);
         (, uint realLPFees, uint realProtocolFees) = pool.swap(address(_yToken), expectedIn, expectedAmount);
         assertLe(realLPFees, lpFees + 1); // we add 1 to account for rounding issues
         assertGe(realLPFees, lpFees - 1); // we add 1 to account for rounding issues

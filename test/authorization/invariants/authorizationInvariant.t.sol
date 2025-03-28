@@ -29,7 +29,7 @@ abstract contract authorizationInvariants is TestCommonSetup {
         pool.swap(address(yToken), 1_000_000_000_000_000_000, expected);
 
         _startingXLiquidity = IERC20(pool.xToken()).balanceOf(address(pool));
-        _startingYLiquidity = pool.yTokenLiquidity();
+        _startingYLiquidity = IERC20(pool.yToken()).balanceOf(address(pool));
     }
 
     function invariant_verifyRevertsForNotOwner_enableSwaps() public view {

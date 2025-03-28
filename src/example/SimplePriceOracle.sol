@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
-import {CumulativePrice} from "src/amm/base/CumulativePrice.sol";
+// import {CumulativePrice} from "src/amm/base/CumulativePrice.sol";
 
 /**
  * @title Simple Price Oracle
@@ -21,16 +21,16 @@ contract SimplePriceOracle {
     }
 
     function update() external {
-        uint cumulativePrice = CumulativePrice(pool).cumulativePrice();
-        uint blockTimestamp = CumulativePrice(pool).lastBlockTimestamp();
-        uint elapsedTime = blockTimestamp - blockTimestampLast;
+        // uint cumulativePrice = CumulativePrice(pool).cumulativePrice();
+        // uint blockTimestamp = CumulativePrice(pool).lastBlockTimestamp();
+        // uint elapsedTime = blockTimestamp - blockTimestampLast;
 
-        // ensure that at least one full period has passed since the last update
-        require(elapsedTime >= PERIOD, 'Minimum PERIOD required');
+        // // ensure that at least one full period has passed since the last update
+        // require(elapsedTime >= PERIOD, 'Minimum PERIOD required');
 
-        priceAverage = (cumulativePrice - priceCumulativeLast) / elapsedTime;
-        blockTimestampLast = blockTimestamp;
-        priceCumulativeLast = cumulativePrice;
+        // priceAverage = (cumulativePrice - priceCumulativeLast) / elapsedTime;
+        // blockTimestampLast = blockTimestamp;
+        // priceCumulativeLast = cumulativePrice;
     }
 
 }

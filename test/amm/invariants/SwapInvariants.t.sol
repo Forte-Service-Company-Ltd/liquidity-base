@@ -4,7 +4,6 @@ pragma solidity ^0.8.24;
 import {SwapHandler} from "test/amm/invariants/SwapHandler.sol";
 import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
 import "forge-std/console2.sol";
-import {CumulativePrice} from "src/amm/base/CumulativePrice.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 /**
  * @title Test all invariants defined for the swap mechanics
@@ -36,12 +35,12 @@ abstract contract SwapInvariants is TestCommonSetup {
         assertLt(lastFees, pool.collectedLPFees());
         lastFees = pool.collectedLPFees();
     }
-    function invariant_cumulativePriceAndLastBlockTimestammpOnlyIncrease() public {
-        uint cumulativePrice = CumulativePrice(address(pool)).cumulativePrice();
-        uint blockTimestamp = CumulativePrice(address(pool)).lastBlockTimestamp();
-        assertGt(cumulativePrice, lastCumulativePrice, "Current cumulativePrice must be greater than last cumulativePrice");
-        assertGt(blockTimestamp, lastBlockTimestamp, "Current blockTimestamp must be greater than last blockTimestamp");
-        lastCumulativePrice = cumulativePrice;
-        lastBlockTimestamp = blockTimestamp;
-    }
+    // function invariant_cumulativePriceAndLastBlockTimestammpOnlyIncrease() public {
+    //     uint cumulativePrice = CumulativePrice(address(pool)).cumulativePrice();
+    //     uint blockTimestamp = CumulativePrice(address(pool)).lastBlockTimestamp();
+    //     assertGt(cumulativePrice, lastCumulativePrice, "Current cumulativePrice must be greater than last cumulativePrice");
+    //     assertGt(blockTimestamp, lastBlockTimestamp, "Current blockTimestamp must be greater than last blockTimestamp");
+    //     lastCumulativePrice = cumulativePrice;
+    //     lastBlockTimestamp = blockTimestamp;
+    // }
 }

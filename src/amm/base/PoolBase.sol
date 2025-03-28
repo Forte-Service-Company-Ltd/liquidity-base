@@ -8,7 +8,6 @@ import {SafeERC20} from "../../../lib/openzeppelin-contracts/contracts/token/ERC
 import {IPool} from "./IPool.sol";
 import "../../common/IErrors.sol";
 import {CalculatorBase, packedFloat} from "./CalculatorBase.sol";
-import {CumulativePrice} from "./CumulativePrice.sol";
 import {FeeInfo, TBCType} from "../../common/TBC.sol";
 import {MathLibs} from "../mathLibs/MathLibs.sol";
 import {LPToken} from "../../../src/common/LPToken.sol";
@@ -20,7 +19,7 @@ import {Descriptor} from "../../common/NFTSVG.sol";
  * Any pool implementation must inherits this contract and implement all the functions from CalculatorBase.
  * @author  @oscarsernarosero @mpetersoCode55 @cirsteve
  */
-abstract contract PoolBase is IPool, CalculatorBase, CumulativePrice, Ownable2Step, Pausable, LPToken {
+abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPToken {
     using SafeERC20 for IERC20;
     using MathLibs for int256;
     using MathLibs for packedFloat;
@@ -40,18 +39,6 @@ abstract contract PoolBase is IPool, CalculatorBase, CumulativePrice, Ownable2St
      * @dev balance of x token that has been swapped out of the Pool
      */
     packedFloat public x;
-
-    /**
-     * @dev lifetime revenue accrued by the pool
-     */
-    // slither-disable-next-line constable-states // updated in child contract
-    packedFloat _h;
-
-    /**
-     * @dev lifetime revenue claimed from the pool
-     */
-    // slither-disable-next-line constable-states // updated in child contract
-    uint256 public r;
 
     /**
      * @dev fee percentage for swaps for the LP
@@ -140,27 +127,21 @@ abstract contract PoolBase is IPool, CalculatorBase, CumulativePrice, Ownable2St
         uint256 _amountIn,
         uint256 _minOut
     ) external whenNotPaused returns (uint256 amountOut, uint256 lpFeeAmount, uint256 protocolFeeAmount) {
-        _updateCumulativePrice(spotPrice(), block.timestamp);
-        packedFloat oldh = _h.mul(_w);
         bool sellingX = _tokenIn == xToken;
         //slither-disable-start reentrancy-benign // the recipient of the transfer is this contract
-        uint256 beforeBalance = IERC20(sellingX ? xToken : yToken).balanceOf(address(this));
         IERC20(sellingX ? xToken : yToken).safeTransferFrom(_msgSender(), address(this), _amountIn);
-        uint256 afterBalance = IERC20(sellingX ? xToken : yToken).balanceOf(address(this));
-        _amountIn = afterBalance - beforeBalance;
 
         if (_minOut == 0) revert ZeroValueNotAllowed();
         (amountOut, lpFeeAmount, protocolFeeAmount) = simSwap(_tokenIn, _amountIn);
         _checkSlippage(amountOut, _minOut);
-        packedFloat xOld = x;
 
         x = sellingX ? x.sub(int(_amountIn).toPackedFloat(-18)) : x.add(int(amountOut).toPackedFloat(-18));
         // slither-disable-end reentrancy-benign
         // slither-disable-start reentrancy-events // the recipient of the initial transfer is this contract
-        _updateParameters(xOld);
+        _updateParameters();
         _collectedLPFees = _collectedLPFees.add(int(lpFeeAmount).toPackedFloat(int(yDecimalDiff) - int(POOL_NATIVE_DECIMALS)).div(_w));
         collectedProtocolFees += protocolFeeAmount;
-        emit FeesGenerated(lpFeeAmount, protocolFeeAmount, uint((_h.mul(_w)).sub(oldh).convertpackedFloatToWAD()));
+        emit FeesGenerated(lpFeeAmount, protocolFeeAmount);
         emit Swap(_tokenIn, _amountIn, amountOut, _minOut);
         // slither-disable-end reentrancy-events
         IERC20(sellingX ? yToken : xToken).safeTransfer(_msgSender(), amountOut);
@@ -299,24 +280,6 @@ abstract contract PoolBase is IPool, CalculatorBase, CumulativePrice, Ownable2St
         delete proposedProtocolFeeCollector;
         protocolFeeCollector = _msgSender();
         emit ProtocolFeeCollectorConfirmed(_msgSender());
-    }
-
-    /**
-     * @dev This function gets the liquidity in the pool for yToken in WAD
-     * @return the liquidity in the pool for yToken in WAD
-     */
-    function yTokenLiquidity() external view returns (uint256) {
-        uint revenue = _totalRevenue();
-        revenue = _normalizeTokenDecimals(false, revenue);
-        return (IERC20(yToken).balanceOf(address(this)) + r) - (collectedProtocolFees + revenue);
-    }
-
-    /**
-     * @dev This function returns the total revenue in the pool for yToken in WAD
-     * @return the revenue in the pool for yToken in WAD
-     */
-    function totalRevenue() public view returns (uint256) {
-        return _totalRevenue();
     }
 
     /**
@@ -473,13 +436,5 @@ abstract contract PoolBase is IPool, CalculatorBase, CumulativePrice, Ownable2St
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         if (_ownerOf(tokenId) == address(0)) revert URIQueryForNonexistentToken();
         return Descriptor.constructTokenURI(tokenId, address(this));
-    }
-
-    /**
-     * @dev This function gets the total revenue in the pool for yToken in WAD
-     * @return revenue The revenue in the pool for yToken in WAD
-     */
-    function _totalRevenue() internal view returns (uint256 revenue) {
-        revenue = uint((_h.mul(_w)).convertpackedFloatToWAD());
     }
 }

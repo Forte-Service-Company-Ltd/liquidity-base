@@ -20,9 +20,8 @@ abstract contract CalculatorBase is Constants {
 
     /**
      * @dev This function updates the state of the math values of the pool.
-     * @param x_old the previous tracker for x
      */
-    function _updateParameters(packedFloat x_old) public virtual;
+    function _updateParameters() internal virtual;
 
     /**
      * @dev This function calculates the amount of token X required for the user to purchase a specific amount of Token Y (buy y with x : out perspective).
