@@ -362,8 +362,8 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
 
         pool.swap(address(_yToken), initialAmount, getAmountSubFee(expected), bob);
         /// now we test
-        (uint expectedIn, uint lpFees, uint protocolFees) = pool.simSwapReversed(address(_yToken), amount);
-        // todo: this looks fishy for FOT, we should investigate this
+        (uint expectedIn, uint lpFees, uint protocolFees) = pool
+            .simSwapReversed(address(_yToken), amount);
         IERC20(pool.xToken()).approve(address(pool), expectedIn);
         vm.expectEmit(false, false, false, false, address(pool)); // Fees generated might be off by 1 unit
         emit IPoolEvents.FeesGenerated(lpFees, protocolFees);
