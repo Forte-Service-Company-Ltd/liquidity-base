@@ -14,7 +14,7 @@ key=$(getNetworkKey $1)
 legacyArg=$(getLegacyArg $1)
 
 simSwap="simSwap(address,uint256)(uint256,uint256,uint256)"
-swap="swap(address,uint256,uint256)(uint256,uint256,uint256)"
+swap="swap(address,uint256,uint256,address)(uint256,uint256,uint256)"
 
 read expected expScientific expFee < <(cast call $legacyArg --rpc-url $url $2 $simSwap $3 $4)
 echo $expected

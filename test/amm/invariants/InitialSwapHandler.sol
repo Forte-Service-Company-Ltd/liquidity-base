@@ -20,7 +20,7 @@ contract InitialSwapHandler is TestCommon {
     function swap(uint256 _amountIn) external returns (uint256 amountOut, uint256 feeAmount) {
         vm.startPrank(admin);
         (uint256 expectedAmountOut, , ) = poolUnderTest.simSwap(poolUnderTest.xToken(), _amountIn);
-        (amountOut, feeAmount, ) = poolUnderTest.swap(poolUnderTest.xToken(), _amountIn, expectedAmountOut);
+        (amountOut, feeAmount, ) = poolUnderTest.swap(poolUnderTest.xToken(), _amountIn, expectedAmountOut, msg.sender);
         trackedAmountOutX = amountOut;
     }
 }

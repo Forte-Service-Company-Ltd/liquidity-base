@@ -20,11 +20,11 @@ contract TestSwap is Script, StdAssertions {
         console2.log("pool", address(pool));
         IERC20(tokenY).approve(address(pool), amountY);
         (uint256 expectedAmountX,,) = pool.simSwap(tokenY, amountY);
-        pool.swap(tokenY, amountY, expectedAmountX);
+        pool.swap(tokenY, amountY, expectedAmountX, msg.sender);
         assertGe(IERC20(tokenX).balanceOf(address(vm.envAddress("DEPLOYMENT_OWNER"))), expectedAmountX);
         (uint256 expectedAmountY,,) = pool.simSwap(tokenX, expectedAmountX);
         IERC20(tokenX).approve(address(pool), expectedAmountX);
-        pool.swap(tokenX, expectedAmountX, expectedAmountY);
+        pool.swap(tokenX, expectedAmountX, expectedAmountY, msg.sender);
         assertGe(IERC20(tokenY).balanceOf(address(vm.envAddress("DEPLOYMENT_OWNER"))), expectedAmountY);
         vm.stopBroadcast();
     }

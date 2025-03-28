@@ -61,7 +61,7 @@ abstract contract PoolPrecisionTest is TestCommonSetup {
             console2.log("buy x failed");
         }
 
-        (amountOut, feeAmount, ) = _pool.swap(address(tokenIn), swapAmount, expected);
+        (amountOut, feeAmount, ) = _pool.swap(address(tokenIn), swapAmount, expected, admin);
     }
 
     function test_poolPrecision_swapTests() public startAsAdmin endWithStopPrank {

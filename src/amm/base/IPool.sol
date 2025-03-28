@@ -16,6 +16,7 @@ interface IPool is IPoolEvents {
      * @param _amountIn the amount of the ERC20 _tokenIn to exchange into the Pool
      * @param _minOut the amount of the other token in the pair minimum to be received for the
      * _amountIn of _tokenIn.
+     * @param _recipient address to receive tokens out 
      * @return amountOut the actual amount of the token coming out of the Pool as result of the swap
      * @return lpFeeAmount the amount of the Y token that's being dedicated to fees for the LP
      * @return protocolFeeAmount the amount of the Y token that's being dedicated to fees for the protocol
@@ -23,14 +24,10 @@ interface IPool is IPoolEvents {
     function swap(
         address _tokenIn,
         uint256 _amountIn,
-        uint256 _minOut
-    )
-        external
-        returns (
-            uint256 amountOut,
-            uint256 lpFeeAmount,
-            uint256 protocolFeeAmount
-        );
+        uint256 _minOut,
+        address _recipient
+    ) external returns (uint256 amountOut, uint256 lpFeeAmount, uint256 protocolFeeAmount);
+
 
     /**
      * @dev This is the function to retrieve the current spot price of the x token.
@@ -140,8 +137,9 @@ interface IPool is IPoolEvents {
 
     /**
      * @dev This function collects the protocol fees from the Pool.
+     * @param _recipient address that receives the fees 
      */
-    function collectProtocolFees() external;
+    function collectProtocolFees(address _recipient) external;
 
     /**
      * @dev fee percentage for swaps for the LPs and for the protocol

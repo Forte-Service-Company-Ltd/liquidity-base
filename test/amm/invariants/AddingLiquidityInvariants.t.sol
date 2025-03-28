@@ -20,7 +20,7 @@ abstract contract AddingLiquidityInvariants is TestCommonSetup {
 
         vm.startPrank(admin);
         (uint _expected, , ) = pool.simSwap(pool.yToken(), amountToTrade);
-        pool.swap(pool.yToken(), amountToTrade, _expected);
+        pool.swap(pool.yToken(), amountToTrade, _expected, msg.sender);
         xTokenLiquidity = IERC20(pool.xToken()).balanceOf(address(pool));
         yTokenLiquidity = IERC20(pool.yToken()).balanceOf(address(pool));
         vm.startPrank(admin);

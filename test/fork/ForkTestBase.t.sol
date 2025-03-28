@@ -18,18 +18,18 @@ abstract contract ForkTestBase is TestCommonSetup {
 
     function testTransferZeroCollateralA() public startAsAdmin {
         vm.expectRevert(abi.encodeWithSignature("ZeroValueNotAllowed()"));
-        pool.swap(address(_yToken), 0, 1000);
+        pool.swap(address(_yToken), 0, 1000, msg.sender);
     }
 
     function testTransferZeroCollateralB() public startAsAdmin {
         uint expected = ERC20_DECIMALS;
         vm.expectRevert(abi.encodeWithSignature("MaxSlippageReached()"));
-        pool.swap(address(_yToken), 1, expected);
+        pool.swap(address(_yToken), 1, expected, msg.sender);
     }
 
     function testNotEnoughXToken() public startAsAdmin {
         (uint expected, , ) = pool.simSwap(address(_yToken), 1 * STABLECOIN_DEC);
-        (uint actual, , ) = pool.swap(address(_yToken), 1 * STABLECOIN_DEC, expected);
+        (uint actual, , ) = pool.swap(address(_yToken), 1 * STABLECOIN_DEC, expected, admin);
 
         xToken.transfer(address(0x1), 1000);
 
@@ -43,11 +43,11 @@ abstract contract ForkTestBase is TestCommonSetup {
             )
         );
 
-        pool.swap(address(xToken), (actual - 1), expectedY);
+        pool.swap(address(xToken), (actual - 1), expectedY, admin);
     }
 
     function testTransferZeroXToken() public startAsAdmin {
         vm.expectRevert(abi.encodeWithSignature("ZeroValueNotAllowed()"));
-        pool.swap(address(xToken), 0, 1000);
+        pool.swap(address(xToken), 0, 1000, admin);
     }
 }
