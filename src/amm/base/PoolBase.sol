@@ -12,7 +12,6 @@ import {FeeInfo, TBCType} from "../../common/TBC.sol";
 import {MathLibs} from "../mathLibs/MathLibs.sol";
 import {LPToken} from "../../../src/common/LPToken.sol";
 import {Descriptor} from "../../common/NFTSVG.sol";
-import "forge-std/console2.sol";
 
 /**
  * @title Pool Base
@@ -76,6 +75,11 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
      */
     packedFloat _w;
 
+    /**
+     * @dev if pool is closed
+     */
+    bool public closed;
+
     modifier onlyProtocolFeeCollector() {
         if (_msgSender() != protocolFeeCollector) revert NotProtocolFeeCollector();
         _;
@@ -83,6 +87,11 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
 
     modifier onlyProposedProtocolFeeCollector() {
         if (_msgSender() != proposedProtocolFeeCollector) revert NotProposedProtocolFeeCollector();
+        _;
+    }
+
+    modifier onlyOpen() {
+        if (closed) revert PoolClosed();
         _;
     }
 

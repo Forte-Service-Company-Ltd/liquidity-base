@@ -52,3 +52,4 @@ An online Keccak-256 hash digester can be found at https://emn178.github.io/onli
 | 0xac9c209c | VOutOfBounds()                                         |
 | 0xcc9d2d63 | VTooLow()                                              |
 | 0x2d281418 | VTooHigh()                                             |
+| 0xd9fd1a29 | PoolClosed()                                           |
