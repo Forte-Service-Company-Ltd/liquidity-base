@@ -95,12 +95,12 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
     /**
      * @dev inactive liquidity share
      */
-    packedFloat _wInactive;
+    packedFloat public _wInactive;
 
     /**
      * @dev total liquidity share
      */
-    packedFloat _w;
+    packedFloat public _w;
 
     modifier onlyProtocolFeeCollector() {
         if (_msgSender() != protocolFeeCollector) revert NotProtocolFeeCollector();
@@ -171,8 +171,10 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
         x = sellingX ? x.sub(int(_amountIn).toPackedFloat(-18)) : x.add(int(amountOut).toPackedFloat(-18));
         // slither-disable-end reentrancy-benign
         // slither-disable-start reentrancy-events // the recipient of the initial transfer is this contract
-        _updateParameters(xOld);
-        _collectedLPFees = _collectedLPFees.add(int(lpFeeAmount).toPackedFloat(int(yDecimalDiff) - int(POOL_NATIVE_DECIMALS)).div(_w));
+        _updateParameters(x);
+        _collectedLPFees = _collectedLPFees.add(
+            int(lpFeeAmount).toPackedFloat(int(yDecimalDiff) - int(POOL_NATIVE_DECIMALS)).div(_w.sub(_wInactive))
+        );
         collectedProtocolFees += protocolFeeAmount;
         //emit FeesGenerated(lpFeeAmount, protocolFeeAmount, uint((h.mul(_w)).sub(oldh).convertpackedFloatToWAD()));
         emit Swap(_tokenIn, _amountIn, amountOut, _minOut);
@@ -213,7 +215,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, Cum
             console2.log("amount in before normalization, before fees", _amountIn);
             _amountIn -= (lpFeeAmount + protocolFeeAmount); // fees are always coming out from the pool
             console2.log("amount in before normalization, after fees", _amountIn);
-            _amountIn = _normalizeTokenDecimals(true, _amountIn - 1);
+            _amountIn = _normalizeTokenDecimals(true, _amountIn);
         }
         rawAmountOut = sellingX
             ? _calculateAmountOfYReceivedSellingX(int(_amountIn).toPackedFloat(-18))
