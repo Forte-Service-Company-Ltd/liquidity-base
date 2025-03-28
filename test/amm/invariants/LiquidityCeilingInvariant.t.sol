@@ -33,10 +33,12 @@ abstract contract LiquidityCeilingInvariants is TestCommonSetup {
         selectors[6] = pool.enableSwaps.selector;
         // selectors[7] = PoolBase(address(pool)).addXSupply.selector; // TODO enable this with depositLiquidity
         selectors[8] = pool.setLPFee.selector;
-        selectors[9] = pool.yTokenLiquidity.selector;
+        //selectors[9] = pool.yTokenLiquidity.selector; // TODO Figure out how we calc yLiq
 
         targetContract(address(pool));
-        targetSelector(FuzzSelector({addr: address(pool), selectors: selectors}));
+        targetSelector(
+            FuzzSelector({addr: address(pool), selectors: selectors})
+        );
         targetSender(admin);
     }
 

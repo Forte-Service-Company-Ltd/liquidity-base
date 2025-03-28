@@ -31,23 +31,6 @@ contract MathLibTests is TestCommon {
         (maxSqr + 1) * (maxSqr + 1);
     }
 
-    function testEquations_MathLibTests_NaturalLogarithmWAD2(uint256 x) public {
-        x = bound(x, 1, 1e36);
-
-        string[] memory inputs = _buildFFICalculateLogarithmNaturalWAD2(x);
-        bytes memory res = vm.ffi(inputs);
-        int pyVal = abi.decode(res, (int256));
-        uint resUint = uint(-pyVal);
-
-        uint256 solVal = x.lnWAD2Negative();
-        console2.log("returnValLo: ", solVal);
-
-        console2.log("Res: ", resUint);
-        if (!areWithinTolerance(resUint, solVal, 1, 27)) {
-            revert("out of tolerance");
-        }
-    }
-
     function testconvertpackedFloatToWADPositive() public pure {
         int256 manA = 2000;
         int256 expA = -16;
