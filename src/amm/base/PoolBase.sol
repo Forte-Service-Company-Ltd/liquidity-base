@@ -20,7 +20,7 @@ import {Descriptor} from "../../common/NFTSVG.sol";
  * Any pool implementation must inherits this contract and implement all the functions from CalculatorBase.
  * @author  @oscarsernarosero @mpetersoCode55 @cirsteve
  */
-abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPToken {
+abstract contract PoolBase is IPool, CalculatorBase, CumulativePrice, Ownable2Step, Pausable, LPToken {
     using SafeERC20 for IERC20;
     using MathLibs for int256;
     using MathLibs for packedFloat;
@@ -140,7 +140,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
         uint256 _amountIn,
         uint256 _minOut
     ) external whenNotPaused returns (uint256 amountOut, uint256 lpFeeAmount, uint256 protocolFeeAmount) {
-        // _updateCumulativePrice(spotPrice(), block.timestamp);
+        _updateCumulativePrice(spotPrice(), block.timestamp);
         packedFloat oldh = _h.mul(_w);
         bool sellingX = _tokenIn == xToken;
         //slither-disable-start reentrancy-benign // the recipient of the transfer is this contract

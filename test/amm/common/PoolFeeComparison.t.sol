@@ -78,7 +78,7 @@ abstract contract PoolFeeComparisonTest is TestCommonSetup {
         }
         vm.startPrank(bob);
         uint yBalanceBefore = _yToken.balanceOf(bob);
-        ( , , , , uint protocolFeesCollected) = pool.getFeeInfo();
+        ( , , , , uint protocolFeesCollected) = poolWFee.getFeeInfo();
         console2.log("protocolFeesCollected", protocolFeesCollected);
         poolWFee.collectProtocolFees();
         assertEq(protocolFeesCollected, (_yToken.balanceOf(bob) - yBalanceBefore));
