@@ -75,11 +75,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
      */
     packedFloat _w;
 
-    /**
-     * @dev if pool is closed
-     */
-    bool public closed;
-
     modifier onlyProtocolFeeCollector() {
         if (_msgSender() != protocolFeeCollector) revert NotProtocolFeeCollector();
         _;
@@ -87,11 +82,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
 
     modifier onlyProposedProtocolFeeCollector() {
         if (_msgSender() != proposedProtocolFeeCollector) revert NotProposedProtocolFeeCollector();
-        _;
-    }
-
-    modifier onlyOpen() {
-        if (closed) revert PoolClosed();
         _;
     }
 
