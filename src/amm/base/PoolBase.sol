@@ -311,7 +311,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
         return _normalizeTokenDecimals(false, uint(_collectedLPFees.convertpackedFloatToWAD()));
     }
 
-    function getFeeInfo() external view returns(uint16, uint16, address, address, uint256){
+    function getFeeInfo() external view returns (uint16, uint16, address, address, uint256) {
         return (lpFee, protocolFee, protocolFeeCollector, proposedProtocolFeeCollector, collectedProtocolFees);
     }
 
