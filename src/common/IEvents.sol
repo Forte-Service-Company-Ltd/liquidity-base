@@ -33,7 +33,7 @@ interface IPoolEvents is CommonEvents {
     event Swap(address indexed _tokenIn, uint256 indexed _amountIn, uint256 indexed _amountOut, uint256 _minOut);
     event RevenueWithdrawn(address indexed _collector, uint256 indexed tokenId, uint256 indexed _amount);
     event LiquidityWithdrawn(address lp, uint indexed tokenId, uint256 indexed amountOutXToken, uint256 indexed amountOutYToken, uint256 revenue);
-    event LPTokenMinted(address indexed lp, uint256 indexed tokenId, packedFloat wj, packedFloat hn);
+    event LPTokenUpdated(uint256 indexed tokenId, packedFloat wj, packedFloat hn);
     event LPTokenBurned(uint256 indexed tokenId, uint256 indexed initialLiquidityWj);
     event FeesGenerated(uint256 indexed lpFee, uint256 indexed protocolFee);
 }
