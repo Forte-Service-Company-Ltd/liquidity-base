@@ -261,7 +261,6 @@ contract PoolDeploymentCommon is CommonDeployment {
         (xToken, yToken) = deployTokens(10e21);
         (AllowList yTokenAllowList, AllowList deployerAllowList) = deployAllowLists();
         factory = _deployFactory();
-        // TODO fix this hack for getting deployer account
         address deployerAddress = vm.envAddress("DEPLOYMENT_OWNER");
         console.log(deployerAddress);
         {
