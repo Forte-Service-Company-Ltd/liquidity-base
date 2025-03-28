@@ -8,6 +8,7 @@ pragma solidity ^0.8.24;
  */
 import {pausedAuthorizationHandler} from "test/authorization/invariants/pausedAuthorizationHandler.sol";
 import {TestCommonSetup} from "test/util/TestCommonSetup.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 abstract contract pausedAuthorizationInvariants is TestCommonSetup {
     uint256 _startingXLiquidity;
     uint256 _startingYLiquidity;
@@ -22,13 +23,14 @@ abstract contract pausedAuthorizationInvariants is TestCommonSetup {
         targetSender(admin);
         vm.startPrank(admin);
         pool.enableSwaps(false);
-        _startingXLiquidity = pool.xTokenLiquidity();
-        _startingYLiquidity = pool.yTokenLiquidity();
+        _startingXLiquidity = IERC20(pool.xToken()).balanceOf(address(pool));
+        _startingYLiquidity = IERC20(pool.yToken()).balanceOf(address(pool));
     }
     function invariant_verifyRevertsWhilePaused_removeLiquidityXToken() public view {
-        assertEq(pool.xTokenLiquidity(), _startingXLiquidity);
+        // First argument is XToken Liquidity
+        assertEq(IERC20(pool.xToken()).balanceOf(address(pool)), _startingXLiquidity);
     }
     function invariant_verifyRevertsWhilePaused_removeLiquidityYToken() public view {
-        assertEq(pool.yTokenLiquidity(), _startingYLiquidity);
+        assertEq(IERC20(pool.yToken()).balanceOf(address(pool)), _startingYLiquidity);
     }
 }

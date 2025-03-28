@@ -20,9 +20,8 @@ abstract contract CalculatorBase is Constants {
 
     /**
      * @dev This function updates the state of the math values of the pool.
-     * @param x_old the previous tracker for x
      */
-    function _updateParameters(packedFloat x_old) public virtual;
+    function _updateParameters() internal virtual;
 
     /**
      * @dev This function calculates the amount of token X required for the user to purchase a specific amount of Token Y (buy y with x : out perspective).
@@ -58,15 +57,4 @@ abstract contract CalculatorBase is Constants {
     function _calculateAmountOfXReceivedSellingY(
         packedFloat _amountOfY
     ) internal view virtual returns (packedFloat amountOfX);
-
-    /**
-     * @dev This function cleans the state of the calculator in the case of the pool closing.
-     */
-    function _clearState() internal virtual;
-
-    /**
-     * @dev This function validates the liquidity addition to ensure it does not exceed the max supply of xToken.
-     * @param afterBalance the balance of xToken after the addition
-     */
-    function _validateLiquidityAdd(packedFloat afterBalance) internal view virtual;
 }

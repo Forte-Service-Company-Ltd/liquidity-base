@@ -24,7 +24,13 @@ interface IPool is IPoolEvents {
         address _tokenIn,
         uint256 _amountIn,
         uint256 _minOut
-    ) external returns (uint256 amountOut, uint256 lpFeeAmount, uint256 protocolFeeAmount);
+    )
+        external
+        returns (
+            uint256 amountOut,
+            uint256 lpFeeAmount,
+            uint256 protocolFeeAmount
+        );
 
     /**
      * @dev This is the function to retrieve the current spot price of the x token.
@@ -43,7 +49,13 @@ interface IPool is IPoolEvents {
     function simSwap(
         address _tokenIn,
         uint256 _amountIn
-    ) external returns (uint256 amountOut, uint256 lpFeeAmount, uint256 protocolFeeAmount);
+    )
+        external
+        returns (
+            uint256 amountOut,
+            uint256 lpFeeAmount,
+            uint256 protocolFeeAmount
+        );
 
     /**
      * @dev This is a simulation of the swap function from the perspective of purchasing a specific amount. Useful to get marginal price.
@@ -58,21 +70,27 @@ interface IPool is IPoolEvents {
     function simSwapReversed(
         address _tokenout,
         uint256 _amountOut
-    ) external returns (uint256 amountIn, uint256 lpFeeAmount, uint256 protocolFeeAmount);
+    )
+        external
+        returns (
+            uint256 amountIn,
+            uint256 lpFeeAmount,
+            uint256 protocolFeeAmount
+        );
 
     /**
      * @dev A function to get the address of the x token of the pool.
      * @return the address of the x token of the pool
      * @notice this value is immutable
      */
-    function xToken() external returns (address);
+    function xToken() external view returns (address);
 
     /**
      * @dev A function to get the address of the Y token of the pool.
      * @return the address of the Y token of the pool
      * @notice this value is immutable
      */
-    function yToken() external returns (address);
+    function yToken() external view returns (address);
 
     /**
      * @dev This is the function to activate/deactivate trading.
@@ -99,7 +117,9 @@ interface IPool is IPoolEvents {
      * @param _protocolFeeCollector the new fee collector
      * @notice that only the current fee collector address can call this function
      */
-    function proposeProtocolFeeCollector(address _protocolFeeCollector) external;
+    function proposeProtocolFeeCollector(
+        address _protocolFeeCollector
+    ) external;
 
     /**
      * @dev function to confirm a new protocol fee collector
@@ -113,7 +133,10 @@ interface IPool is IPoolEvents {
      * @param Q the amount of revenue to withdraw
      * @return revenue the normalized amount of revenue actually withdrawn
      */
-    function withdrawRevenue(uint256 tokenId, uint256 Q) external returns (uint256 revenue);
+    function withdrawRevenue(
+        uint256 tokenId,
+        uint256 Q
+    ) external returns (uint256 revenue);
 
     /**
      * @dev This function collects the protocol fees from the Pool.
@@ -121,60 +144,29 @@ interface IPool is IPoolEvents {
     function collectProtocolFees() external;
 
     /**
-     * @dev This function gets the liquidity in the pool for xToken in WAD.
-     * @return the liquidity in the pool for xToken in WAD
+     * @dev fee percentage for swaps for the LPs and for the protocol
+     * @return lpFee the percentage for swaps in basis points that will go towards the LPs
+     * @return protocolFee the percentage for swaps in basis points that will go towards the protocol
+     * @return protocolFeeCollector address of the account with the privilage of collecting the the protocol fees
+     * @return proposedProtocolFeeCollector the address proposed to be the new protocolFeeCollector
+     * @return collectedProtocolFees the available amount of protocol fees to be collected
      */
-    function xTokenLiquidity() external returns (uint256);
-
-    /**
-     * @dev This function gets the liquidity in the pool for yToken in WAD
-     * @return the liquidity in the pool for yToken in WAD
-     */
-    function yTokenLiquidity() external returns (uint256);
-
-    /**
-     * @dev fee percentage for swaps for the LP
-     * @return the percentage for swaps in basis points that will go towards the LP
-     */
-    function lpFee() external returns (uint16);
-
-    /**
-     * @dev fee percentage for swaps for the protocol
-     * @return the percentage for swaps in basis points that will go towards the protocol
-     */
-    function protocolFee() external returns (uint16);
-
-    /**
-     * @dev protocol-fee collector address
-     * @return the current protocolFeeCollector address
-     */
-    function protocolFeeCollector() external returns (address);
-
-    /**
-     * @dev proposed protocol-fee collector address
-     * @return the current proposedProtocolFeeCollector address
-     */
-    function proposedProtocolFeeCollector() external returns (address);
+    function getFeeInfo()
+        external
+        view
+        returns (
+            uint16 lpFee,
+            uint16 protocolFee,
+            address protocolFeeCollector,
+            address proposedProtocolFeeCollector,
+            uint256 collectedProtocolFees
+        );
 
     /**
      * @dev tells current LP fees accumulated in the pool
      * @return currently claimable LP fee balance
      */
     function collectedLPFees() external returns (uint256);
-
-    /**
-     * @dev tells current protocol fees accumulated in the pool
-     * @return currently claimable protocol fee balance
-     */
-    function collectedProtocolFees() external returns (uint256);
-
-    /**
-     * @dev This function returns the available revenue for the given token
-     * @param lp The address of the liquidity provider
-     * @param tokenId The ID of the LPToken
-     * @return uint256 amount of revenue available for the given token
-     */
-    function revenueAvailable(address lp, uint256 tokenId) external returns (uint256);
 
     /**
      * @dev returns the current total liquidity in the Pool

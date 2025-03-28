@@ -3,8 +3,9 @@ pragma solidity ^0.8.24;
 
 import "solady/utils/FixedPointMathLib.sol";
 import "./lib/MathUtils.sol";
-import {LN} from "./lib/LN.sol";
-import {Float128, packedFloat} from "../../../lib/float128/src/Float128.sol";
+import {Ln} from "../../../lib/float128/src/Ln.sol";
+import {Float128} from "../../../lib/float128/src/Float128.sol";
+import {packedFloat} from  "../../../lib/float128/src/Types.sol";
 
 /**
  * @title Abstraction Layer between Equations and the underlying Math libraries
@@ -16,9 +17,9 @@ library MathLibs {
     using FixedPointMathLib for uint256;
     using FixedPointMathLib for int256;
     using MathUtils for uint256;
-    using LN for uint256;
-    using Float128 for int256;
+    using Ln for packedFloat;
     using Float128 for packedFloat;
+    using Float128 for int;
 
     uint256 constant WAD = FixedPointMathLib.WAD;
 
@@ -29,14 +30,6 @@ library MathLibs {
      */
     function convertToRaw(uint256 value) internal pure returns (uint256 result) {
         result = value.convertToRaw();
-    }
-
-    /**
-     * @param x the number to take the natural log of. Expressed as a WAD ** 2
-     * @return result the ln of x multiplied by -1. Expressed as a WAD ** 2
-     */
-    function lnWAD2Negative(uint256 x) internal pure returns (uint256 result) {
-        result = x.lnWAD2Negative();
     }
 
     /**

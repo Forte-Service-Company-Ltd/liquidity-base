@@ -4,7 +4,7 @@ pragma solidity ^0.8.24;
 import "lib/openzeppelin-contracts/contracts/utils/Strings.sol";
 import "forge-std/console2.sol";
 import "forge-std/Test.sol";
-import {MathLibs, packedFloat, Float128} from "src/amm/mathLibs/MathLibs.sol";
+import {MathLibs, packedFloat} from "src/amm/mathLibs/MathLibs.sol";
 import {diffGreaterThanUint256, bytesLargerThanUint256} from "src/common/IErrors.sol";
 
 /**

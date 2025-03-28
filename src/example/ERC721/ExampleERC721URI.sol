@@ -23,14 +23,6 @@ contract ExampleERC721URI is ERC721 {
     }
 
     function tokenURI(uint256 _tokenId) public view override returns (string memory) {
-        return Descriptor.constructTokenURI(Descriptor.ConstructTokenURIParams({
-            tokenId: _tokenId,
-            xTokenAddress: XTOKEN,
-            yTokenAddress: YTOKEN,
-            xTokenSymbol: IERC20Metadata(XTOKEN).symbol(),
-            yTokenSymbol: IERC20Metadata(YTOKEN).symbol(),
-            fee: FEE,
-            poolManager: POOL_MANAGER
-        }));
+        return Descriptor.constructTokenURI(_tokenId, address(this));
     }
 }
