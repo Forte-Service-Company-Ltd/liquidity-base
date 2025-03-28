@@ -78,7 +78,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         pool.enableSwaps(false);
     }
 
-    function testLiquidity_Pool_checkActiveLiquidityNFTAmount() public {
+    function testLiquidity_Pool_checkActiveLiquidityNFTAmount() public view {
         uint256 ACTIVE_LIQUIDITY_NFT_ID = 2;
         (packedFloat wj, ) = pool.getLPToken(ACTIVE_LIQUIDITY_NFT_ID);
         uint256 w = pool.w();
@@ -201,10 +201,15 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         _xToken.transfer(address(alice), 0);
     }
 
-    function testLiquidity_Pool_withdrawRevenue_Positive() public startAsAdmin endWithStopPrank {
-        // TODO Investigate this test. Silencing the slither warning
-        //uint collectedLPFees = (3 * fullToken) / 1e6 + 1;
-        (uint expected, , ) = pool.simSwap(address(_yToken), (1 * fullToken) / 1e3);
+    function testLiquidity_Pool_withdrawRevenue_Positive()
+        public
+        startAsAdmin
+        endWithStopPrank
+    {
+        (uint expected, , ) = pool.simSwap(
+            address(_yToken),
+            (1 * fullToken) / 1e3
+        );
         pool.swap(address(_yToken), (1 * fullToken) / 1e3, expected, msg.sender);
 
         uint256 originalBalance = IERC20(_yToken).balanceOf(address(admin));
