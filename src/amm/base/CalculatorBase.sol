@@ -57,4 +57,9 @@ abstract contract CalculatorBase is Constants {
     function _calculateAmountOfXReceivedSellingY(
         packedFloat _amountOfY
     ) internal view virtual returns (packedFloat amountOfX);
+
+    /**
+     * @dev this function emits an event with the state of the curve
+     */
+    function _emitCurveState() internal virtual;
 }
