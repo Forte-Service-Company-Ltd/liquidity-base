@@ -127,11 +127,13 @@ interface IPool is IPoolEvents {
      * @dev This function allows the owner of the lp token to pull accrued revenue from the Pool.
      * @param tokenId the id of the LP token to withdraw revenue for
      * @param Q the amount of revenue to withdraw
+     * @param recipient address to send the revenue to
      * @return revenue the normalized amount of revenue actually withdrawn
      */
     function withdrawRevenue(
         uint256 tokenId,
-        uint256 Q
+        uint256 Q,
+        address recipient
     ) external returns (uint256 revenue);
 
     /**

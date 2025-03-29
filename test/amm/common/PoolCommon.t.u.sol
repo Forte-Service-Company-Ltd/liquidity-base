@@ -210,7 +210,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         uint256 originalBalance = IERC20(_yToken).balanceOf(address(admin));
 
         (, packedFloat rj) = pool.getLPToken(2);
-        uint256 amount = pool.withdrawRevenue(2, uint(rj.convertpackedFloatToWAD()));
+        uint256 amount = pool.withdrawRevenue(2, uint(rj.convertpackedFloatToWAD()), address(admin));
         uint256 updatedBalance = IERC20(_yToken).balanceOf(address(admin));
         uint256 expectedBalance = originalBalance + amount;
         assertEq(updatedBalance, expectedBalance);
@@ -219,7 +219,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
     function testLiquidity_Pool_withdrawRevenue_NotAuthorized() public endWithStopPrank {
         vm.startPrank(alice);
         vm.expectRevert(abi.encodeWithSelector(InvalidToken.selector));
-        pool.withdrawRevenue(2, 1);
+        pool.withdrawRevenue(2, 1, address(alice));
     }
 
     function testLiquidity_Pool_buyGameToken_MaxSlippageReached() public startAsAdmin endWithStopPrank {
@@ -609,7 +609,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         vm.stopPrank();
         vm.startPrank(alice);
         vm.expectRevert(abi.encodeWithSignature("InvalidToken()"));
-        pool.withdrawRevenue(2, 0);
+        pool.withdrawRevenue(2, 0, address(alice));
     }
 
     function testLiquidity_Pool_WithdrawRevenueAccrued_Positive() public startAsAdmin endWithStopPrank {
