@@ -144,7 +144,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
         _collectedLPFees = _collectedLPFees.add(int(lpFeeAmount).toPackedFloat(int(yDecimalDiff) - int(POOL_NATIVE_DECIMALS)).div(_w));
         collectedProtocolFees += protocolFeeAmount;
         emit FeesGenerated(lpFeeAmount, protocolFeeAmount);
-        emit Swap(_tokenIn, _amountIn, amountOut, _minOut);
+        emit Swap(_tokenIn, _amountIn, amountOut, _minOut, _recipient);
         _emitCurveState();
         // slither-disable-end reentrancy-events
         IERC20(sellingX ? yToken : xToken).safeTransfer(_recipient == address(0) ? _msgSender() : _recipient, amountOut);

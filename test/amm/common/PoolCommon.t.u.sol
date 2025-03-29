@@ -251,7 +251,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
                 expectedProtocolFee;
                 transferFee = 300;
                 vm.expectEmit(true, true, true, true, address(pool));
-                emit IPoolEvents.Swap(address(_yToken), amountIn, expected, getAmountSubFee(expected));
+                emit IPoolEvents.Swap(address(_yToken), amountIn, expected, getAmountSubFee(expected), msg.sender);
                 try pool.swap(address(_yToken), amountIn, getAmountSubFee(expected), msg.sender) returns (
                     uint actual,
                     uint actualFeeAmount,
@@ -290,7 +290,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
                 pFee;
                 transferFee = 300;
                 vm.expectEmit(true, true, true, true, address(pool));
-                emit IPoolEvents.Swap(address(_yToken), amountIn, expected, getAmountSubFee(expected));
+                emit IPoolEvents.Swap(address(_yToken), amountIn, expected, getAmountSubFee(expected), msg.sender);
                 (uint actual, uint actualFeeAmount, ) = pool.swap(address(_yToken), amountIn, getAmountSubFee(expected), msg.sender);
                 counter++;
                 assertEq(actual, expected);
