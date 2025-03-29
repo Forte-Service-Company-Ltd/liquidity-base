@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
-import "solady/utils/FixedPointMathLib.sol";
 import "./lib/MathUtils.sol";
 import {Ln} from "../../../lib/float128/src/Ln.sol";
 import {Float128} from "../../../lib/float128/src/Float128.sol";
@@ -11,26 +10,15 @@ import {packedFloat} from "../../../lib/float128/src/Types.sol";
  * @title Abstraction Layer between Equations and the underlying Math libraries
  * @author  @oscarsernarosero @mpetersoCode55 @cirsteve
  * @dev Wrapper functions to act as an abstraction layer between Equations and the Math library we're using.
- * @notice current implementation is using the FixedPointMathLib library from Solady and the Solidity_Uint512 library
+ * @notice current implementation is using the float128 library for floating-point math operations.
  */
 library MathLibs {
-    using FixedPointMathLib for uint256;
-    using FixedPointMathLib for int256;
     using MathUtils for uint256;
     using Ln for packedFloat;
     using Float128 for packedFloat;
     using Float128 for int;
 
-    uint256 constant WAD = FixedPointMathLib.WAD;
-
-    /**
-     * @dev Converts a WAD number to a raw number
-     * @param value The number to be converted
-     * @return result resulting raw number
-     */
-    function convertToRaw(uint256 value) internal pure returns (uint256 result) {
-        result = value.convertToRaw();
-    }
+    uint256 constant WAD = 1e18;
 
     /**
      * @dev adds 2 signed floating point numbers
