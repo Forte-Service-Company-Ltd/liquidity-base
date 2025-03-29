@@ -55,49 +55,35 @@ contract LPToken is ERC721, ERC721Enumerable {
     function _mintTokenAndUpdate(address lp, packedFloat wj, packedFloat hn) internal {
         currentTokenId++;
         _mint(lp, currentTokenId);
-        _updateLPTokenVarsDeposit( currentTokenId, wj, hn);
-        emit IPoolEvents.LPTokenMinted(lp, currentTokenId, wj, hn);
+        _updateLPToken( currentTokenId, wj, hn);
     }
 
     /**
      * @dev Updates the values wj and rj of tokenId
      * @notice The internal version of the updateLPToken method. Used in the constructor, in order to circumvent ownership transfers.
      * @param tokenId The token id of the lpToken being updated
-     * @param wj The amount of liquidity associated with the lpToken being updated
-     * @param rj The amount of revenue associated with the lpToken being updated
+     * @param _wj The amount of liquidity associated with the lpToken being updated
+     * @param _rj The amount of revenue associated with the lpToken being updated
      */
-    function _updateLPTokenVarsDeposit(uint256 tokenId, packedFloat wj, packedFloat rj) internal {
-        lpToken[tokenId].rj = rj;
-        lpToken[tokenId].wj =  lpToken[tokenId].wj.add(wj);
-    }
-
-    /**
-     * @dev Updates the values wj and rj of tokenId
-     * @param tokenId The token id of the lpToken being updated
-     * @param addedRj The amount of revenue claimed to add to the lpToken being updated
-     */
-    function _updateLPTokenLastRevenueClaim(uint256 tokenId, packedFloat addedRj) internal {
-        lpToken[tokenId].rj = lpToken[tokenId].rj.add(addedRj);
+    function _updateLPToken(uint256 tokenId, packedFloat _wj, packedFloat _rj) internal {
+        lpToken[tokenId].rj = _rj;
+        lpToken[tokenId].wj = _wj;
+        emit IPoolEvents.LPTokenUpdated(tokenId, _wj, _rj);
     }
 
     /**
      * @dev Updates the amount of liquidity associated with an LP Token. Used when withdrawing a full or partial liquidity position.
      * @notice If an LP is withdrawing their entire position, the LP Token associated will be burned.
      * @param _tokenId The token id of the lpToken being updated
-     * @param _uj The amount of liquidity the LP would like to withdraw
+     * @param _wj The amount of liquidity the LP would like to withdraw
+     * @param _rj The new value of _rj
      */
-    function _updateLPTokenVarsWithdrawal(uint256 _tokenId, packedFloat _uj) internal returns (packedFloat) {
-        packedFloat wj = lpToken[_tokenId].wj;
-        if (wj.lt(_uj)) revert LPTokenWithdrawalAmountExceedsAllowance();
-
-        if (wj.gt(_uj)) {
-            lpToken[_tokenId].wj =  lpToken[_tokenId].wj.sub(_uj);
-        } else {
+    function _updateLPTokenVarsWithdrawal(uint256 _tokenId, packedFloat _wj,  packedFloat _rj) internal returns (packedFloat) {
+        if(_wj.eq(packedFloat.wrap(0))) {
             _burn(_tokenId);
-            lpToken[_tokenId].wj = packedFloat.wrap(0);
-            emit IPoolEvents.LPTokenBurned(_tokenId, uint(_uj.convertpackedFloatToWAD()));
-        }
-        return lpToken[_tokenId].rj;
+            delete lpToken[_tokenId];
+        }else _updateLPToken(_tokenId, _wj, _rj);
+        
     }
 
     /**
