@@ -96,7 +96,7 @@ abstract contract PoolFeeComparisonTest is TestCommonSetup {
 
         vm.expectEmit(false, false, false, false, address(pool)); // Fees generated might be off by 1 unit
         emit IPoolEvents.FeesGenerated(lpFeeAmount, protocolFeeAmount);
-        (, uint realLPFees, uint realProtocolFees) = pool.swap(address(_yToken), expectedIn, expectedAmount, msg.sender);
+        (, uint realLPFees, uint realProtocolFees) = pool.swap(address(_yToken), expectedIn, expectedAmount, bob);
 
         assertLe(realLPFees, lpFees + 1); // we add 1 to account for rounding issues
         assertGe(realLPFees, lpFees - 1); // we add 1 to account for rounding issues
@@ -108,7 +108,7 @@ abstract contract PoolFeeComparisonTest is TestCommonSetup {
         console2.log("protocolFeesCollected", protocolFeesCollected);
         vm.expectEmit(true, true, false, false, address(pool)); // Fees generated might be off by 1 unit
         emit IPoolEvents.FeesCollected(CommonEvents.FeeCollectionType.PROTOCOL, bob, protocolFeesCollected);
-        pool.collectProtocolFees();
+        pool.collectProtocolFees(bob);
         assertEq(protocolFeesCollected, (_yToken.balanceOf(bob) - yBalanceBefore));
     }
 
