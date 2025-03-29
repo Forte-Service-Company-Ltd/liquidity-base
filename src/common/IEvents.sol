@@ -30,9 +30,9 @@ interface CommonEvents {
  */
 interface IPoolEvents is CommonEvents {
     event FeesCollected(FeeCollectionType indexed _feeType, address indexed _collector, uint256 indexed _amount);
-    event Swap(address indexed _tokenIn, uint256 indexed _amountIn, uint256 indexed _amountOut, uint256 _minOut);
-    event RevenueWithdrawn(address indexed _collector, uint256 indexed tokenId, uint256 indexed _amount);
-    event LiquidityWithdrawn(address lp, uint indexed tokenId, uint256 indexed amountOutXToken, uint256 indexed amountOutYToken, uint256 revenue);
+    event Swap(address indexed _tokenIn, uint256 indexed _amountIn, uint256 indexed _amountOut, uint256 _minOut, address _recipient);
+    event RevenueWithdrawn(address indexed _collector, uint256 indexed tokenId, uint256 indexed _amount, address _recipient);
+    event LiquidityWithdrawn(address lp, uint indexed tokenId, uint256 indexed amountOutXToken, uint256 indexed amountOutYToken, uint256 revenue, address _recipient);
     event LPTokenUpdated(uint256 indexed tokenId, packedFloat wj, packedFloat hn);
     event FeesGenerated(uint256 indexed lpFee, uint256 indexed protocolFee);
 }
