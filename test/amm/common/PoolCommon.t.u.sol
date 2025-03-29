@@ -354,7 +354,8 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         (, uint fees, ) = pool.swap(
             _xToken,
             expectedIn,
-            getAmountSubFee(amount)
+            getAmountSubFee(amount),
+            msg.sender
         );
         assertLe(fees, estimatedFees);
         assertGe(fees, estimatedFees);
