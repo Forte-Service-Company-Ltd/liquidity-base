@@ -31,6 +31,16 @@ contract MathLibTests is TestCommon {
         (maxSqr + 1) * (maxSqr + 1);
     }
 
+        function testconvertpackedFloatToSpecificDecimals() public pure {
+        int256 manA = 2000;
+        int256 expA = -16;
+        packedFloat floA = manA.toPackedFloat(expA);
+
+        int256 result = MathLibs.convertpackedFloatToSpecificDecimals(floA, 22);
+        console2.log(result);
+        assertEq(2000000000, result);
+    }
+
     function testconvertpackedFloatToWADPositive() public pure {
         int256 manA = 2000;
         int256 expA = -16;

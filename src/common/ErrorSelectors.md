@@ -23,7 +23,7 @@ An online Keccak-256 hash digester can be found at https://emn178.github.io/onli
 | 0x1de42a90 | DivideByZero()                                         |
 | 0x13d54d96 | YTokenNotAllowed()                                     |
 | 0xfeaf73c7 | BeyondLiquidity()                                      |
-| 0x07149010 | LPFeeAboveMax(uint16 proposedFee, uint16 maxFee)       |
+| 0x07149010 | LPFeeAboveMax(uint16,uint16)                           |
 | 0xbc19b2bf | MaxTotalSupplyTooLarge()                               |
 | 0xd0b73f52 | NotAnAllowedDeployer()                                 |
 | 0x22ef9850 | PriceRangeNotWideEnough()                              |
@@ -39,11 +39,11 @@ An online Keccak-256 hash digester can be found at https://emn178.github.io/onli
 | 0x4bc1f6e0 | CTooLarge()                                            |
 | 0xedd7abac | LiquidityRemovalForbidden()                            |
 | 0xc1ab6dc1 | InvalidToken()                                         |
-| 0xcd6c7802 | XOutOfBounds(uint256 howMuch)                          |
+| 0xcd6c7802 | XOutOfBounds(uint256)                                  |
 | 0x32a1d94e | YTokenDecimalsGT18()                                   |
 | 0x15affb65 | XTokenDecimalsIsNot18()                                |
 | 0x88356ef9 | XandYTokensAreTheSame()                                |
-| 0x4bc811d1 | ProtocolFeeAboveMax(uint16 proposedFee, uint16 maxFee) |
+| 0x4bc811d1 | ProtocolFeeAboveMax(uint16,uint16)                     |
 | 0x97992322 | NotProtocolFeeCollector()                              |
 | 0xa8ed10f5 | NotProposedProtocolFeeCollector()                      |
 | 0x6d52fdaf | NoProtocolFeeCollector()                               |
@@ -52,3 +52,18 @@ An online Keccak-256 hash digester can be found at https://emn178.github.io/onli
 | 0xac9c209c | VOutOfBounds()                                         |
 | 0xcc9d2d63 | VTooLow()                                              |
 | 0x2d281418 | VTooHigh()                                             |
+| 0x34477cc0 | NotEnoughCollateral()                                  |
+| 0x7445fc7e | CannotDepositInactiveLiquidity()                       |
+| 0xc8943938 | AllLiquidityCannotBeInactive()                         |
+| 0xbd79fed7 | NoInitialLiquidity()                                   |
+| 0x34173478 | CCannotBeZero()                                        |
+| 0xc999f51d | VCannotBeZero()                                        |
+| 0x1ba7a2f9 | xMinCannotBeZero()                                     |
+| 0x951df443 | MaxSlippageReached()                                   |
+| 0x2a9fb832 | LPTokenWithdrawalAmountExceedsAllowance()              |
+| 0xa95445d0 | QTooHigh()                                             |
+| 0xa14c4b50 | URIQueryForNonexistentToken()                          |
+
+
+
+

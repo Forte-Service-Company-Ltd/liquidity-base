@@ -14,8 +14,7 @@ interface IPool is IPoolEvents {
      * @dev This is the main function of the pool to swap.
      * @param _tokenIn the address of the token being given to the pool in exchange for another token
      * @param _amountIn the amount of the ERC20 _tokenIn to exchange into the Pool
-     * @param _minOut the amount of the other token in the pair minimum to be received for the
-     * _amountIn of _tokenIn.
+     * @param _minOut the amount of the other token in the pair minimum to be received for the_amountIn of _tokenIn.
      * @param _recipient address to receive tokens out 
      * @return amountOut the actual amount of the token coming out of the Pool as result of the swap
      * @return lpFeeAmount the amount of the Y token that's being dedicated to fees for the LP
@@ -128,11 +127,13 @@ interface IPool is IPoolEvents {
      * @dev This function allows the owner of the lp token to pull accrued revenue from the Pool.
      * @param tokenId the id of the LP token to withdraw revenue for
      * @param Q the amount of revenue to withdraw
+     * @param recipient address to send the revenue to
      * @return revenue the normalized amount of revenue actually withdrawn
      */
     function withdrawRevenue(
         uint256 tokenId,
-        uint256 Q
+        uint256 Q,
+        address recipient
     ) external returns (uint256 revenue);
 
     /**

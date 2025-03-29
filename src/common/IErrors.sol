@@ -7,18 +7,12 @@ pragma solidity ^0.8.24;
  */
 
 /**** CofNErrors ****/
-error ResultBelowPMin();
-error XnCannotBeZero();
-error BnCannotBeZero();
 error NegativeValue();
 error DnTooLarge();
 
 /**** PythonUtilErrors ****/
 error bytesLargerThanUint256();
 error diffGreaterThanUint256();
-
-/**** EquationErrors****/
-error DivideByZero();
 
 /**** PoolErrors ****/
 error YTokenNotAllowed();
@@ -27,14 +21,7 @@ error BeyondLiquidity();
 error LPFeeAboveMax(uint16 proposedFee, uint16 maxFee);
 error YTokenDecimalsGT18();
 error XTokenDecimalsIsNot18();
-error MaxTotalSupplyTooLarge();
-error MaxTotalSupplyCannotBeZero();
-error PriceRangeNotWideEnough();
-error PriceRangeTooLarge();
-error lowerPriceTooLow();
 error ZeroValueNotAllowed();
-error TransferFailed();
-error LiquidityRemovalForbidden();
 error InvalidToken();
 error XOutOfBounds(uint256 howMuch);
 error NotEnoughCollateral();
@@ -51,8 +38,6 @@ error xMinCannotBeZero();
 error MaxSlippageReached();
 error LPTokenWithdrawalAmountExceedsAllowance();
 error QTooHigh();
-/**** URQTBCErrors ****/
-error VOutOfBounds();
 
 /**** PoolFactoryErrors ****/
 error NotAnAllowedDeployer();
