@@ -68,7 +68,7 @@ contract LPToken is ERC721, ERC721Enumerable {
     function _updateLPToken(uint256 tokenId, packedFloat _wj, packedFloat _rj) internal {
         lpToken[tokenId].rj = _rj;
         lpToken[tokenId].wj = _wj;
-        emit IPoolEvents.LPTokenUpdated(currentTokenId, _wj, _rj);
+        emit IPoolEvents.LPTokenUpdated(tokenId, _wj, _rj);
     }
 
     /**
