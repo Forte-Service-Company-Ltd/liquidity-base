@@ -289,7 +289,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
             address(_yToken),
             (1 * fullToken) / 1e3
         );
-        pool.swap(address(_yToken), (1 * fullToken) / 1e3, expected);
+        pool.swap(address(_yToken), (1 * fullToken) / 1e3, expected, msg.sender);
 
         uint256 originalBalance = IERC20(_yToken).balanceOf(address(admin));
 
@@ -330,7 +330,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         // we adjust expected to be higher than the actual amount expected inflated beyond slippage to force the reversion
         expected = (expected * pctDenom) / (pctDenom - uint(maxSlippage + 2)); // looks like + 1 didn't do the trick
         vm.expectRevert(abi.encodeWithSelector(MaxSlippageReached.selector));
-        pool.swap(address(_yToken), amountIn, expected);
+        pool.swap(address(_yToken), amountIn, expected, msg.sender);
     }
 
     function testLiquidity_Pool_buyGameToken_Positive()
@@ -372,9 +372,11 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
                     pool.swap(
                         address(_yToken),
                         amountIn,
-                        getAmountSubFee(expected)
+                        getAmountSubFee(expected),
+                        msg.sender
                     )
                 returns (uint actual, uint actualFeeAmount, uint) {
+
                     counter++;
                     assertEq(actual, expected);
                     assertEq(expectedFeeAmount, actualFeeAmount);
@@ -427,7 +429,8 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
                 (uint actual, uint actualFeeAmount, ) = pool.swap(
                     address(_yToken),
                     amountIn,
-                    getAmountSubFee(expected)
+                    getAmountSubFee(expected),
+                    msg.sender
                 );
                 counter++;
                 assertEq(actual, expected);
@@ -458,7 +461,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         (uint expected, , ) = pool.simSwapReversed(_xToken, targetAmount);
         transferFee = 30;
         uint minOut = getAmountSubFee(targetAmount);
-        (uint actual, , ) = pool.swap(_yTokenAddress, expected, minOut);
+        (uint actual, , ) = pool.swap(_yTokenAddress, expected, minOut, msg.sender);
         assertEq(
             packedFloat.unwrap(pool.x()),
             packedFloat.unwrap(int(actual + xMin).toPackedFloat(-18))
@@ -483,7 +486,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         );
         vm.expectEmit(true, true, false, false, address(pool));
         emit IPoolEvents.FeesGenerated(estimatedFees, protocolFeeAmount);
-        (, uint fees, ) = pool.swap(address(_yToken), expectedIn, expectedOut);
+        (, uint fees, ) = pool.swap(address(_yToken), expectedIn, expectedOut, msg.sender);
         assertLe(fees, estimatedFees + 1); // we add 1 to account for rounding issues
         assertGe(fees, estimatedFees - 1); // we subtract 1 to account for rounding issues
     }
@@ -496,7 +499,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         address _xToken = pool.xToken();
         // Set initial X value to something above 0 before starting to swap for X
         (uint expected, , ) = pool.simSwap(address(_yToken), initialAmount);
-        pool.swap(address(_yToken), initialAmount, expected);
+        pool.swap(address(_yToken), initialAmount, expected, msg.sender);
         /// now we test
         (uint expectedIn, uint estimatedFees, ) = pool.simSwapReversed(
             address(_yToken),
@@ -520,7 +523,8 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         (, uint fees, ) = pool.swap(
             _xToken,
             expectedIn,
-            getAmountSubFee(amount) - 1
+            getAmountSubFee(amount) - 1,
+            msg.sender
         ); // TODO look into the - 1 with fees
         assertLe(fees, estimatedFees + 1); // we add 1 to account for rounding issues
         assertGe(fees, estimatedFees - 1); // we subtract 1 to account for rounding issues
@@ -537,7 +541,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         // Set initial X value to something above 0 before starting to swap for X
         (uint expected, , ) = pool.simSwap(address(_yToken), initialAmount);
 
-        pool.swap(address(_yToken), initialAmount, getAmountSubFee(expected));
+        pool.swap(address(_yToken), initialAmount, getAmountSubFee(expected), bob);
         /// now we test
         (uint expectedIn, uint lpFees, uint protocolFees) = pool
             .simSwapReversed(address(_yToken), amount);
@@ -548,7 +552,8 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         (, uint realLPFees, uint realProtocolFees) = pool.swap(
             _xToken,
             expectedIn,
-            getAmountSubFee(amount - 1)
+            getAmountSubFee(amount - 1),
+            bob
         );
         if (transferFee == 0) {
             assertLe(realLPFees, lpFees + 1); // we add 1 to account for rounding issues
@@ -559,7 +564,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         vm.startPrank(bob);
         uint yBalanceBefore = _yToken.balanceOf(bob);
         (, , , , uint protocolFeesCollected) = pool.getFeeInfo();
-        pool.collectProtocolFees();
+        pool.collectProtocolFees(bob);
         assertEq(
             protocolFeesCollected,
             (_yToken.balanceOf(bob) - yBalanceBefore)
@@ -586,7 +591,8 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         (, uint realLPFees, uint realProtocolFees) = pool.swap(
             address(_yToken),
             expectedIn,
-            expectedOut
+            expectedOut,
+            msg.sender
         );
         assertEq(realLPFees, lpFees);
         assertEq(realProtocolFees, protocolFees);
@@ -610,7 +616,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         uint256 maxIterations = 7000;
         for (uint i; i < maxIterations; i++) {
             (uint out, , ) = pool.simSwap(address(_yToken), amountIn);
-            pool.swap(address(_yToken), amountIn, out);
+            pool.swap(address(_yToken), amountIn, out, admin);
         }
         /// the sells the whole balance of x tokens at once
         uint adminXBalance = IERC20(pool.xToken()).balanceOf(address(admin)) -
@@ -636,7 +642,8 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         pool.swap(
             address(pool.xToken()),
             adminXBalance,
-            getAmountSubFee(expected)
+            getAmountSubFee(expected),
+            msg.sender
         );
     }
 
@@ -660,7 +667,8 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         (uint actual, , ) = pool.swap(
             address(_yToken),
             amountYIn,
-            getAmountSubFee(expected)
+            getAmountSubFee(expected),
+            admin
         );
         /// then sells it back in <maxIterations> trades of the same amount of y tokens
         uint256 xBalance = IERC20(pool.xToken()).balanceOf(admin);
@@ -677,7 +685,8 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
             pool.swap(
                 address(pool.xToken()),
                 adjustedAmountIn,
-                getAmountSubFee(expected)
+                getAmountSubFee(expected),
+                admin
             );
         }
         if (lastAmountIn > 0) {
@@ -692,7 +701,8 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
                 pool.swap(
                     address(pool.xToken()),
                     lastAmountIn,
-                    getAmountSubFee(expected)
+                    getAmountSubFee(expected),
+                    msg.sender
                 );
         }
         uint yBalance = IERC20(pool.yToken()).balanceOf(address(pool));
@@ -712,6 +722,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
             // 10 swaps in each direction back and forth
             for (uint j = 0; j < 10; j++) {
                 uint256 previous = 0;
+
                 (uint expected, uint expectedFeeAmount, ) = pool.simSwap(
                     address(_yToken),
                     (1 * fullToken)
@@ -719,7 +730,8 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
                 (uint actual, uint actualFeeAmount, ) = pool.swap(
                     address(_yToken),
                     (1 * fullToken),
-                    expected
+                    expected,
+                    msg.sender
                 );
                 if (previous > 0) {
                     assertLe(actual, previous);
@@ -745,7 +757,8 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
                 (uint actual, uint actualFeeAmount, ) = pool.swap(
                     address(pool.xToken()),
                     amountIn,
-                    getAmountSubFee(expected)
+                    getAmountSubFee(expected),
+                    msg.sender
                 );
                 if (previous > 0) {
                     assertLe(actual, previous);
@@ -774,7 +787,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
             address(_yToken),
             1_000 * fullToken
         );
-        pool.swap(address(_yToken), 1_000 * fullToken, expected);
+        pool.swap(address(_yToken), 1_000 * fullToken, expected, msg.sender);
         uint256 previous = 0;
 
         for (uint i = 0; i < 100; i++) {
@@ -789,7 +802,8 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
             (uint actual, uint actualFeeAmount, ) = pool.swap(
                 address(pool.xToken()),
                 amountIn,
-                getAmountSubFee(expected)
+                getAmountSubFee(expected),
+                msg.sender
             );
             if (previous > 0) {
                 assertLe(actual, previous);
@@ -816,7 +830,8 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
             (uint256 actual, , ) = pool.swap(
                 address(_yToken),
                 needed,
-                getAmountSubFee(expected)
+                getAmountSubFee(expected),
+                msg.sender
             );
             uint256 difference;
             difference = expected > actual
@@ -835,7 +850,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         uint initialAmount = 1_000 * fullToken;
         // Set initial X value to something above 0 before starting to swap for X
         (uint expected, , ) = pool.simSwap(address(_yToken), initialAmount);
-        pool.swap(address(_yToken), initialAmount, expected);
+        pool.swap(address(_yToken), initialAmount, expected, msg.sender);
         for (uint i = 0; i < 100; i++) {
             uint amountOut = (1 * fullToken);
             (uint expectedIn, , ) = pool.simSwapReversed(
@@ -848,7 +863,8 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
             (uint256 actual, , ) = pool.swap(
                 address(pool.xToken()),
                 expectedIn,
-                amountOut - 300
+                amountOut - 300,
+                msg.sender
             );
             uint256 difference = amountOut > actual
                 ? amountOut - actual
@@ -861,7 +877,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         (uint expected, , ) = pool.simSwap(address(_yToken), 1 * fullToken);
         _deenableSwaps();
         vm.expectRevert(abi.encodeWithSignature("EnforcedPause()"));
-        pool.swap(address(_yToken), 1 * fullToken, expected);
+        pool.swap(address(_yToken), 1 * fullToken, expected, msg.sender);
     }
 
     function testLiquidity_recordCurveStateForSmallYTokenSales() public {
@@ -872,13 +888,13 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         uint initial_x = ((1 * fullToken));
         _yToken.approve(address(pool), initial_x);
         (uint256 toutOp, , ) = pool.simSwap(address(_yToken), initial_x);
-        pool.swap(address(_yToken), initial_x, toutOp);
+        pool.swap(address(_yToken), initial_x, toutOp, msg.sender);
 
         uint256 priceBefore = pool.spotPrice();
         for (uint i; i < 1000; i++) {
             _yToken.approve(address(pool), amount);
             (toutOp, , ) = pool.simSwap(address(_yToken), amount);
-            pool.swap(address(_yToken), amount, toutOp);
+            pool.swap(address(_yToken), amount, toutOp, msg.sender);
             uint256 priceAfter = pool.spotPrice();
             // assert(priceAfter >= priceBefore); /// PRICE VALLEY FOR URQTBC WETH
             priceBefore = priceAfter;
@@ -924,6 +940,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
             // 10 swaps in each direction back and forth
             _approvePool(pool, false);
             vm.startPrank(admin);
+
             (uint expected, uint expectedFeeAmount, ) = pool.simSwap(
                 address(_yToken),
                 amountIn
@@ -931,14 +948,16 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
             (uint actual, uint actualFeeAmount, ) = pool.swap(
                 address(_yToken),
                 amountIn,
-                getAmountSubFee(expected)
+                getAmountSubFee(expected),
+                msg.sender
             );
             (uint256 expectedBack, uint256 expectedFeeAmountBack, ) = pool
                 .simSwap(address(pool.xToken()), actual);
             (uint actualBack, uint actualFeeAmountBack, ) = pool.swap(
                 address(pool.xToken()),
                 actual,
-                getAmountSubFee(expectedBack)
+                getAmountSubFee(expectedBack),
+                msg.sender
             );
             actualBack; // silence warnings
             actualFeeAmountBack; // silence warnings

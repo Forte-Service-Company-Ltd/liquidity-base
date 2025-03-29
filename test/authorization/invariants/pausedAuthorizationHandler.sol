@@ -18,11 +18,11 @@ contract pausedAuthorizationHandler is TestCommon {
         vm.startPrank(admin);
         if (previousSwapX) {
             (uint256 expectedAmountOut, , ) = poolUnderTest.simSwap(poolUnderTest.yToken(), _amountIn);
-            (amountOut, feeAmount, ) = poolUnderTest.swap(poolUnderTest.yToken(), _amountIn, expectedAmountOut);
+            (amountOut, feeAmount, ) = poolUnderTest.swap(poolUnderTest.yToken(), _amountIn, expectedAmountOut, msg.sender);
             previousSwapX = false;
         } else {
             (uint256 expectedAmountOut, , ) = poolUnderTest.simSwap(poolUnderTest.xToken(), _amountIn);
-            (amountOut, feeAmount, ) = poolUnderTest.swap(poolUnderTest.xToken(), _amountIn, expectedAmountOut);
+            (amountOut, feeAmount, ) = poolUnderTest.swap(poolUnderTest.xToken(), _amountIn, expectedAmountOut, msg.sender);
             previousSwapX = true;
         }
     }

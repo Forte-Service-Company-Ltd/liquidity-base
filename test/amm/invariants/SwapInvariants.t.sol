@@ -31,7 +31,7 @@ abstract contract SwapInvariants is TestCommonSetup {
             address(pool.yToken()),
             1_000_000_000_000_000_000
         );
-        pool.swap(address(pool.yToken()), 1_000_000_000_000_000_000, expected);
+        pool.swap(address(pool.yToken()), 1_000_000_000_000_000_000, expected, msg.sender);
     }
     function invariant_verifyAmountOutNeverExceedsLiquidity_TokenX()
         public
