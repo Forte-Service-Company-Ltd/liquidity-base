@@ -622,22 +622,6 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         pool.withdrawRevenue(2, 0, address(alice));
     }
 
-<<<<<<< HEAD
-    function testLiquidity_Pool_WithdrawRevenueAccrued_Positive() public startAsAdmin endWithStopPrank {
-        //TODO determine how to test new revenue withdrawal mechanism
-        vm.skip(true);
-        _pool_BackAndForthSwaps();
-        _checkWithdrawRevenueState();
-    }
-
-    function testLiquidity_Pool_NotEnoughCollateral() public {
-        vm.startPrank(admin);
-        vm.expectRevert(abi.encodeWithSignature("NotEnoughCollateral()"));
-        pool.simSwapReversed(address(_yToken), X_TOKEN_MAX_SUPPLY);
-    }
-
-=======
->>>>>>> ca82a52 (eliminating todos and unused variables)
     function _pool_BackAndForthSwaps() internal {
         vm.stopPrank();
         uint amountIn = 1_000_000 * fullToken;
