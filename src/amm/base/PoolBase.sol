@@ -11,7 +11,7 @@ import {CalculatorBase, packedFloat} from "./CalculatorBase.sol";
 import {FeeInfo, TBCType} from "../../common/TBC.sol";
 import {MathLibs} from "../mathLibs/MathLibs.sol";
 import {LPToken} from "../../../src/common/LPToken.sol";
-import {Descriptor} from "../../common/NFTSVG.sol";
+import {Descriptor} from "../../common/SVG/NFTSVG.sol";
 
 /**
  * @title Pool Base

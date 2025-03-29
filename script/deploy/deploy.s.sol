@@ -14,7 +14,7 @@ import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {PythonUtils} from "./pythonUtils.s.sol";
 import {SixDecimalERC20} from "src/example/ERC20/SixDecimalERC20.sol";
 import {ExampleERC721URI} from "src/example/ERC721/ExampleERC721URI.sol";
-import {Descriptor, SVGLinesPart1, SVGLinesPart2, SVGLinesPart3, SVG, HexStrings} from "src/common/NFTSVG.sol";
+import {Descriptor, SVGLinesPart1, SVGLinesPart2, SVGLinesPart3, SVG, HexStrings} from "../../src/common/SVG/NFTSVG.sol";
 
 contract CommonDeployment is Script, PythonUtils {
     function _deployFactory() internal virtual returns (IFactory) {}
@@ -50,7 +50,10 @@ contract CommonDeployment is Script, PythonUtils {
         xToken = new GenericERC20FixedSupply("Test Token", "TST", supply);
         setENVAddress("XTOKEN_ADDRESS", vm.toString(address(xToken)));
         require(xToken.totalSupply() == supply, "xToken supply is not equal to the supply passed to the function");
-        require(xToken.balanceOf(vm.envAddress("DEPLOYMENT_OWNER")) == supply, "xToken balance of the owner is not equal to the supply passed to the function");
+        require(
+            xToken.balanceOf(vm.envAddress("DEPLOYMENT_OWNER")) == supply,
+            "xToken balance of the owner is not equal to the supply passed to the function"
+        );
         console2.log("Test Token (TST):", address(xToken));
     }
 
@@ -60,7 +63,10 @@ contract CommonDeployment is Script, PythonUtils {
         setENVAddress("YTOKEN_ADDRESS", vm.toString(address(weth)));
         setENVAddress("WETH_ADDRESS", vm.toString(address(weth)));
         require(weth.totalSupply() == supply, "weth supply is not equal to the supply passed to the function");
-        require(weth.balanceOf(vm.envAddress("DEPLOYMENT_OWNER")) == supply, "weth balance of the owner is not equal to the supply passed to the function");
+        require(
+            weth.balanceOf(vm.envAddress("DEPLOYMENT_OWNER")) == supply,
+            "weth balance of the owner is not equal to the supply passed to the function"
+        );
         console2.log("Wrapped Ether (WETH):", address(weth));
     }
 
@@ -70,7 +76,10 @@ contract CommonDeployment is Script, PythonUtils {
         setENVAddress("YTOKEN_ADDRESS", vm.toString(address(stableCoin)));
         setENVAddress("STC_ADDRESS", vm.toString(address(stableCoin)));
         require(stableCoin.totalSupply() == supply, "stableCoin supply is not equal to the supply passed to the function");
-        require(stableCoin.balanceOf(vm.envAddress("DEPLOYMENT_OWNER")) == supply, "stableCoin balance of the owner is not equal to the supply passed to the function");
+        require(
+            stableCoin.balanceOf(vm.envAddress("DEPLOYMENT_OWNER")) == supply,
+            "stableCoin balance of the owner is not equal to the supply passed to the function"
+        );
         console2.log("Stable Coin (STC):", address(stableCoin));
     }
 
@@ -140,9 +149,7 @@ contract ERC721Deployment is CommonDeployment {
     }
 }
 
-
 contract CommonConfigDeployment is CommonDeployment {
-
     IFactory _factory;
 
     function prepareForDeployment() internal {
@@ -155,7 +162,10 @@ contract CommonConfigDeployment is CommonDeployment {
         assembly {
             size := extcodesize(factoryAddress)
         }
-        require(size > 0, "FACTORY is not a deployed contract, try deploying the factory with deploy.s.sol:ALTBCFactoryDeployment or deploy.s.sol:URQTBCFactoryDeployment");
+        require(
+            size > 0,
+            "FACTORY is not a deployed contract, try deploying the factory with deploy.s.sol:ALTBCFactoryDeployment or deploy.s.sol:URQTBCFactoryDeployment"
+        );
         {
             address yToken = vm.envAddress("YTOKEN_ADDRESS");
             assembly {
@@ -166,12 +176,18 @@ contract CommonConfigDeployment is CommonDeployment {
             assembly {
                 size := extcodesize(yTokenAllowList)
             }
-            require(size > 0, "Y_TOKEN_ALLOWLIST is not a deployed contract, try deploying the allow lists with deploy.s.sol:allowlistsDeployment");
+            require(
+                size > 0,
+                "Y_TOKEN_ALLOWLIST is not a deployed contract, try deploying the allow lists with deploy.s.sol:allowlistsDeployment"
+            );
             address deployerAllowList = vm.envAddress("DEPLOYER_ALLOWLIST");
             assembly {
                 size := extcodesize(deployerAllowList)
             }
-            require(size > 0, "DEPLOYER_ALLOWLIST is not a deployed contract, try deploying the allow lists with deploy.s.sol:allowlistsDeployment");
+            require(
+                size > 0,
+                "DEPLOYER_ALLOWLIST is not a deployed contract, try deploying the allow lists with deploy.s.sol:allowlistsDeployment"
+            );
             AllowList(yTokenAllowList).addToAllowList(vm.envAddress("YTOKEN_ADDRESS"));
             AllowList(deployerAllowList).addToAllowList(vm.envAddress("DEPLOYMENT_OWNER"));
         }
@@ -261,7 +277,6 @@ contract PoolDeploymentCommon is CommonDeployment {
 }
 
 contract PoolConfigDeploymentCommon is CommonDeployment, Recorder {
-
     function initializePool(address poolAddress, address xTokenAddress, address yTokenAddress, address ownerAddress) internal {
         IERC20 tokenX = IERC20(xTokenAddress);
         {

@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
-import 'forge-std/Test.sol';
-import 'src/common/NFTSVG.sol';
-import 'src/amm/base/PoolBase.sol';
-import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
-import 'forge-std/console.sol';
-
+import "forge-std/Test.sol";
+import "src/common/SVG/NFTSVG.sol";
+import "src/amm/base/PoolBase.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "forge-std/console.sol";
 
 contract NFTSVGTest is Test {
     using Descriptor for Descriptor.ConstructTokenURIParams;
@@ -112,4 +111,3 @@ contract NFTSVGTest is Test {
     //     console.log(uri);
     // }
 }
-

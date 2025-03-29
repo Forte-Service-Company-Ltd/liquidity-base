@@ -5,7 +5,7 @@ import "solady/utils/FixedPointMathLib.sol";
 import "./lib/MathUtils.sol";
 import {Ln} from "../../../lib/float128/src/Ln.sol";
 import {Float128} from "../../../lib/float128/src/Float128.sol";
-import {packedFloat} from  "../../../lib/float128/src/Types.sol";
+import {packedFloat} from "../../../lib/float128/src/Types.sol";
 
 /**
  * @title Abstraction Layer between Equations and the underlying Math libraries
@@ -148,7 +148,7 @@ library MathLibs {
         float = mantissa.toPackedFloat(exponent);
     }
 
-     /**
+    /**
      * @dev calculates the natural logarithm of a positive number
      * @param x the number to get the natural logarithm from
      * @return float the result of the natural logarithm of x as a float number
