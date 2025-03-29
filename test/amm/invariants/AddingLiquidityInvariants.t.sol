@@ -25,7 +25,7 @@ abstract contract AddingLiquidityInvariants is TestCommonSetup {
         yTokenLiquidity = IERC20(pool.yToken()).balanceOf(address(pool));
         vm.startPrank(admin);
         bytes4[] memory selectors = new bytes4[](1);
-        // selectors[0] = PoolBase(address(pool)).depositLiquidity.selector; // TODO enable this with depositLiquidity
+        selectors[0] = PoolBase(address(pool)).depositLiquidity.selector;
         targetContract(address(pool));
         targetSelector(
             FuzzSelector({addr: address(pool), selectors: selectors})

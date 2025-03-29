@@ -351,9 +351,13 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         IERC20(pool.xToken()).approve(address(pool), expectedIn);
         vm.expectEmit(address(_yToken) == address(stableCoin), false, false, false, address(pool)); // Fees generated might be off by 1 unit in WETH case
         emit IPoolEvents.FeesGenerated(estimatedFees, 0);
-        (, uint fees, ) = pool.swap(_xToken, expectedIn, getAmountSubFee(amount) - 1, msg.sender); // TODO look into the - 1 with fees
-        assertLe(fees, estimatedFees + 1); // we add 1 to account for rounding issues
-        assertGe(fees, estimatedFees - 1); // we subtract 1 to account for rounding issues
+        (, uint fees, ) = pool.swap(
+            _xToken,
+            expectedIn,
+            getAmountSubFee(amount)
+        );
+        assertLe(fees, estimatedFees);
+        assertGe(fees, estimatedFees);
     }
 
     function testLiquidity_Pool_ProtocolFeesAccuracyInSimSwapReversed_BuyY(uint256 amount) public endWithStopPrank {
@@ -617,6 +621,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         pool.withdrawRevenue(2, 0, address(alice));
     }
 
+<<<<<<< HEAD
     function testLiquidity_Pool_WithdrawRevenueAccrued_Positive() public startAsAdmin endWithStopPrank {
         //TODO determine how to test new revenue withdrawal mechanism
         vm.skip(true);
@@ -630,6 +635,8 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         pool.simSwapReversed(address(_yToken), X_TOKEN_MAX_SUPPLY);
     }
 
+=======
+>>>>>>> ca82a52 (eliminating todos and unused variables)
     function _pool_BackAndForthSwaps() internal {
         vm.stopPrank();
         uint amountIn = 1_000_000 * fullToken;
