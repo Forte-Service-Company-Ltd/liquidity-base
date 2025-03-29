@@ -621,6 +621,12 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         vm.expectRevert(abi.encodeWithSignature("InvalidToken()"));
         pool.withdrawRevenue(2, 0, address(alice));
     }
+    
+    function testLiquidity_Pool_NotEnoughCollateral() public {
+        vm.startPrank(admin);
+        vm.expectRevert(abi.encodeWithSignature("NotEnoughCollateral()"));
+        pool.simSwapReversed(address(_yToken), X_TOKEN_MAX_SUPPLY);
+    }
 
     function _pool_BackAndForthSwaps() internal {
         vm.stopPrank();
