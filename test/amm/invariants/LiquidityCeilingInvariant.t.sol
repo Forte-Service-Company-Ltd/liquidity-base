@@ -23,7 +23,7 @@ abstract contract LiquidityCeilingInvariants is TestCommonSetup {
         IERC20 tokenY = IERC20(pool.yToken());
         _yTotal = tokenY.totalSupply();
 
-        bytes4[] memory selectors = new bytes4[](10);
+        bytes4[] memory selectors = new bytes4[](8);
         selectors[0] = pool.withdrawRevenue.selector;
         selectors[1] = pool.swap.selector;
         selectors[2] = pool.simSwap.selector;
@@ -31,9 +31,7 @@ abstract contract LiquidityCeilingInvariants is TestCommonSetup {
         selectors[4] = pool.xToken.selector;
         selectors[5] = pool.yToken.selector;
         selectors[6] = pool.enableSwaps.selector;
-        // selectors[7] = PoolBase(address(pool)).addXSupply.selector; // TODO enable this with depositLiquidity
-        selectors[8] = pool.setLPFee.selector;
-        //selectors[9] = pool.yTokenLiquidity.selector; // TODO Figure out how we calc yLiq
+        selectors[7] = pool.setLPFee.selector;
 
         targetContract(address(pool));
         targetSelector(

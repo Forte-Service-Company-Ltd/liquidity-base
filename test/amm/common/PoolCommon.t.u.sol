@@ -78,7 +78,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         pool.enableSwaps(false);
     }
 
-    function testLiquidity_Pool_checkActiveLiquidityNFTAmount() public {
+    function testLiquidity_Pool_checkActiveLiquidityNFTAmount() public view {
         uint256 ACTIVE_LIQUIDITY_NFT_ID = 2;
         (packedFloat wj, ) = pool.getLPToken(ACTIVE_LIQUIDITY_NFT_ID);
         uint256 w = pool.w();
@@ -201,10 +201,15 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         _xToken.transfer(address(alice), 0);
     }
 
-    function testLiquidity_Pool_withdrawRevenue_Positive() public startAsAdmin endWithStopPrank {
-        // TODO Investigate this test. Silencing the slither warning
-        //uint collectedLPFees = (3 * fullToken) / 1e6 + 1;
-        (uint expected, , ) = pool.simSwap(address(_yToken), (1 * fullToken) / 1e3);
+    function testLiquidity_Pool_withdrawRevenue_Positive()
+        public
+        startAsAdmin
+        endWithStopPrank
+    {
+        (uint expected, , ) = pool.simSwap(
+            address(_yToken),
+            (1 * fullToken) / 1e3
+        );
         pool.swap(address(_yToken), (1 * fullToken) / 1e3, expected, msg.sender);
 
         uint256 originalBalance = IERC20(_yToken).balanceOf(address(admin));
@@ -346,9 +351,14 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         IERC20(pool.xToken()).approve(address(pool), expectedIn);
         vm.expectEmit(address(_yToken) == address(stableCoin), false, false, false, address(pool)); // Fees generated might be off by 1 unit in WETH case
         emit IPoolEvents.FeesGenerated(estimatedFees, 0);
-        (, uint fees, ) = pool.swap(_xToken, expectedIn, getAmountSubFee(amount) - 1, msg.sender); // TODO look into the - 1 with fees
-        assertLe(fees, estimatedFees + 1); // we add 1 to account for rounding issues
-        assertGe(fees, estimatedFees - 1); // we subtract 1 to account for rounding issues
+        (, uint fees, ) = pool.swap(
+            _xToken,
+            expectedIn,
+            getAmountSubFee(amount),
+            msg.sender
+        );
+        assertLe(fees, estimatedFees);
+        assertGe(fees, estimatedFees);
     }
 
     function testLiquidity_Pool_ProtocolFeesAccuracyInSimSwapReversed_BuyY(uint256 amount) public endWithStopPrank {
@@ -362,8 +372,8 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
 
         pool.swap(address(_yToken), initialAmount, getAmountSubFee(expected), bob);
         /// now we test
-        (uint expectedIn, uint lpFees, uint protocolFees) = pool.simSwapReversed(address(_yToken), amount);
-        // todo: this looks fishy for FOT, we should investigate this
+        (uint expectedIn, uint lpFees, uint protocolFees) = pool
+            .simSwapReversed(address(_yToken), amount);
         IERC20(pool.xToken()).approve(address(pool), expectedIn);
         vm.expectEmit(false, false, false, false, address(pool)); // Fees generated might be off by 1 unit
         emit IPoolEvents.FeesGenerated(lpFees, protocolFees);
@@ -611,14 +621,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         vm.expectRevert(abi.encodeWithSignature("InvalidToken()"));
         pool.withdrawRevenue(2, 0, address(alice));
     }
-
-    function testLiquidity_Pool_WithdrawRevenueAccrued_Positive() public startAsAdmin endWithStopPrank {
-        //TODO determine how to test new revenue withdrawal mechanism
-        vm.skip(true);
-        _pool_BackAndForthSwaps();
-        _checkWithdrawRevenueState();
-    }
-
+    
     function testLiquidity_Pool_NotEnoughCollateral() public {
         vm.startPrank(admin);
         vm.expectRevert(abi.encodeWithSignature("NotEnoughCollateral()"));
