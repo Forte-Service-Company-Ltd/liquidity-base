@@ -710,7 +710,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         uint fees = pool.collectedLPFees();
         console2.log("fees", fees);
         console2.log("yBalance - fees:", yBalance - fees);
-        _checkLiquidityExcessState();
+        _checkRevenueState();
     }
 
     function testLiquidity_Pool_backAndForthSwaps()
@@ -773,7 +773,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         uint fees = pool.collectedLPFees();
         console2.log("fees", fees);
         console2.log("yBalance - fees", yBalance - fees);
-        _checkBackAndForthSwapsState();
+        _checkRevenueState();
     }
 
     function testLiquidity_Pool_buyCollateralToken_Positive()
