@@ -79,11 +79,11 @@ contract LPToken is ERC721, ERC721Enumerable {
      * @param _rj The new value of _rj
      */
     function _updateLPTokenVarsWithdrawal(uint256 _tokenId, packedFloat _wj,  packedFloat _rj) internal returns (packedFloat) {
-        _updateLPToken(_tokenId, _wj, _rj);
         if(_wj.eq(packedFloat.wrap(0))) {
             _burn(_tokenId);
             delete lpToken[_tokenId];
-        }
+        }else _updateLPToken(_tokenId, _wj, _rj);
+        
     }
 
     /**
