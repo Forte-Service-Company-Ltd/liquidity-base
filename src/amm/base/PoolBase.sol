@@ -41,6 +41,10 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
     packedFloat public x;
 
     /**
+     * @dev total revenue claimed historically by the LPs
+     */
+    uint256 public totalRevenueClaimed;
+    /**
      * @dev fee percentage for swaps for the LP
      */
     uint16 lpFee;
