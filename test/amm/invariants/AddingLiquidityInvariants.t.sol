@@ -45,9 +45,12 @@ abstract contract AddingLiquidityInvariants is TestCommonSetup {
 
     function invariant_liquidityCanNeverDecreaseCallingAddLiquidity_TokenY()
         public
+        startAsAdmin
     {
-        vm.skip(true);
-        //assertGe(pool.yTokenLiquidity(), yTokenLiquidity);
+        assertGe(
+            IERC20(pool.yToken()).balanceOf(address(pool)), 
+            yTokenLiquidity
+        );
     }
 
     function invariant_liquidityCanNeverIncreasePastMaxSupply() public {
