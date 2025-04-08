@@ -12,4 +12,5 @@ abstract contract TestCommonSetupAbs is TestConstants, TestModifiers {
     function _getFactoryAddress() internal virtual returns (address);
     function _deployPool(address, address, uint16, uint256, TBCInputOption) internal virtual returns (PoolBase);
     function _getMaxXTokenSupply() internal virtual returns (uint);
+    function _getYTokenLiquidity(address _pool) internal virtual returns (uint);
 }
