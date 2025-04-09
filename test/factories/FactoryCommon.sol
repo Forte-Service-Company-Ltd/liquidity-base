@@ -131,4 +131,11 @@ abstract contract FactoryCommon is TestCommonSetup {
         vm.expectRevert(abi.encodeWithSignature("ProtocolFeeAboveMax(uint16,uint16)", 21, 20));
         factory.setProtocolFee(21);
     }
+
+    function testLiquidity_PoolFactory_RevertOnRenounceOwnershipCall() public {
+        _deployAndSetupFactory();
+        vm.startPrank(admin);
+        vm.expectRevert(abi.encodeWithSignature("RenouncingOwnershipForbidden()"));
+        factory.renounceOwnership();
+    }
 }
