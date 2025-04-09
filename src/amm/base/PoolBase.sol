@@ -85,6 +85,11 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
         _;
     }
 
+    modifier checkExpiration(uint _expires) {
+        if (_expires < block.timestamp) revert TransactionExpired();
+        _;
+    }
+
     /**
      * @dev constructor
      * @param _xToken address of the X token (x axis)
@@ -118,7 +123,8 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
      * @param _amountIn the amount of the ERC20 _tokenIn to exchange into the Pool
      * @param _minOut the amount of the other token in the pair minimum to be received for the
      * _amountIn of _tokenIn.
-     * @param _recipient address to receive tokens out 
+     * @param _recipient address to receive tokens out
+     * @param _expires timestamp at which the swap transaction will expire
      * @return amountOut the actual amount of the token coming out of the Pool as result of the swap
      * @return lpFeeAmount the amount of the Y token that's being dedicated to fees for the LP
      * @return protocolFeeAmount the amount of the Y token that's being dedicated to fees for the protocol
@@ -127,8 +133,9 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
         address _tokenIn,
         uint256 _amountIn,
         uint256 _minOut,
-        address _recipient
-    ) external whenNotPaused returns (uint256 amountOut, uint256 lpFeeAmount, uint256 protocolFeeAmount) {
+        address _recipient,
+        uint256 _expires
+    ) external whenNotPaused checkExpiration(_expires) returns (uint256 amountOut, uint256 lpFeeAmount, uint256 protocolFeeAmount) {
         bool sellingX = _tokenIn == xToken;
         //slither-disable-start reentrancy-benign // the recipient of the transfer is this contract
         IERC20(sellingX ? xToken : yToken).safeTransferFrom(_msgSender(), address(this), _amountIn);
