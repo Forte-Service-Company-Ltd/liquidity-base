@@ -31,12 +31,24 @@ abstract contract PoolFeeComparisonTest is TestCommonSetup {
             (uint expected, uint expectedFeeAmount, ) = poolWFee.simSwap(address(_yToken), (1 * fullToken) / 1_000);
             vm.expectEmit(true, false, false, false, address(poolWFee));
             emit IPoolEvents.FeesGenerated(expectedFeeAmount, 0);
-            (uint actual, uint actualFeeAmount, ) = poolWFee.swap(address(_yToken), (1 * fullToken) / 1_000, expected, msg.sender);
+            (uint actual, uint actualFeeAmount, ) = poolWFee.swap(
+                address(_yToken),
+                (1 * fullToken) / 1_000,
+                expected,
+                msg.sender,
+                block.timestamp + 1
+            );
             assertEq(actual, expected);
             assertEq(expectedFeeAmount, actualFeeAmount);
 
             (uint expectedNoFee, uint expectedFeeAmountNoFee, ) = poolWOutFee.simSwap(address(_yToken), (1 * fullToken) / 1_000);
-            (uint actualNoFee, uint actualFeeAmountNoFee, ) = poolWOutFee.swap(address(_yToken), (1 * fullToken) / 1_000, expected, msg.sender);
+            (uint actualNoFee, uint actualFeeAmountNoFee, ) = poolWOutFee.swap(
+                address(_yToken),
+                (1 * fullToken) / 1_000,
+                expected,
+                msg.sender,
+                block.timestamp + 1
+            );
             assertEq(actualNoFee, expectedNoFee);
             assertEq(expectedFeeAmountNoFee, 0);
             assertEq(actualFeeAmountNoFee, 0);
@@ -55,7 +67,8 @@ abstract contract PoolFeeComparisonTest is TestCommonSetup {
                 address(_yToken),
                 (1 * fullToken) / 1_000,
                 expected,
-                msg.sender
+                msg.sender,
+                block.timestamp + 1
             );
             assertEq(actual, expected);
             assertEq(expectedFeeAmount, actualFeeAmount);
@@ -68,8 +81,9 @@ abstract contract PoolFeeComparisonTest is TestCommonSetup {
             (uint actualNoFee, uint actualFeeAmountNoFee, uint actualProtocolNoFee) = poolWOutFee.swap(
                 address(_yToken),
                 (1 * fullToken) / 1_000,
-                expected, 
-                msg.sender
+                expected,
+                msg.sender,
+                block.timestamp + 1
             );
             assertEq(actualNoFee, expectedNoFee);
             assertEq(expectedFeeAmountNoFee, 0);
@@ -80,7 +94,7 @@ abstract contract PoolFeeComparisonTest is TestCommonSetup {
         }
         vm.startPrank(bob);
         uint yBalanceBefore = _yToken.balanceOf(bob);
-        ( , , , , uint protocolFeesCollected) = poolWFee.getFeeInfo();
+        (, , , , uint protocolFeesCollected) = poolWFee.getFeeInfo();
         console2.log("protocolFeesCollected", protocolFeesCollected);
         poolWFee.collectProtocolFees(bob);
         assertEq(protocolFeesCollected, (_yToken.balanceOf(bob) - yBalanceBefore));
@@ -96,7 +110,7 @@ abstract contract PoolFeeComparisonTest is TestCommonSetup {
 
         vm.expectEmit(false, false, false, false, address(pool)); // Fees generated might be off by 1 unit
         emit IPoolEvents.FeesGenerated(lpFeeAmount, protocolFeeAmount);
-        (, uint realLPFees, uint realProtocolFees) = pool.swap(address(_yToken), expectedIn, expectedAmount, bob);
+        (, uint realLPFees, uint realProtocolFees) = pool.swap(address(_yToken), expectedIn, expectedAmount, bob, block.timestamp + 1);
 
         assertLe(realLPFees, lpFees + 1); // we add 1 to account for rounding issues
         assertGe(realLPFees, lpFees - 1); // we add 1 to account for rounding issues
@@ -104,7 +118,7 @@ abstract contract PoolFeeComparisonTest is TestCommonSetup {
         assertGe(realProtocolFees, protocolFees - 1); // we add 1 to account for rounding issues
         vm.startPrank(bob);
         uint yBalanceBefore = _yToken.balanceOf(bob);
-        ( , , , , uint protocolFeesCollected) = pool.getFeeInfo();
+        (, , , , uint protocolFeesCollected) = pool.getFeeInfo();
         console2.log("protocolFeesCollected", protocolFeesCollected);
         vm.expectEmit(true, true, false, false, address(pool)); // Fees generated might be off by 1 unit
         emit IPoolEvents.FeesCollected(CommonEvents.FeeCollectionType.PROTOCOL, bob, protocolFeesCollected);
@@ -116,10 +130,10 @@ abstract contract PoolFeeComparisonTest is TestCommonSetup {
         vm.startPrank(admin);
         // Set initial X value to something above 0 before starting to swap for X
         (uint _expected, , ) = poolWFee.simSwap(address(_yToken), 1 * fullToken);
-        poolWFee.swap(address(_yToken), 1 * fullToken, _expected, admin);
+        poolWFee.swap(address(_yToken), 1 * fullToken, _expected, admin, block.timestamp + 1);
 
         (uint _expectedNoFee, , ) = poolWOutFee.simSwap(address(_yToken), 1 * fullToken);
-        poolWOutFee.swap(address(_yToken), 1 * fullToken, _expectedNoFee, admin);
+        poolWOutFee.swap(address(_yToken), 1 * fullToken, _expectedNoFee, admin, block.timestamp + 1);
 
         for (uint j = 0; j < 100; j++) {
             _approvePool(poolWFee, false);
@@ -127,13 +141,25 @@ abstract contract PoolFeeComparisonTest is TestCommonSetup {
             vm.startPrank(admin);
 
             (uint expected, uint expectedFeeAmount, ) = poolWFee.simSwap(address(xTokenWithFee), 1_000_000_000_000_000);
-            (uint actual, uint actualFeeAmount, ) = poolWFee.swap(address(xTokenWithFee), 1_000_000_000_000_000, expected, admin);
+            (uint actual, uint actualFeeAmount, ) = poolWFee.swap(
+                address(xTokenWithFee),
+                1_000_000_000_000_000,
+                expected,
+                admin,
+                block.timestamp + 1
+            );
 
             assertEq(actual, expected);
             assertEq(expectedFeeAmount, actualFeeAmount);
 
             (uint expectedNoFee, uint expectedFeeAmountNoFee, ) = poolWOutFee.simSwap(address(xTokenWoutFee), 1_000_000_000_000_000);
-            (uint actualNoFee, uint actualFeeAmountNoFee, ) = poolWOutFee.swap(address(xTokenWoutFee), 1_000_000_000_000_000, expected, admin);
+            (uint actualNoFee, uint actualFeeAmountNoFee, ) = poolWOutFee.swap(
+                address(xTokenWoutFee),
+                1_000_000_000_000_000,
+                expected,
+                admin,
+                block.timestamp + 1
+            );
 
             assertEq(actualNoFee, expectedNoFee);
             assertEq(expectedFeeAmountNoFee, 0);

@@ -61,7 +61,7 @@ abstract contract PoolPrecisionTest is TestCommonSetup {
             console2.log("buy x failed");
         }
 
-        (amountOut, feeAmount, ) = _pool.swap(address(tokenIn), swapAmount, expected, admin);
+        (amountOut, feeAmount, ) = _pool.swap(address(tokenIn), swapAmount, expected, admin, block.timestamp + 1);
     }
 
     function test_poolPrecision_swapTests() public startAsAdmin endWithStopPrank {
@@ -77,9 +77,9 @@ abstract contract PoolPrecisionTest is TestCommonSetup {
         uint256 expectedReverseWad;
         uint256 expectedReverseSd;
         for (uint i = 0; i < SWAPS; i++) {
-            (, , ,  expectedReverseWad) = _swapX(true, wadPool, buyAmountWad);
-            (, , ,  expectedReverseSd) = _swapX(true, sdPool, buyAmountSixDecimal);
-            
+            (, , , expectedReverseWad) = _swapX(true, wadPool, buyAmountWad);
+            (, , , expectedReverseSd) = _swapX(true, sdPool, buyAmountSixDecimal);
+
             assertTrue(buyAmountWad >= expectedReverseWad);
             assertTrue(buyAmountSixDecimal >= expectedReverseSd);
 
@@ -93,7 +93,10 @@ abstract contract PoolPrecisionTest is TestCommonSetup {
             console2.log("x sd pool: ", sdPool.x().convertpackedFloatToWAD());
 
             assertTrue(areWithinTolerance(xBalanceWad, xBalanceSd, 9, 9), "x balances should be within tolerance after buy");
-            assertTrue(areWithinTolerance(yBalanceSd * 10 ** 12, yBalanceWad, MAX_TOLERANCE_X, TOLERANCE_PRECISION_X), "x out of tolerance");
+            assertTrue(
+                areWithinTolerance(yBalanceSd * 10 ** 12, yBalanceWad, MAX_TOLERANCE_X, TOLERANCE_PRECISION_X),
+                "x out of tolerance"
+            );
         }
 
         xBalanceAdminWad = wadXToken.balanceOf(address(admin)) - xBalanceAdminWad;
@@ -102,7 +105,6 @@ abstract contract PoolPrecisionTest is TestCommonSetup {
         uint sellAmountWad = xBalanceAdminWad / SWAPS;
         console2.log("sellAmountSixDecimal: ", sellAmountSixDecimal);
         console2.log("sellAmountWad", sellAmountWad);
-
 
         for (uint i = 0; i < SWAPS; i++) {
             (uint256 amountOutWad, , , ) = _swapX(false, wadPool, sellAmountWad);

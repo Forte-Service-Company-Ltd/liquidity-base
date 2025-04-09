@@ -60,7 +60,7 @@ abstract contract WETHForkTest is ForkTestBase {
         } else {
             vm.expectRevert("ERC20: transfer amount exceeds allowance");
         }
-        pool.swap(address(_yToken), 1e2 * ERC20_DECIMALS, expected, msg.sender);
+        pool.swap(address(_yToken), 1e2 * ERC20_DECIMALS, expected, msg.sender, block.timestamp + 1);
     }
 
     function testNotEnoughCollateralWETH() public startAsAdmin {
@@ -76,6 +76,6 @@ abstract contract WETHForkTest is ForkTestBase {
         } else {
             vm.expectRevert("ERC20: transfer amount exceeds balance");
         }
-        pool.swap(address(_yToken), 1e6 * ERC20_DECIMALS, expected, msg.sender);
+        pool.swap(address(_yToken), 1e6 * ERC20_DECIMALS, expected, msg.sender, block.timestamp + 1);
     }
 }

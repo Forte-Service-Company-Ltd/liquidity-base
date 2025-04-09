@@ -27,6 +27,10 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         _yToken = IERC20(pool.yToken());
         fullToken = address(_yToken) == address(stableCoin) ? STABLECOIN_DEC : ERC20_DECIMALS;
     }
+
+    function getValidExpiration() internal returns (uint256) {
+        return block.timestamp + 1;
+    }
     function _setUpTokens(uint256 _xTokenSupply) internal startAsAdmin endWithStopPrank {
         xToken = new GenericERC20FixedSupply("x token", "GAME", _xTokenSupply * 3);
         yToken = new GenericERC20("collateral token", "COLL");
