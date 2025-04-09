@@ -36,7 +36,7 @@ abstract contract PoolFeeComparisonTest is TestCommonSetup {
                 (1 * fullToken) / 1_000,
                 expected,
                 msg.sender,
-                block.timestamp + 1
+                getValidExpiration()
             );
             assertEq(actual, expected);
             assertEq(expectedFeeAmount, actualFeeAmount);
@@ -47,7 +47,7 @@ abstract contract PoolFeeComparisonTest is TestCommonSetup {
                 (1 * fullToken) / 1_000,
                 expected,
                 msg.sender,
-                block.timestamp + 1
+                getValidExpiration()
             );
             assertEq(actualNoFee, expectedNoFee);
             assertEq(expectedFeeAmountNoFee, 0);
@@ -68,7 +68,7 @@ abstract contract PoolFeeComparisonTest is TestCommonSetup {
                 (1 * fullToken) / 1_000,
                 expected,
                 msg.sender,
-                block.timestamp + 1
+                getValidExpiration()
             );
             assertEq(actual, expected);
             assertEq(expectedFeeAmount, actualFeeAmount);
@@ -83,7 +83,7 @@ abstract contract PoolFeeComparisonTest is TestCommonSetup {
                 (1 * fullToken) / 1_000,
                 expected,
                 msg.sender,
-                block.timestamp + 1
+                getValidExpiration()
             );
             assertEq(actualNoFee, expectedNoFee);
             assertEq(expectedFeeAmountNoFee, 0);
@@ -110,7 +110,7 @@ abstract contract PoolFeeComparisonTest is TestCommonSetup {
 
         vm.expectEmit(false, false, false, false, address(pool)); // Fees generated might be off by 1 unit
         emit IPoolEvents.FeesGenerated(lpFeeAmount, protocolFeeAmount);
-        (, uint realLPFees, uint realProtocolFees) = pool.swap(address(_yToken), expectedIn, expectedAmount, bob, block.timestamp + 1);
+        (, uint realLPFees, uint realProtocolFees) = pool.swap(address(_yToken), expectedIn, expectedAmount, bob, getValidExpiration());
 
         assertLe(realLPFees, lpFees + 1); // we add 1 to account for rounding issues
         assertGe(realLPFees, lpFees - 1); // we add 1 to account for rounding issues
@@ -130,10 +130,10 @@ abstract contract PoolFeeComparisonTest is TestCommonSetup {
         vm.startPrank(admin);
         // Set initial X value to something above 0 before starting to swap for X
         (uint _expected, , ) = poolWFee.simSwap(address(_yToken), 1 * fullToken);
-        poolWFee.swap(address(_yToken), 1 * fullToken, _expected, admin, block.timestamp + 1);
+        poolWFee.swap(address(_yToken), 1 * fullToken, _expected, admin, getValidExpiration());
 
         (uint _expectedNoFee, , ) = poolWOutFee.simSwap(address(_yToken), 1 * fullToken);
-        poolWOutFee.swap(address(_yToken), 1 * fullToken, _expectedNoFee, admin, block.timestamp + 1);
+        poolWOutFee.swap(address(_yToken), 1 * fullToken, _expectedNoFee, admin, getValidExpiration());
 
         for (uint j = 0; j < 100; j++) {
             _approvePool(poolWFee, false);
@@ -146,7 +146,7 @@ abstract contract PoolFeeComparisonTest is TestCommonSetup {
                 1_000_000_000_000_000,
                 expected,
                 admin,
-                block.timestamp + 1
+                getValidExpiration()
             );
 
             assertEq(actual, expected);
@@ -158,7 +158,7 @@ abstract contract PoolFeeComparisonTest is TestCommonSetup {
                 1_000_000_000_000_000,
                 expected,
                 admin,
-                block.timestamp + 1
+                getValidExpiration()
             );
 
             assertEq(actualNoFee, expectedNoFee);

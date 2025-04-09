@@ -26,7 +26,7 @@ abstract contract SwapInvariants is TestCommonSetup {
         vm.startPrank(admin);
         // Set initial X value to something above 0 before starting to swap for X
         (uint expected, , ) = pool.simSwap(address(pool.yToken()), 1_000_000_000_000_000_000);
-        pool.swap(address(pool.yToken()), 1_000_000_000_000_000_000, expected, msg.sender, block.timestamp + 1);
+        pool.swap(address(pool.yToken()), 1_000_000_000_000_000_000, expected, msg.sender, getValidExpiration());
     }
     function invariant_verifyAmountOutNeverExceedsLiquidity_TokenX() public view {
         assertLt(_handler.trackedAmountOutX(), IERC20(pool.xToken()).balanceOf(address(pool)));

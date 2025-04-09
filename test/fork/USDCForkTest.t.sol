@@ -40,7 +40,7 @@ abstract contract USDCForkTest is ForkTestBase {
 
         (uint expected, , ) = pool.simSwap(address(_yToken), 1e2 * STABLECOIN_DEC);
         vm.expectRevert("ERC20: transfer amount exceeds allowance");
-        pool.swap(address(_yToken), 1e12 * STABLECOIN_DEC, expected, msg.sender, block.timestamp + 1);
+        pool.swap(address(_yToken), 1e12 * STABLECOIN_DEC, expected, msg.sender, getValidExpiration());
     }
 
     function testNotEnoughCollateral() public startAsAdmin {
@@ -50,6 +50,6 @@ abstract contract USDCForkTest is ForkTestBase {
         uint balance = _yToken.balanceOf(address(this));
         _yToken.transfer(address(alice), balance - 1);
         vm.expectRevert("ERC20: transfer amount exceeds balance");
-        pool.swap(address(_yToken), 1e13 * STABLECOIN_DEC, expected, msg.sender, block.timestamp + 1);
+        pool.swap(address(_yToken), 1e13 * STABLECOIN_DEC, expected, msg.sender, getValidExpiration());
     }
 }

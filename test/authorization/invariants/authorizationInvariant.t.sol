@@ -26,7 +26,7 @@ abstract contract authorizationInvariants is TestCommonSetup {
         targetSender(alice);
         vm.startPrank(admin);
         (uint expected, , ) = pool.simSwap(address(yToken), 1_000_000_000_000_000_000);
-        pool.swap(address(yToken), 1_000_000_000_000_000_000, expected, msg.sender, block.timestamp + 1);
+        pool.swap(address(yToken), 1_000_000_000_000_000_000, expected, msg.sender, getValidExpiration());
 
         _startingXLiquidity = IERC20(pool.xToken()).balanceOf(address(pool));
         _startingYLiquidity = IERC20(pool.yToken()).balanceOf(address(pool));

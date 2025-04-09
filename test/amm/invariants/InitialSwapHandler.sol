@@ -25,7 +25,7 @@ contract InitialSwapHandler is TestCommon {
             _amountIn,
             expectedAmountOut,
             msg.sender,
-            block.timestamp + 1
+            getValidExpiration()
         );
         trackedAmountOutX = amountOut;
     }

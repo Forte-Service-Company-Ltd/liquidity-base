@@ -23,7 +23,7 @@ contract pausedAuthorizationHandler is TestCommon {
                 _amountIn,
                 expectedAmountOut,
                 msg.sender,
-                block.timestamp + 1
+                getValidExpiration()
             );
             previousSwapX = false;
         } else {
@@ -33,7 +33,7 @@ contract pausedAuthorizationHandler is TestCommon {
                 _amountIn,
                 expectedAmountOut,
                 msg.sender,
-                block.timestamp + 1
+                getValidExpiration()
             );
             previousSwapX = true;
         }

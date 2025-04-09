@@ -22,12 +22,12 @@ abstract contract PoolPriceFuzzTest is TestCommonSetup, PoolCommonAbs {
 
         _yToken.approve(address(pool), amount);
         (uint256 toutOp, , ) = pool.simSwap(address(_yToken), amount);
-        pool.swap(address(_yToken), amount, toutOp, msg.sender, block.timestamp + 1);
+        pool.swap(address(_yToken), amount, toutOp, msg.sender, getValidExpiration());
         uint256 priceBefore = pool.spotPrice();
 
         _yToken.approve(address(pool), amount);
         (toutOp, , ) = pool.simSwap(address(_yToken), amount);
-        pool.swap(address(_yToken), amount, toutOp, msg.sender, block.timestamp + 1);
+        pool.swap(address(_yToken), amount, toutOp, msg.sender, getValidExpiration());
         uint256 priceAfter = pool.spotPrice();
 
         assert(priceAfter >= priceBefore);
@@ -38,7 +38,7 @@ abstract contract PoolPriceFuzzTest is TestCommonSetup, PoolCommonAbs {
 
         _yToken.approve(address(pool), amount);
         (uint256 toutOp, , ) = pool.simSwap(address(_yToken), amount);
-        pool.swap(address(_yToken), amount, toutOp, msg.sender, block.timestamp + 1);
+        pool.swap(address(_yToken), amount, toutOp, msg.sender, getValidExpiration());
         uint256 priceAfter = pool.spotPrice();
 
         assert(priceAfter >= priceBefore);
@@ -59,7 +59,7 @@ abstract contract PoolPriceFuzzTest is TestCommonSetup, PoolCommonAbs {
         uint currentPrice = pool.spotPrice();
 
         (uint256 tout, , ) = pool.simSwap(address(_yToken), amount);
-        pool.swap(address(_yToken), amount, tout, msg.sender, block.timestamp + 1);
+        pool.swap(address(_yToken), amount, tout, msg.sender, getValidExpiration());
 
         uint _currentPrice = pool.spotPrice();
         assertLe(currentPrice, _currentPrice, "Price decreased");
@@ -69,7 +69,7 @@ abstract contract PoolPriceFuzzTest is TestCommonSetup, PoolCommonAbs {
 
         uint256 afterImpact;
         (tout, , ) = pool.simSwap(address(_yToken), amount);
-        pool.swap(address(_yToken), amount, tout, msg.sender, block.timestamp + 1);
+        pool.swap(address(_yToken), amount, tout, msg.sender, getValidExpiration());
 
         afterImpact = pool.spotPrice() - currentPrice;
         console2.log(currentImpact, afterImpact);
@@ -83,20 +83,20 @@ abstract contract PoolPriceFuzzTest is TestCommonSetup, PoolCommonAbs {
 
         _yToken.approve(address(pool), initialAmount);
         (uint256 toutOp, , ) = pool.simSwap(address(_yToken), initialAmount);
-        pool.swap(address(_yToken), initialAmount, getAmountSubFee(toutOp), msg.sender, block.timestamp + 1);
+        pool.swap(address(_yToken), initialAmount, getAmountSubFee(toutOp), msg.sender, getValidExpiration());
 
         packedFloat xBefore = PoolBase(address(pool)).x();
         uint256 priceBefore = pool.spotPrice();
         _yToken.approve(address(pool), amount);
         (toutOp, , ) = pool.simSwap(address(_yToken), amount);
-        pool.swap(address(_yToken), amount, getAmountSubFee(toutOp), msg.sender, block.timestamp + 1);
+        pool.swap(address(_yToken), amount, getAmountSubFee(toutOp), msg.sender, getValidExpiration());
         address _xToken = pool.xToken();
 
         IERC20(_xToken).approve(address(pool), toutOp);
         /// therre are 2 fees
         (uint yOut, , ) = pool.simSwap(_xToken, getAmountSubFee(getAmountSubFee(toutOp)));
         if (yOut > 0) {
-            pool.swap(_xToken, toutOp, yOut, msg.sender, block.timestamp + 1);
+            pool.swap(_xToken, toutOp, yOut, msg.sender, getValidExpiration());
             uint256 priceAfter = pool.spotPrice();
             packedFloat xAfter = PoolBase(address(pool)).x();
             console2.log(priceBefore, priceAfter);
