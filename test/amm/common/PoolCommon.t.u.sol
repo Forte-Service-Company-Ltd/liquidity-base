@@ -547,6 +547,17 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         vm.startPrank(admin);
         // Set initial X value to something above 0 before starting to swap for X
         (uint expected, uint feeAmount, ) = pool.simSwap(address(_yToken), 1_000 * fullToken);
+
+        // we test that no disguised negative amount in can be traded.
+        vm.expectRevert(
+            abi.encodeWithSignature(
+                "SafeCastOverflowedUintToInt(uint256)",
+                115792089237316195423570985008687907853269984665640564039457584007913129629936
+            )
+        );
+        pool.swap(address(_yToken), uint(-int(1_000 * fullToken)), expected, address(0));
+
+        // now we carry out the valid swap
         pool.swap(address(_yToken), 1_000 * fullToken, expected, msg.sender, getValidExpiration());
         uint256 previous = 0;
 

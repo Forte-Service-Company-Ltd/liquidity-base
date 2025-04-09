@@ -144,7 +144,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
         (amountOut, lpFeeAmount, protocolFeeAmount) = simSwap(_tokenIn, _amountIn);
         _checkSlippage(amountOut, _minOut);
 
-        x = sellingX ? x.sub(int(_amountIn).toPackedFloat(-18)) : x.add(int(amountOut).toPackedFloat(-18));
+        x = sellingX ? x.sub(int(_amountIn).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE)) : x.add(int(amountOut).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE));
         // slither-disable-end reentrancy-benign
         // slither-disable-start reentrancy-events // the recipient of the initial transfer is this contract
         _updateParameters();
@@ -186,8 +186,8 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
             _amountIn = _normalizeTokenDecimals(true, _amountIn);
         }
         packedFloat rawAmountOut = sellingX
-            ? _calculateAmountOfYReceivedSellingX(int(_amountIn).toPackedFloat(-18))
-            : _calculateAmountOfXReceivedSellingY(int(_amountIn).toPackedFloat(-18));
+            ? _calculateAmountOfYReceivedSellingX(int(_amountIn).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE))
+            : _calculateAmountOfXReceivedSellingY(int(_amountIn).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE));
         amountOut = uint(rawAmountOut.convertpackedFloatToWAD());
         if (sellingX) {
             amountOut = _normalizeTokenDecimals(false, amountOut);
@@ -218,7 +218,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
         if (!buyingX && _tokenout != yToken) revert InvalidToken();
 
         if (buyingX) {
-            packedFloat amountInRaw = _calculateAmountOfYRequiredBuyingX(int(_amountOut).toPackedFloat(-18));
+            packedFloat amountInRaw = _calculateAmountOfYRequiredBuyingX(int(_amountOut).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE));
             uint256 uamountInRaw = uint(amountInRaw.convertpackedFloatToWAD());
             uamountInRaw = _normalizeTokenDecimals(false, uamountInRaw); // reversed logic because swap is reversed
             (protocolFeeAmount, lpFeeAmount) = _determineProtocolAndLPFeesBuy(uamountInRaw);
@@ -226,7 +226,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
         } else {
             (protocolFeeAmount, lpFeeAmount) = _determineProtocolAndLPFeesBuy(_amountOut);
             _amountOut = _normalizeTokenDecimals(true, _amountOut + protocolFeeAmount + lpFeeAmount); // reversed logic because swap is reversed
-            packedFloat amountInRaw = _calculateAmountOfXRequiredBuyingY(int(_amountOut).toPackedFloat(-18));
+            packedFloat amountInRaw = _calculateAmountOfXRequiredBuyingY(int(_amountOut).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE));
             amountIn = uint(amountInRaw.convertpackedFloatToWAD());
         }
     }
