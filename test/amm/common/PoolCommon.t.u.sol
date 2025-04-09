@@ -663,6 +663,17 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         pool.withdrawRevenue(2, 0, address(alice));
     }
 
+    function testLiquidity_Pool_WithdrawRevenueAccrued_NegativeAmount() public startAsAdmin endWithStopPrank {
+        _pool_BackAndForthSwaps();
+         vm.expectRevert(
+            abi.encodeWithSignature(
+                "SafeCastOverflowedUintToInt(uint256)",
+                115792089237316195423570985008687907853269984665640564039457584007913129539936
+            )
+        );
+        pool.withdrawRevenue(2, uint(int(-100000)), address(0));
+    }
+    
     function testLiquidity_Pool_NotEnoughCollateral() public {
         vm.startPrank(admin);
         vm.expectRevert(abi.encodeWithSignature("NotEnoughCollateral()"));
