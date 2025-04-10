@@ -148,7 +148,9 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
         // slither-disable-end reentrancy-benign
         // slither-disable-start reentrancy-events // the recipient of the initial transfer is this contract
         _updateParameters();
-        _collectedLPFees = _collectedLPFees.add(int(lpFeeAmount).toPackedFloat(int(yDecimalDiff) - int(POOL_NATIVE_DECIMALS)).div(_w));
+        _collectedLPFees = _collectedLPFees.add(
+            int(lpFeeAmount).toPackedFloat(int(yDecimalDiff) - int(POOL_NATIVE_DECIMALS)).div(_w.sub(_wInactive()))
+        );
         collectedProtocolFees += protocolFeeAmount;
         emit FeesGenerated(lpFeeAmount, protocolFeeAmount);
         emit Swap(_tokenIn, _amountIn, amountOut, _minOut, _recipient);
