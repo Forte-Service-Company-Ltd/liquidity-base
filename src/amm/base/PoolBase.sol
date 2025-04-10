@@ -12,6 +12,7 @@ import {FeeInfo, TBCType} from "../../common/TBC.sol";
 import {MathLibs} from "../mathLibs/MathLibs.sol";
 import {LPToken} from "../../../src/common/LPToken.sol";
 import {Descriptor} from "../../common/SVG/NFTSVG.sol";
+import {SafeCast} from "../../../lib/openzeppelin-contracts/contracts/utils/Math/SafeCast.sol";
 
 /**
  * @title Pool Base
@@ -23,6 +24,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
     using SafeERC20 for IERC20;
     using MathLibs for int256;
     using MathLibs for packedFloat;
+    using SafeCast for uint256;
 
     int256 constant POOL_NATIVE_DECIMALS_NEGATIVE = 0 - int(POOL_NATIVE_DECIMALS);
 
@@ -113,7 +115,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
         protocolFeeCollector = fees._protocolFeeCollector;
         // slither-disable-end missing-zero-check
         yDecimalDiff = POOL_NATIVE_DECIMALS - IERC20Metadata(_yToken).decimals();
-
         /// implementation contract must transfer ownership and emit a PoolDeployed event
     }
 
@@ -144,7 +145,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
         (amountOut, lpFeeAmount, protocolFeeAmount) = simSwap(_tokenIn, _amountIn);
         _checkSlippage(amountOut, _minOut);
 
-        x = sellingX ? x.sub(int(_amountIn).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE)) : x.add(int(amountOut).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE));
+        x = sellingX ? x.sub((_amountIn.toInt256()).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE)) : x.add(int(amountOut).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE));
         // slither-disable-end reentrancy-benign
         // slither-disable-start reentrancy-events // the recipient of the initial transfer is this contract
         _updateParameters();
@@ -186,8 +187,8 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
             _amountIn = _normalizeTokenDecimals(true, _amountIn);
         }
         packedFloat rawAmountOut = sellingX
-            ? _calculateAmountOfYReceivedSellingX(int(_amountIn).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE))
-            : _calculateAmountOfXReceivedSellingY(int(_amountIn).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE));
+            ? _calculateAmountOfYReceivedSellingX((_amountIn).toInt256().toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE))
+            : _calculateAmountOfXReceivedSellingY((_amountIn).toInt256().toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE));
         amountOut = uint(rawAmountOut.convertpackedFloatToWAD());
         if (sellingX) {
             amountOut = _normalizeTokenDecimals(false, amountOut);
