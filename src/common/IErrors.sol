@@ -47,3 +47,6 @@ error ZeroAddress();
 
 /**** ERC721 Errors ****/
 error URIQueryForNonexistentToken();
+
+/**** Ownership Errors ****/
+error RenouncingOwnershipForbidden();

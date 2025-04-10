@@ -109,4 +109,12 @@ abstract contract FactoryBase is Ownable2Step, IFactory {
         protocolFeeCollector = _msgSender();
         emit ProtocolFeeCollectorConfirmed(_msgSender());
     }
+
+    /**
+     * @dev Overriden rounounceOwnership from Ownable.sol
+     * @notice This method prevents irreversible loss of admin rights
+     */
+    function renounceOwnership() public pure override {
+        revert RenouncingOwnershipForbidden();
+    }
 }
