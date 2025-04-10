@@ -103,4 +103,8 @@ abstract contract TestCommon is PythonUtils {
     function _createERC20(string memory _name, string memory _symbol) internal returns (GenericERC20 _token) {
         return new GenericERC20(_name, _symbol);
     }
+
+    function getValidExpiration() internal returns (uint256) {
+        return block.timestamp + 1;
+    }
 }

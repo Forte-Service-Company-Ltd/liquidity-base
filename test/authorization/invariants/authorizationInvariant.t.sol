@@ -26,7 +26,7 @@ abstract contract authorizationInvariants is TestCommonSetup {
         targetSender(alice);
         vm.startPrank(admin);
         (uint expected, , ) = pool.simSwap(address(yToken), 1_000_000_000_000_000_000);
-        pool.swap(address(yToken), 1_000_000_000_000_000_000, expected, msg.sender);
+        pool.swap(address(yToken), 1_000_000_000_000_000_000, expected, msg.sender, getValidExpiration());
 
         _startingXLiquidity = IERC20(pool.xToken()).balanceOf(address(pool));
         _startingYLiquidity = IERC20(pool.yToken()).balanceOf(address(pool));
@@ -37,9 +37,7 @@ abstract contract authorizationInvariants is TestCommonSetup {
     }
 
     function invariant_verifyRevertsForNotOwner_setLPFee() public view {
-        (uint16 fee, , , , ) = pool.getFeeInfo(); 
+        (uint16 fee, , , , ) = pool.getFeeInfo();
         assertEq(fee, 30);
-
     }
-
 }

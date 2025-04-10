@@ -21,26 +21,15 @@ abstract contract SwapInvariants is TestCommonSetup {
         bytes4[] memory selectors = new bytes4[](1);
         selectors[0] = _handler.swap.selector;
         targetContract(address(_handler));
-        targetSelector(
-            FuzzSelector({addr: address(_handler), selectors: selectors})
-        );
+        targetSelector(FuzzSelector({addr: address(_handler), selectors: selectors}));
         targetSender(admin);
         vm.startPrank(admin);
         // Set initial X value to something above 0 before starting to swap for X
-        (uint expected, , ) = pool.simSwap(
-            address(pool.yToken()),
-            1_000_000_000_000_000_000
-        );
-        pool.swap(address(pool.yToken()), 1_000_000_000_000_000_000, expected, msg.sender);
+        (uint expected, , ) = pool.simSwap(address(pool.yToken()), 1_000_000_000_000_000_000);
+        pool.swap(address(pool.yToken()), 1_000_000_000_000_000_000, expected, msg.sender, getValidExpiration());
     }
-    function invariant_verifyAmountOutNeverExceedsLiquidity_TokenX()
-        public
-        view
-    {
-        assertLt(
-            _handler.trackedAmountOutX(),
-            IERC20(pool.xToken()).balanceOf(address(pool))
-        );
+    function invariant_verifyAmountOutNeverExceedsLiquidity_TokenX() public view {
+        assertLt(_handler.trackedAmountOutX(), IERC20(pool.xToken()).balanceOf(address(pool)));
     }
     function invariant_verifyFeesIncreaseTokenX() public {
         assertLt(lastFees, pool.collectedLPFees());

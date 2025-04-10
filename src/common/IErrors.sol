@@ -38,6 +38,7 @@ error xMinCannotBeZero();
 error MaxSlippageReached();
 error LPTokenWithdrawalAmountExceedsAllowance();
 error QTooHigh();
+error TransactionExpired();
 
 /**** PoolFactoryErrors ****/
 error NotAnAllowedDeployer();
