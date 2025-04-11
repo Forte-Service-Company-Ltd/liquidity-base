@@ -12,7 +12,6 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  */
 abstract contract SwapInvariants is TestCommonSetup {
     SwapHandler _handler;
-    uint256 lastFees;
     uint lastCumulativePrice;
     uint lastBlockTimestamp;
     function setUp() public endWithStopPrank {
@@ -30,9 +29,5 @@ abstract contract SwapInvariants is TestCommonSetup {
     }
     function invariant_verifyAmountOutNeverExceedsLiquidity_TokenX() public view {
         assertLt(_handler.trackedAmountOutX(), IERC20(pool.xToken()).balanceOf(address(pool)));
-    }
-    function invariant_verifyFeesIncreaseTokenX() public {
-        assertLt(lastFees, pool.collectedLPFees());
-        lastFees = pool.collectedLPFees();
     }
 }

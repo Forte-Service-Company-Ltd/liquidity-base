@@ -275,7 +275,6 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         uint256 totalOut;
         uint counter = 1;
         uint minimumSwapCount = 9;
-        uint previousCollectedFees;
 
         while (totalOut + amountIn < startingLiquidity) {
             amountIn = counter * counter * amountIn;
@@ -294,10 +293,8 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
                 counter++;
                 assertEq(actual, expected);
                 assertEq(expectedFeeAmount, actualFeeAmount);
-                assertLt(previousCollectedFees, pool.collectedLPFees());
                 previous = actual;
                 totalOut += actual;
-                previousCollectedFees = pool.collectedLPFees();
             } catch {
                 break;
             }
@@ -431,9 +428,6 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         console2.log("expected", expected);
         uint yBalance = IERC20(pool.yToken()).balanceOf(address(pool));
         console2.log("yBalance", yBalance);
-        uint fees = pool.collectedLPFees();
-        console2.log("fees", fees);
-        console2.log("yBalance - fees", yBalance - fees);
         /// we check that the pool would have enough liquidity to buy back all the x tokens
         // assertLe(expected, yliq, "not enough liquidity to buy back x tokens");
 
@@ -481,9 +475,6 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         }
         uint yBalance = IERC20(pool.yToken()).balanceOf(address(pool));
         console2.log("yBalance", yBalance);
-        uint fees = pool.collectedLPFees();
-        console2.log("fees", fees);
-        console2.log("yBalance - fees:", yBalance - fees);
         _checkRevenueState();
     }
 
@@ -536,9 +527,6 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         }
         uint yBalance = IERC20(pool.yToken()).balanceOf(address(pool));
         console2.log("yBalance", yBalance);
-        uint fees = pool.collectedLPFees();
-        console2.log("fees", fees);
-        console2.log("yBalance - fees", yBalance - fees);
         _checkRevenueState();
     }
 
@@ -553,10 +541,11 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         vm.expectRevert(
             abi.encodeWithSignature(
                 "ERC20InsufficientBalance(address,uint256,uint256)",
-                admin, 1e12 * fullToken, 
-                address(_yToken) == address(stableCoin) ? 
-                115792089237316195423570985008687907853269984665640564039457584007912129639936 : 
-                115792089237316195423570985008687907853269984665640564038457584007913129639936
+                admin,
+                1e12 * fullToken,
+                address(_yToken) == address(stableCoin)
+                    ? 115792089237316195423570985008687907853269984665640564039457584007912129639936
+                    : 115792089237316195423570985008687907853269984665640564038457584007913129639936
             )
         );
         pool.swap(address(_yToken), uint(-int(1_000 * fullToken)), expected, address(0), getValidExpiration());
@@ -665,7 +654,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
 
     function testLiquidity_Pool_WithdrawRevenueAccrued_NegativeAmount() public startAsAdmin endWithStopPrank {
         _pool_BackAndForthSwaps();
-         vm.expectRevert(
+        vm.expectRevert(
             abi.encodeWithSignature(
                 "SafeCastOverflowedUintToInt(uint256)",
                 115792089237316195423570985008687907853269984665640564039457584007913129539936
@@ -673,7 +662,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         );
         pool.withdrawRevenue(2, uint(int(-100000)), address(0));
     }
-    
+
     function testLiquidity_Pool_NotEnoughCollateral() public {
         vm.startPrank(admin);
         vm.expectRevert(abi.encodeWithSignature("NotEnoughCollateral()"));
