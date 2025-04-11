@@ -559,7 +559,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
                 115792089237316195423570985008687907853269984665640564038457584007913129639936
             )
         );
-        pool.swap(address(_yToken), uint(-int(1_000 * fullToken)), expected, address(0));
+        pool.swap(address(_yToken), uint(-int(1_000 * fullToken)), expected, address(0), getValidExpiration());
 
         // now we carry out the valid swap
         pool.swap(address(_yToken), 1_000 * fullToken, expected, msg.sender, getValidExpiration());
