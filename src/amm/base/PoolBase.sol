@@ -313,7 +313,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
      * @return currently claimable LP fee balance
      */
     function collectedLPFees() external view returns (uint256) {
-        return _normalizeTokenDecimals(false, uint((_collectedLPFees.mul(_w)).convertpackedFloatToWAD()));
+        return _normalizeTokenDecimals(false, uint((_collectedLPFees.mul(_w.sub(_wInactive()))).convertpackedFloatToWAD()));
     }
 
     function getFeeInfo() external view returns (uint16, uint16, address, address, uint256) {
