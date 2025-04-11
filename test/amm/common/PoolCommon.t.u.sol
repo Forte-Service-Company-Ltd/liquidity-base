@@ -547,6 +547,21 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         vm.startPrank(admin);
         // Set initial X value to something above 0 before starting to swap for X
         (uint expected, uint feeAmount, ) = pool.simSwap(address(_yToken), 1_000 * fullToken);
+
+        // we test that no disguised negative amount in can be traded.
+        _yToken.approve(address(pool), type(uint256).max);
+        vm.expectRevert(
+            abi.encodeWithSignature(
+                "ERC20InsufficientBalance(address,uint256,uint256)",
+                admin, 1e12 * fullToken, 
+                address(_yToken) == address(stableCoin) ? 
+                115792089237316195423570985008687907853269984665640564039457584007912129639936 : 
+                115792089237316195423570985008687907853269984665640564038457584007913129639936
+            )
+        );
+        pool.swap(address(_yToken), uint(-int(1_000 * fullToken)), expected, address(0), getValidExpiration());
+
+        // now we carry out the valid swap
         pool.swap(address(_yToken), 1_000 * fullToken, expected, msg.sender, getValidExpiration());
         uint256 previous = 0;
 
@@ -648,6 +663,17 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         pool.withdrawRevenue(2, 0, address(alice));
     }
 
+    function testLiquidity_Pool_WithdrawRevenueAccrued_NegativeAmount() public startAsAdmin endWithStopPrank {
+        _pool_BackAndForthSwaps();
+         vm.expectRevert(
+            abi.encodeWithSignature(
+                "SafeCastOverflowedUintToInt(uint256)",
+                115792089237316195423570985008687907853269984665640564039457584007913129539936
+            )
+        );
+        pool.withdrawRevenue(2, uint(int(-100000)), address(0));
+    }
+    
     function testLiquidity_Pool_NotEnoughCollateral() public {
         vm.startPrank(admin);
         vm.expectRevert(abi.encodeWithSignature("NotEnoughCollateral()"));

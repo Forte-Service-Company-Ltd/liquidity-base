@@ -5,6 +5,7 @@ import {Pausable} from "../../../lib/openzeppelin-contracts/contracts/utils/Paus
 import {IERC20Metadata} from "../../../lib/openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import {IERC20} from "../../../lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "../../../lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
+import {SafeCast} from "../../../lib/openzeppelin-contracts/contracts/utils/math/SafeCast.sol";
 import {IPool} from "./IPool.sol";
 import "../../common/IErrors.sol";
 import {CalculatorBase, packedFloat} from "./CalculatorBase.sol";
@@ -23,6 +24,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
     using SafeERC20 for IERC20;
     using MathLibs for int256;
     using MathLibs for packedFloat;
+    using SafeCast for uint256;
 
     int256 constant POOL_NATIVE_DECIMALS_NEGATIVE = 0 - int(POOL_NATIVE_DECIMALS);
 
@@ -113,7 +115,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
         protocolFeeCollector = fees._protocolFeeCollector;
         // slither-disable-end missing-zero-check
         yDecimalDiff = POOL_NATIVE_DECIMALS - IERC20Metadata(_yToken).decimals();
-
         /// implementation contract must transfer ownership and emit a PoolDeployed event
     }
 
@@ -144,7 +145,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
         (amountOut, lpFeeAmount, protocolFeeAmount) = simSwap(_tokenIn, _amountIn);
         _checkSlippage(amountOut, _minOut);
 
-        x = sellingX ? x.sub(int(_amountIn).toPackedFloat(-18)) : x.add(int(amountOut).toPackedFloat(-18));
+        x = sellingX ? x.sub((_amountIn.toInt256()).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE)) : x.add(int(amountOut).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE));
         // slither-disable-end reentrancy-benign
         // slither-disable-start reentrancy-events // the recipient of the initial transfer is this contract
         _updateParameters();
@@ -186,8 +187,8 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
             _amountIn = _normalizeTokenDecimals(true, _amountIn);
         }
         packedFloat rawAmountOut = sellingX
-            ? _calculateAmountOfYReceivedSellingX(int(_amountIn).toPackedFloat(-18))
-            : _calculateAmountOfXReceivedSellingY(int(_amountIn).toPackedFloat(-18));
+            ? _calculateAmountOfYReceivedSellingX((_amountIn).toInt256().toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE))
+            : _calculateAmountOfXReceivedSellingY((_amountIn).toInt256().toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE));
         amountOut = uint(rawAmountOut.convertpackedFloatToWAD());
         if (sellingX) {
             amountOut = _normalizeTokenDecimals(false, amountOut);
@@ -218,7 +219,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
         if (!buyingX && _tokenout != yToken) revert InvalidToken();
 
         if (buyingX) {
-            packedFloat amountInRaw = _calculateAmountOfYRequiredBuyingX(int(_amountOut).toPackedFloat(-18));
+            packedFloat amountInRaw = _calculateAmountOfYRequiredBuyingX(int(_amountOut).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE));
             uint256 uamountInRaw = uint(amountInRaw.convertpackedFloatToWAD());
             uamountInRaw = _normalizeTokenDecimals(false, uamountInRaw); // reversed logic because swap is reversed
             (protocolFeeAmount, lpFeeAmount) = _determineProtocolAndLPFeesBuy(uamountInRaw);
@@ -226,7 +227,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
         } else {
             (protocolFeeAmount, lpFeeAmount) = _determineProtocolAndLPFeesBuy(_amountOut);
             _amountOut = _normalizeTokenDecimals(true, _amountOut + protocolFeeAmount + lpFeeAmount); // reversed logic because swap is reversed
-            packedFloat amountInRaw = _calculateAmountOfXRequiredBuyingY(int(_amountOut).toPackedFloat(-18));
+            packedFloat amountInRaw = _calculateAmountOfXRequiredBuyingY(int(_amountOut).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE));
             amountIn = uint(amountInRaw.convertpackedFloatToWAD());
         }
     }
