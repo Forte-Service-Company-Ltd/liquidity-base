@@ -145,7 +145,9 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
         (amountOut, lpFeeAmount, protocolFeeAmount) = simSwap(_tokenIn, _amountIn);
         _checkSlippage(amountOut, _minOut);
 
-        x = sellingX ? x.sub((_amountIn.toInt256()).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE)) : x.add(int(amountOut).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE));
+        x = sellingX
+            ? x.sub((_amountIn.toInt256()).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE))
+            : x.add(int(amountOut).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE));
         // slither-disable-end reentrancy-benign
         // slither-disable-start reentrancy-events // the recipient of the initial transfer is this contract
         _updateParameters();
@@ -306,14 +308,6 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
         if (yDecimalDiff != 0) {
             sPrice = _normalizeTokenDecimals(false, sPrice);
         }
-    }
-
-    /**
-     * @dev tells current LP fees accumulated in the pool
-     * @return currently claimable LP fee balance
-     */
-    function collectedLPFees() external view returns (uint256) {
-        return _normalizeTokenDecimals(false, uint((_collectedLPFees.mul(_w)).convertpackedFloatToWAD()));
     }
 
     function getFeeInfo() external view returns (uint16, uint16, address, address, uint256) {

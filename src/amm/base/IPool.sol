@@ -145,12 +145,6 @@ interface IPool is IPoolEvents {
         );
 
     /**
-     * @dev tells current LP fees accumulated in the pool
-     * @return currently claimable LP fee balance
-     */
-    function collectedLPFees() external returns (uint256);
-
-    /**
      * @dev returns the current total liquidity in the Pool
      * @return w
      */
