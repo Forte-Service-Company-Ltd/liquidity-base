@@ -94,6 +94,17 @@ contract CommonDeployment is Script, PythonUtils {
         factory.proposeProtocolFeeCollector(_protocolFeeCollector);
         factory.confirmProtocolFeeCollector();
     }
+
+    function approvePool(address poolAddress, address xTokenAddress, address yTokenAddress, address ownerAddress) internal {
+        IERC20 tokenX = IERC20(xTokenAddress);
+        {
+            IERC20 tokenY = IERC20(yTokenAddress);
+            tokenX.approve(poolAddress, tokenX.totalSupply());
+            tokenX.approve(ownerAddress, tokenX.totalSupply());
+            tokenY.approve(poolAddress, tokenX.totalSupply());
+            tokenY.approve(ownerAddress, tokenX.totalSupply());
+        }
+    }
 }
 
 contract allowlistsDeployment is CommonDeployment {
@@ -223,55 +234,5 @@ abstract contract Recorder is Script {
             "_deploymentRecord.json"
         );
         vm.writeJson(recordJson, path);
-    }
-}
-
-contract PoolDeploymentCommon is CommonDeployment {
-    function prepareForDeployment() internal returns (IFactory factory, GenericERC20FixedSupply xToken, GenericERC20 yToken) {
-        vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
-        (xToken, yToken) = deployTokens(10e21);
-        (AllowList yTokenAllowList, AllowList deployerAllowList) = deployAllowLists();
-        factory = _deployFactory();
-        address deployerAddress = vm.envAddress("DEPLOYMENT_OWNER");
-        {
-            yTokenAllowList.addToAllowList(address(yToken));
-            deployerAllowList.addToAllowList(deployerAddress);
-            factory.setYTokenAllowList(address(yTokenAllowList));
-            factory.setDeployerAllowList(address(deployerAllowList));
-            factory.setProtocolFee(uint16(vm.envUint("PROTOCOL_FEE_AMOUNT")));
-            setProtocolFeeCollector(factory, vm.envAddress("FEE_COLLECTOR"), uint256(vm.envUint("FEE_COLLECTOR_KEY")));
-        }
-    }
-
-    function prepareForPoolDeployment() internal returns (IFactory factory, GenericERC20FixedSupply xToken, GenericERC20 yToken) {
-        vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
-        AllowList yTokenAllowList = AllowList(vm.envAddress("Y_TOKEN_ALLOWLIST"));
-        AllowList deployerAllowList = AllowList(vm.envAddress("DEPLOYER_ALLOWLIST"));
-        factory = IFactory(vm.envAddress("ALTBC_FACTORY"));
-        xToken = GenericERC20FixedSupply(vm.envAddress("XTOKEN_ADDRESS"));
-        yToken = GenericERC20(vm.envAddress("YTOKEN_ADDRESS"));
-        address deployerAddress = vm.envAddress("DEPLOYMENT_OWNER");
-        {
-            yTokenAllowList.addToAllowList(address(yToken));
-            deployerAllowList.addToAllowList(deployerAddress);
-            factory.setYTokenAllowList(address(yTokenAllowList));
-            factory.setDeployerAllowList(address(deployerAllowList));
-            factory.setProtocolFee(uint16(vm.envUint("PROTOCOL_FEE_AMOUNT")));
-            setProtocolFeeCollectorOneAddr(factory, deployerAddress);
-        }
-    }
-}
-
-contract PoolConfigDeploymentCommon is CommonDeployment, Recorder {
-    function approvePool(address poolAddress, address xTokenAddress, address yTokenAddress, address ownerAddress) internal {
-        IERC20 tokenX = IERC20(xTokenAddress);
-        {
-            IERC20 tokenY = IERC20(yTokenAddress);
-            tokenX.approve(poolAddress, tokenX.totalSupply());
-            tokenX.approve(ownerAddress, tokenX.totalSupply());
-            tokenY.approve(poolAddress, tokenX.totalSupply());
-            tokenY.approve(ownerAddress, tokenX.totalSupply());
-        }
-        {}
     }
 }
