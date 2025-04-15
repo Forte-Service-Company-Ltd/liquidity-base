@@ -98,6 +98,11 @@ contract CommonDeployment is Script, PythonUtils {
         factory.confirmProtocolFeeCollector();
         vm.stopBroadcast();
     }
+
+    function setProtocolFeeCollectorOneAddr(IFactory factory, address _protocolFeeCollector) internal {
+        factory.proposeProtocolFeeCollector(_protocolFeeCollector);
+        factory.confirmProtocolFeeCollector();
+    }
 }
 
 contract allowlistsDeployment is CommonDeployment {
@@ -262,16 +267,33 @@ contract PoolDeploymentCommon is CommonDeployment {
         (AllowList yTokenAllowList, AllowList deployerAllowList) = deployAllowLists();
         factory = _deployFactory();
         address deployerAddress = vm.envAddress("DEPLOYMENT_OWNER");
-        console.log(deployerAddress);
         {
             yTokenAllowList.addToAllowList(address(yToken));
             deployerAllowList.addToAllowList(deployerAddress);
             factory.setYTokenAllowList(address(yTokenAllowList));
             factory.setDeployerAllowList(address(deployerAllowList));
             factory.setProtocolFee(uint16(vm.envUint("PROTOCOL_FEE_AMOUNT")));
-            setProtocolFeeCollector(factory, vm.envAddress("FEE_COLLECTOR"), uint256(vm.envUint("FEE_COLLECTOR_KEY")));
+            setProtocolFeeCollector(factory, vm.envAddress("    FEE_COLLECTOR"), uint256(vm.envUint("FEE_COLLECTOR_KEY")));
         }
         vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
+    }
+
+    function prepareForPoolDeployment() internal returns (IFactory factory, GenericERC20FixedSupply xToken, GenericERC20 yToken) {
+        vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
+        AllowList yTokenAllowList = AllowList(vm.envAddress("Y_TOKEN_ALLOWLIST"));
+        AllowList deployerAllowList = AllowList(vm.envAddress("DEPLOYER_ALLOWLIST"));
+        factory = IFactory(vm.envAddress("ALTBC_FACTORY"));
+        xToken = GenericERC20FixedSupply(vm.envAddress("XTOKEN_ADDRESS"));
+        yToken = GenericERC20(vm.envAddress("YTOKEN_ADDRESS"));
+        address deployerAddress = vm.envAddress("DEPLOYMENT_OWNER");
+        {
+            yTokenAllowList.addToAllowList(address(yToken));
+            deployerAllowList.addToAllowList(deployerAddress);
+            factory.setYTokenAllowList(address(yTokenAllowList));
+            factory.setDeployerAllowList(address(deployerAllowList));
+            factory.setProtocolFee(uint16(vm.envUint("PROTOCOL_FEE_AMOUNT")));
+            setProtocolFeeCollectorOneAddr(factory, deployerAddress);
+        }
     }
 }
 
