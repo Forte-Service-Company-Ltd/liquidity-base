@@ -20,8 +20,10 @@ contract CommonDeployment is Script, PythonUtils {
     function _deployFactory() internal virtual returns (IFactory) {}
 
     function deployAllowLists() internal returns (AllowList yTokenAllowList, AllowList deployerAllowList) {
+        vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
         yTokenAllowList = new AllowList();
         deployerAllowList = new AllowList();
+        vm.stopBroadcast();
         setENVAddress("Y_TOKEN_ALLOWLIST", vm.toString(address(yTokenAllowList)));
         setENVAddress("DEPLOYER_ALLOWLIST", vm.toString(address(deployerAllowList)));
         console2.log("Y_TOKEN_ALLOWLIST", vm.toString(address(yTokenAllowList)));
@@ -30,24 +32,14 @@ contract CommonDeployment is Script, PythonUtils {
 
     // used for deploying a fresh batch of tokens
     function deployTokens(uint supply) internal returns (GenericERC20FixedSupply xToken, GenericERC20 yToken) {
-        xToken = new GenericERC20FixedSupply("Test Token", "TST", supply);
-        yToken = new GenericERC20("collateral token", "COLL");
-        address _owner = vm.envAddress("DEPLOYMENT_OWNER");
-        yToken.mint(_owner, supply);
-        setENVAddress("XTOKEN_ADDRESS", vm.toString(address(xToken)));
-        setENVAddress("YTOKEN_ADDRESS", vm.toString(address(yToken)));
-        console2.log("xToken", address(xToken));
-        console2.log("yToken", address(yToken));
-        require(yToken.totalSupply() == supply, "yToken supply is not equal to the supply passed to the function");
-        require(xToken.totalSupply() == supply, "xToken supply is not equal to the supply passed to the function");
-        require(yToken.owner() == _owner, "yToken owner is not the owner passed to the function");
-        require(yToken.balanceOf(_owner) == supply, "yToken balance of the owner is not equal to the supply passed to the function");
-        require(xToken.balanceOf(_owner) == supply, "xToken balance of the owner is not equal to the supply passed to the function");
-        console2.log("Test Token (TST):", address(xToken), "\n collateral token (COLL):", address(yToken));
+        xToken = deployXToken(supply); //new GenericERC20FixedSupply("Test Token", "TST", supply);
+        yToken = deployWETH(supply); //new GenericERC20("collateral token", "COLL");
     }
 
     function deployXToken(uint supply) internal returns (GenericERC20FixedSupply xToken) {
+        vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
         xToken = new GenericERC20FixedSupply("Test Token", "TST", supply);
+        vm.stopBroadcast();
         setENVAddress("XTOKEN_ADDRESS", vm.toString(address(xToken)));
         require(xToken.totalSupply() == supply, "xToken supply is not equal to the supply passed to the function");
         require(
@@ -58,8 +50,11 @@ contract CommonDeployment is Script, PythonUtils {
     }
 
     function deployWETH(uint supply) internal returns (GenericERC20 weth) {
+        vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
         weth = new GenericERC20("Wrapped Ether", "WETH");
+
         weth.mint(vm.envAddress("DEPLOYMENT_OWNER"), supply);
+        vm.stopBroadcast();
         setENVAddress("YTOKEN_ADDRESS", vm.toString(address(weth)));
         setENVAddress("WETH_ADDRESS", vm.toString(address(weth)));
         require(weth.totalSupply() == supply, "weth supply is not equal to the supply passed to the function");
@@ -67,12 +62,15 @@ contract CommonDeployment is Script, PythonUtils {
             weth.balanceOf(vm.envAddress("DEPLOYMENT_OWNER")) == supply,
             "weth balance of the owner is not equal to the supply passed to the function"
         );
+        require(weth.owner() == vm.envAddress("DEPLOYMENT_OWNER"), "weth owner is not the owner passed to the function");
         console2.log("Wrapped Ether (WETH):", address(weth));
     }
 
     function deployStableCoin(uint supply) internal returns (SixDecimalERC20 stableCoin) {
+        vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
         stableCoin = new SixDecimalERC20("Stable Coin", "STC");
         stableCoin.mint(vm.envAddress("DEPLOYMENT_OWNER"), supply);
+        vm.stopBroadcast();
         setENVAddress("YTOKEN_ADDRESS", vm.toString(address(stableCoin)));
         setENVAddress("STC_ADDRESS", vm.toString(address(stableCoin)));
         require(stableCoin.totalSupply() == supply, "stableCoin supply is not equal to the supply passed to the function");
@@ -83,18 +81,11 @@ contract CommonDeployment is Script, PythonUtils {
         console2.log("Stable Coin (STC):", address(stableCoin));
     }
 
-    function deployERC721() internal returns (ExampleERC721URI) {
-        ExampleERC721URI erc721 = new ExampleERC721URI("Example ERC721", "ERC721");
-        setENVAddress("ERC721_ADDRESS", vm.toString(address(erc721)));
-        console2.log("Example ERC721 (ERC721):", address(erc721));
-        erc721.mint(vm.envAddress("DEPLOYMENT_OWNER"));
-        return erc721;
-    }
-
-    function setProtocolFeeCollector(IFactory factory, address _protocolFeeCollector, uint feeCollectorFee) internal {
+    function setProtocolFeeCollector(IFactory factory, address _protocolFeeCollector, uint feeCollectorKey) internal {
+        vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
         factory.proposeProtocolFeeCollector(_protocolFeeCollector);
         vm.stopBroadcast();
-        vm.startBroadcast(feeCollectorFee);
+        vm.startBroadcast(feeCollectorKey);
         factory.confirmProtocolFeeCollector();
         vm.stopBroadcast();
     }
@@ -108,54 +99,29 @@ contract CommonDeployment is Script, PythonUtils {
 contract allowlistsDeployment is CommonDeployment {
     function run() external {
         uint256 privateKey = vm.envUint("DEPLOYMENT_OWNER_KEY");
-        vm.startBroadcast(privateKey);
         deployAllowLists();
-        vm.stopBroadcast();
     }
 }
 
 contract TokenDeployment is CommonDeployment {
     function run() external {
-        vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
         deployTokens(10e21);
-        vm.stopBroadcast();
     }
 }
 
 contract WETHDeployment is CommonDeployment {
     function run() external {
-        vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
         deployWETH(10e18);
-        vm.stopBroadcast();
-    }
-}
-
-contract StableCoinDeployment is CommonDeployment {
-    function run() external {
-        vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
-        deployStableCoin(10e21);
-        vm.stopBroadcast();
-    }
-}
-
-contract XTokenDeployment is CommonDeployment {
-    function run() external {
-        vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
-        deployTokens(10e21);
-        vm.stopBroadcast();
-    }
-}
-
-contract ERC721Deployment is CommonDeployment {
-    function run() external {
-        vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
-        deployERC721();
-        vm.stopBroadcast();
     }
 }
 
 contract CommonConfigDeployment is CommonDeployment {
     IFactory _factory;
+
+    function deployExternalContracts(uint _supply) internal {
+        deployAllowLists();
+        deployTokens(_supply);
+    }
 
     function prepareForDeployment() internal {
         if (address(_factory) == address(0)) {
@@ -204,9 +170,9 @@ contract CommonConfigDeployment is CommonDeployment {
             _factory.proposeProtocolFeeCollector(vm.envAddress("FEE_COLLECTOR"));
             _factory.setProtocolFee(uint16(vm.envUint("PROTOCOL_FEE_AMOUNT")));
         }
+        vm.stopBroadcast();
         {
             setProtocolFeeCollector(_factory, vm.envAddress("FEE_COLLECTOR"), uint256(vm.envUint("FEE_COLLECTOR_KEY")));
-            vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
         }
     }
 }
@@ -273,9 +239,8 @@ contract PoolDeploymentCommon is CommonDeployment {
             factory.setYTokenAllowList(address(yTokenAllowList));
             factory.setDeployerAllowList(address(deployerAllowList));
             factory.setProtocolFee(uint16(vm.envUint("PROTOCOL_FEE_AMOUNT")));
-            setProtocolFeeCollector(factory, vm.envAddress("    FEE_COLLECTOR"), uint256(vm.envUint("FEE_COLLECTOR_KEY")));
+            setProtocolFeeCollector(factory, vm.envAddress("FEE_COLLECTOR"), uint256(vm.envUint("FEE_COLLECTOR_KEY")));
         }
-        vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
     }
 
     function prepareForPoolDeployment() internal returns (IFactory factory, GenericERC20FixedSupply xToken, GenericERC20 yToken) {
@@ -298,7 +263,7 @@ contract PoolDeploymentCommon is CommonDeployment {
 }
 
 contract PoolConfigDeploymentCommon is CommonDeployment, Recorder {
-    function initializePool(address poolAddress, address xTokenAddress, address yTokenAddress, address ownerAddress) internal {
+    function approvePool(address poolAddress, address xTokenAddress, address yTokenAddress, address ownerAddress) internal {
         IERC20 tokenX = IERC20(xTokenAddress);
         {
             IERC20 tokenY = IERC20(yTokenAddress);
@@ -307,9 +272,6 @@ contract PoolConfigDeploymentCommon is CommonDeployment, Recorder {
             tokenY.approve(poolAddress, tokenX.totalSupply());
             tokenY.approve(ownerAddress, tokenX.totalSupply());
         }
-        {
-            PoolBase pool = PoolBase(poolAddress);
-            setENVAddress("POOL_CONTRACT", vm.toString(address(pool)));
-        }
+        {}
     }
 }
