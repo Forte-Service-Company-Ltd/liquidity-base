@@ -166,9 +166,8 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         // the token supply is the same value used in the stress test simulation and must match
         uint256 maxX = uint(int(10000000000000000000000000000000000000).toPackedFloat(-34).convertpackedFloatToWAD());
         // We need enough coin for the admin to run through all actions
-        // TODO fix this solution. It should just mint max uint for each token
-        _setUpTokensAndFactories(maxX * 10_000_00000000000000);
-        stableCoin.mint(admin, maxX * 10_000_00000000000000000 * STABLECOIN_DEC);
+        _setUpTokensAndFactories(maxX * 1e18);
+        stableCoin.mint(admin, maxX * 1e21 * STABLECOIN_DEC);
 
         _approveFactory(address(xToken));
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
