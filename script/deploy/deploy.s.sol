@@ -16,9 +16,7 @@ import {SixDecimalERC20} from "src/example/ERC20/SixDecimalERC20.sol";
 import {ExampleERC721URI} from "src/example/ERC721/ExampleERC721URI.sol";
 import {Descriptor, SVGLinesPart1, SVGLinesPart2, SVGLinesPart3, SVG, HexStrings} from "../../src/common/SVG/NFTSVG.sol";
 
-contract CommonDeployment is Script, PythonUtils {
-    function _deployFactory() internal virtual returns (IFactory) {}
-
+contract ExternalDeployments is Script, PythonUtils {
     function deployAllowLists() internal returns (AllowList yTokenAllowList, AllowList deployerAllowList) {
         vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
         yTokenAllowList = new AllowList();
@@ -81,6 +79,42 @@ contract CommonDeployment is Script, PythonUtils {
         console2.log("Stable Coin (STC):", address(stableCoin));
     }
 
+    function deployExternalContracts(uint _supply) internal {
+        deployAllowLists();
+        deployTokens(_supply);
+    }
+}
+
+contract allowlistsDeployment is ExternalDeployments {
+    function run() external {
+        uint256 privateKey = vm.envUint("DEPLOYMENT_OWNER_KEY");
+        deployAllowLists();
+    }
+}
+
+contract TokenDeployment is ExternalDeployments {
+    function run() external {
+        deployTokens(10e21);
+    }
+}
+
+contract WETHDeployment is ExternalDeployments {
+    function run() external {
+        deployWETH(10e18);
+    }
+}
+
+contract StableCoinDeployment is ExternalDeployments {
+    function run() external {
+        deployStableCoin(10e18);
+    }
+}
+
+abstract contract FactoryDeployment is Script, PythonUtils {
+    IFactory _factory;
+
+    function _deployFactory() internal virtual returns (IFactory);
+
     function setProtocolFeeCollector(IFactory factory, address _protocolFeeCollector, uint feeCollectorKey) internal {
         vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
         factory.proposeProtocolFeeCollector(_protocolFeeCollector);
@@ -88,50 +122,6 @@ contract CommonDeployment is Script, PythonUtils {
         vm.startBroadcast(feeCollectorKey);
         factory.confirmProtocolFeeCollector();
         vm.stopBroadcast();
-    }
-
-    function setProtocolFeeCollectorOneAddr(IFactory factory, address _protocolFeeCollector) internal {
-        factory.proposeProtocolFeeCollector(_protocolFeeCollector);
-        factory.confirmProtocolFeeCollector();
-    }
-
-    function approvePool(address poolAddress, address xTokenAddress, address yTokenAddress, address ownerAddress) internal {
-        IERC20 tokenX = IERC20(xTokenAddress);
-        {
-            IERC20 tokenY = IERC20(yTokenAddress);
-            tokenX.approve(poolAddress, tokenX.totalSupply());
-            tokenX.approve(ownerAddress, tokenX.totalSupply());
-            tokenY.approve(poolAddress, tokenX.totalSupply());
-            tokenY.approve(ownerAddress, tokenX.totalSupply());
-        }
-    }
-}
-
-contract allowlistsDeployment is CommonDeployment {
-    function run() external {
-        uint256 privateKey = vm.envUint("DEPLOYMENT_OWNER_KEY");
-        deployAllowLists();
-    }
-}
-
-contract TokenDeployment is CommonDeployment {
-    function run() external {
-        deployTokens(10e21);
-    }
-}
-
-contract WETHDeployment is CommonDeployment {
-    function run() external {
-        deployWETH(10e18);
-    }
-}
-
-contract CommonConfigDeployment is CommonDeployment {
-    IFactory _factory;
-
-    function deployExternalContracts(uint _supply) internal {
-        deployAllowLists();
-        deployTokens(_supply);
     }
 
     function prepareForDeployment() internal {
@@ -234,5 +224,18 @@ abstract contract Recorder is Script {
             "_deploymentRecord.json"
         );
         vm.writeJson(recordJson, path);
+    }
+}
+
+contract CommonPoolDeployment is Script, PythonUtils {
+    function approvePool(address poolAddress, address xTokenAddress, address yTokenAddress, address ownerAddress) internal {
+        IERC20 tokenX = IERC20(xTokenAddress);
+        {
+            IERC20 tokenY = IERC20(yTokenAddress);
+            tokenX.approve(poolAddress, tokenX.totalSupply());
+            tokenX.approve(ownerAddress, tokenX.totalSupply());
+            tokenY.approve(poolAddress, tokenX.totalSupply());
+            tokenY.approve(ownerAddress, tokenX.totalSupply());
+        }
     }
 }
