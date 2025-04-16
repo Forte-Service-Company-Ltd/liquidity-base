@@ -13,6 +13,7 @@ import {TwentyTwoDecimalERC20} from "src/example/ERC20/TwentyTwoDecimalERC20.sol
 import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {TestCommonSetupAbs, TBCInputOption} from "test/util/TestCommonSetupAbs.sol";
 import {LPToken} from "src/common/LPToken.sol";
+import {Float128, packedFloat, MathLibs} from "src/amm/mathLibs/MathLibs.sol";
 import "forge-std/console2.sol";
 
 /**
@@ -23,6 +24,10 @@ import "forge-std/console2.sol";
  * _create = deploy contract, return the contract
  */
 abstract contract TestCommonSetup is TestCommonSetupAbs {
+    using MathLibs for int256;
+    using MathLibs for uint256;
+    using MathLibs for packedFloat;
+
     function _setupCollateralToken() internal {
         _yToken = IERC20(pool.yToken());
         fullToken = address(_yToken) == address(stableCoin) ? STABLECOIN_DEC : ERC20_DECIMALS;
@@ -159,15 +164,28 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
 
     function _setupStressTestPool(bool withStableCoin) internal endWithStopPrank returns (PoolBase poolRet) {
         // the token supply is the same value used in the stress test simulation and must match
-        uint256 maxX = 10e3 * ERC20_DECIMALS;
-        _setUpTokensAndFactories(maxX);
+        uint256 maxX = uint(int(10000000000000000000000000000000000000).toPackedFloat(-34).convertpackedFloatToWAD());
+        // We need enough coin for the admin to run through all actions
+        // TODO fix this solution. It should just mint max uint for each token
+        _setUpTokensAndFactories(maxX * 10_000_00000000000000);
+        stableCoin.mint(admin, maxX * 10_000_00000000000000000 * STABLECOIN_DEC);
+
         _approveFactory(address(xToken));
         address yTokenAddress = withStableCoin ? address(stableCoin) : address(yToken);
         // the pool config values are the same config values used in the stress test simulation and must match
-        /// fee: 0.0%, supply: 10K tokens, y-intersect: 10, minPrice: 1, maxPrice: 100
-        poolRet = _deployPool(address(xToken), yTokenAddress, 0, maxX, TBCInputOption.FORK);
-        _approvePool(poolRet, false);
-        // _addInitialLiquidity(poolRet, 10e3 * ERC20_DECIMALS);
+        poolRet = _deployStressTestPool(
+            address(xToken),
+            yTokenAddress,
+            50, // phi
+            maxX,
+            TBCInputOption.STRESS
+        );
+        IERC20 _xToken = IERC20(poolRet.xToken());
+        IERC20 _yToken = IERC20(poolRet.yToken());
+        _xToken.approve(address(poolRet), type(uint256).max);
+        _yToken.approve(address(poolRet), type(uint256).max);
+        vm.startPrank(address(0xb0b));
+        poolRet.setProtocolFee(10);
     }
 
     function _setupPrecisionPools(
