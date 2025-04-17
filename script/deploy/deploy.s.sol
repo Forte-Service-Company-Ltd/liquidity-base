@@ -30,8 +30,8 @@ contract ExternalDeployments is Script, PythonUtils {
 
     // used for deploying a fresh batch of tokens
     function deployTokens(uint supply) internal returns (GenericERC20FixedSupply xToken, GenericERC20 yToken) {
-        xToken = deployXToken(supply); //new GenericERC20FixedSupply("Test Token", "TST", supply);
-        yToken = deployWETH(supply); //new GenericERC20("collateral token", "COLL");
+        xToken = deployXToken(supply);
+        yToken = deployWETH(supply);
     }
 
     function deployXToken(uint supply) internal returns (GenericERC20FixedSupply xToken) {
