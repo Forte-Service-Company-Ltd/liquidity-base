@@ -8,15 +8,12 @@ echo "################################################################"
 
 if [[ $2 == "local" ]]; then
     url=$LOCAL_RPC_URL
-    key=$LOCAL_DEPLOYER_KEY
     legacyArg=""
 elif [[ $2 == "amoy" ]]; then
     url=$AMOY_RPC_URL
-    key=$AMOY_DEPLOYER_KEY
     legacyArg=""
 elif [[ $2 == "sepolia" ]]; then
     url=$SEPOLIA_RPC_URL
-    key=$SEPOLIA_DEPLOYER_KEY
     legacyArg="--legacy"
 else
     echo "Error - Deployment chain required" 1>&2
