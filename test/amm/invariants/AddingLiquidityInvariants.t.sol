@@ -22,10 +22,10 @@ abstract contract AddingLiquidityInvariants is TestCommonSetup {
         (uint _expected, , ) = pool.simSwap(pool.yToken(), amountToTrade);
         pool.swap(pool.yToken(), amountToTrade, _expected, msg.sender, getValidExpiration());
         xTokenLiquidity = IERC20(pool.xToken()).balanceOf(address(pool));
-        yTokenLiquidity = IERC20(pool.yToken()).balanceOf(address(pool));
+        yTokenLiquidity = _getYTokenLiquidity(address(pool));
         vm.startPrank(admin);
         bytes4[] memory selectors = new bytes4[](1);
-        // selectors[0] = PoolBase(address(pool)).depositLiquidity.selector;
+        selectors[0] = 0xf9c8b956; // TODO fix once IPool can be modified to PoolBase(address(pool)).depositLiquidity.selector
         targetContract(address(pool));
         targetSelector(FuzzSelector({addr: address(pool), selectors: selectors}));
         targetSender(admin);
@@ -35,9 +35,15 @@ abstract contract AddingLiquidityInvariants is TestCommonSetup {
         assertGe(IERC20(pool.xToken()).balanceOf(address(pool)), xTokenLiquidity);
     }
 
-    function invariant_liquidityCanNeverDecreaseCallingAddLiquidity_TokenY() public {
-        vm.skip(true);
-        //assertGe(pool.yTokenLiquidity(), yTokenLiquidity);
+
+    function invariant_liquidityCanNeverDecreaseCallingAddLiquidity_TokenY()
+        public
+        startAsAdmin
+    {
+        assertGe(
+            _getYTokenLiquidity(address(pool)), 
+            yTokenLiquidity
+        );
     }
 
     function invariant_liquidityCanNeverIncreasePastMaxSupply() public {
