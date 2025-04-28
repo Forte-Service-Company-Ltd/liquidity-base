@@ -149,4 +149,11 @@ interface IPool is IPoolEvents {
      * @return w
      */
     function w() external returns (uint256);
+
+    /**
+     * @dev This is the function to get the revenue available for a liquidity position.
+     * @param tokenId The tokenId representing the liquidity position
+     * @return _revenueAvailable The amount of revenue available for the liquidity position
+     */
+    function revenueAvailable(uint256 tokenId) external view returns (uint256);
 }

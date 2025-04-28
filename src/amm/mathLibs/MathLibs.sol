@@ -173,10 +173,10 @@ library MathLibs {
         } else {
             if (exponent > decimals) {
                 uint256 diff = uint(exponent - decimals);
-                result = int(uint(mantissa) / (10 ** diff));
+                result = mantissa / int(10 ** diff);
             } else {
                 uint256 diff = uint(decimals - exponent);
-                result = int(uint(mantissa) * (10 ** diff));
+                result = mantissa * int(10 ** diff);
             }
         }
     }
