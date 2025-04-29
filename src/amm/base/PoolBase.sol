@@ -75,7 +75,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
     /**
      * @dev total liquidity share
      */
-    packedFloat _w;
+    packedFloat public _w;
 
     modifier onlyProtocolFeeCollector() {
         if (_msgSender() != protocolFeeCollector) revert NotProtocolFeeCollector();
@@ -142,12 +142,12 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
         IERC20(sellingX ? xToken : yToken).safeTransferFrom(_msgSender(), address(this), _amountIn);
 
         if (_minOut == 0) revert ZeroValueNotAllowed();
-        (amountOut, lpFeeAmount, protocolFeeAmount) = simSwap(_tokenIn, _amountIn);
+        packedFloat rawAmountOut;
+        (rawAmountOut, lpFeeAmount, protocolFeeAmount) = simSwapx(_tokenIn, _amountIn);
+        amountOut = _normalizeTokenDecimals(false, uint(rawAmountOut.convertpackedFloatToWAD()));
         _checkSlippage(amountOut, _minOut);
 
-        x = sellingX
-            ? x.sub((_amountIn.toInt256()).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE))
-            : x.add(int(amountOut).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE));
+        x = sellingX ? x.sub((_amountIn.toInt256()).toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE)) : x.add(rawAmountOut);
         // slither-disable-end reentrancy-benign
         // slither-disable-start reentrancy-events // the recipient of the initial transfer is this contract
         _updateParameters();
@@ -156,6 +156,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
         );
         collectedProtocolFees += protocolFeeAmount;
         emit FeesGenerated(lpFeeAmount, protocolFeeAmount);
+
         emit Swap(_tokenIn, _amountIn, amountOut, _minOut, _recipient);
         _emitCurveState();
         // slither-disable-end reentrancy-events
@@ -196,6 +197,39 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
             amountOut = _normalizeTokenDecimals(false, amountOut);
             // slither-disable-start incorrect-equality
             if (amountOut == 0) return (0, 0, 0);
+            // slither-disable-end incorrect-equality
+            lpFeeAmount = _determineFeeAmountSell(amountOut, lpFee);
+            protocolFeeAmount = _determineFeeAmountSell(amountOut, protocolFee);
+            amountOut -= (lpFeeAmount + protocolFeeAmount);
+        }
+    }
+
+    function simSwapx(
+        address _tokenIn,
+        uint256 _amountIn
+    ) public view returns (packedFloat rawAmountOut, uint256 lpFeeAmount, uint256 protocolFeeAmount) {
+        bool sellingX = _tokenIn == xToken;
+        if (!sellingX && _tokenIn != yToken) revert InvalidToken();
+
+        uint minAmountIn = 1;
+        if (lpFee > 0 && !sellingX) ++minAmountIn;
+        if (protocolFee > 0 && !sellingX) ++minAmountIn;
+        if (_amountIn < minAmountIn) revert ZeroValueNotAllowed();
+
+        if (!sellingX) {
+            lpFeeAmount = _determineFeeAmountSell(_amountIn, lpFee);
+            protocolFeeAmount = _determineFeeAmountSell(_amountIn, protocolFee);
+            _amountIn -= (lpFeeAmount + protocolFeeAmount); // fees are always coming out from the pool
+            _amountIn = _normalizeTokenDecimals(true, _amountIn);
+        }
+        rawAmountOut = sellingX
+            ? _calculateAmountOfYReceivedSellingX((_amountIn).toInt256().toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE))
+            : _calculateAmountOfXReceivedSellingY((_amountIn).toInt256().toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE));
+        uint amountOut = uint(rawAmountOut.convertpackedFloatToWAD());
+        if (sellingX) {
+            amountOut = _normalizeTokenDecimals(false, amountOut);
+            // slither-disable-start incorrect-equality
+            if (amountOut == 0) return (int(0).toPackedFloat(0), 0, 0);
             // slither-disable-end incorrect-equality
             lpFeeAmount = _determineFeeAmountSell(amountOut, lpFee);
             protocolFeeAmount = _determineFeeAmountSell(amountOut, protocolFee);
