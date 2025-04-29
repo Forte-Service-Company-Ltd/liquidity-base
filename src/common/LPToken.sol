@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSL-1.1
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.24;
 
 import {ERC721} from "../../lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
