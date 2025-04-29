@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: BSL-1.1
 pragma solidity ^0.8.24;
 import {Ownable2Step, Ownable} from "../../../lib/openzeppelin-contracts/contracts/access/Ownable2Step.sol";
 import {Pausable} from "../../../lib/openzeppelin-contracts/contracts/utils/Pausable.sol";

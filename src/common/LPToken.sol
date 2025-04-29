@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: BSL-1.1
 pragma solidity ^0.8.24;
 
 import {ERC721} from "../../lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
@@ -55,7 +55,7 @@ contract LPToken is ERC721, ERC721Enumerable {
     function _mintTokenAndUpdate(address lp, packedFloat wj, packedFloat hn) internal {
         currentTokenId++;
         _mint(lp, currentTokenId);
-        _updateLPToken( currentTokenId, wj, hn);
+        _updateLPToken(currentTokenId, wj, hn);
     }
 
     /**
@@ -78,12 +78,11 @@ contract LPToken is ERC721, ERC721Enumerable {
      * @param _wj The amount of liquidity the LP would like to withdraw
      * @param _rj The new value of _rj
      */
-    function _updateLPTokenVarsWithdrawal(uint256 _tokenId, packedFloat _wj,  packedFloat _rj) internal {
-        if(_wj.eq(packedFloat.wrap(0))) {
+    function _updateLPTokenVarsWithdrawal(uint256 _tokenId, packedFloat _wj, packedFloat _rj) internal {
+        if (_wj.eq(packedFloat.wrap(0))) {
             _burn(_tokenId);
             delete lpToken[_tokenId];
-        }else _updateLPToken(_tokenId, _wj, _rj);
-        
+        } else _updateLPToken(_tokenId, _wj, _rj);
     }
 
     /**
