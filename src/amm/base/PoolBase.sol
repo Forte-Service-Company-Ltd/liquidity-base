@@ -174,7 +174,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
     function simSwap(
         address _tokenIn,
         uint256 _amountIn
-    ) public view returns (uint256 amountOut, uint256 lpFeeAmount, uint256 protocolFeeAmount) {
+    ) public returns (uint256 amountOut, uint256 lpFeeAmount, uint256 protocolFeeAmount) {
         bool sellingX = _tokenIn == xToken;
         if (!sellingX && _tokenIn != yToken) revert InvalidToken();
 
@@ -191,7 +191,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
         }
         packedFloat rawAmountOut = sellingX
             ? _calculateAmountOfYReceivedSellingX((_amountIn).toInt256().toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE))
-            : _calculateAmountOfXReceivedSellingY((_amountIn).toInt256().toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE));
+            : _calculateAmountOfXReceivedSellingYNoLog((_amountIn).toInt256().toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE));
         amountOut = uint(rawAmountOut.convertpackedFloatToWAD());
         if (sellingX) {
             amountOut = _normalizeTokenDecimals(false, amountOut);
@@ -207,7 +207,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
     function simSwapx(
         address _tokenIn,
         uint256 _amountIn
-    ) public view returns (packedFloat rawAmountOut, uint256 lpFeeAmount, uint256 protocolFeeAmount) {
+    ) public returns (packedFloat rawAmountOut, uint256 lpFeeAmount, uint256 protocolFeeAmount) {
         bool sellingX = _tokenIn == xToken;
         if (!sellingX && _tokenIn != yToken) revert InvalidToken();
 
