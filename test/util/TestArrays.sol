@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.24;
 
 /**
@@ -92,7 +92,7 @@ abstract contract TestArrays {
         uint256 arg6,
         uint256 arg7
     ) internal pure returns (uint256[] memory array) {
-        array = new uint256[](7); 
+        array = new uint256[](7);
         array[0] = arg1;
         array[1] = arg2;
         array[2] = arg3;
@@ -145,5 +145,4 @@ abstract contract TestArrays {
         array[7] = arg8;
         array[8] = arg9;
     }
-
 }

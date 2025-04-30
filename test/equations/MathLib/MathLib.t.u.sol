@@ -1,4 +1,4 @@
-/// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.24;
 
 import "forge-std/console2.sol";
@@ -31,7 +31,7 @@ contract MathLibTests is TestCommon {
         (maxSqr + 1) * (maxSqr + 1);
     }
 
-        function testconvertpackedFloatToSpecificDecimals() public pure {
+    function testconvertpackedFloatToSpecificDecimals() public pure {
         int256 manA = 2000;
         int256 expA = -16;
         packedFloat floA = manA.toPackedFloat(expA);

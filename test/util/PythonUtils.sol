@@ -1,4 +1,4 @@
-/// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.24;
 
 import "lib/openzeppelin-contracts/contracts/utils/Strings.sol";
@@ -145,7 +145,12 @@ abstract contract PythonUtils is Test {
      * @param tolerancePrecision the number of decimals of the tolerance. For instance, 11 will mean maxTolerance / 10 ** 11.
      * @return withinTolerance true if the difference expressed as a normalized value is less or equal than the tolerance.
      */
-    function areWithinTolerance(uint x, uint y, uint8 maxTolerance, uint256 tolerancePrecision) internal pure returns (bool withinTolerance) {
+    function areWithinTolerance(
+        uint x,
+        uint y,
+        uint8 maxTolerance,
+        uint256 tolerancePrecision
+    ) internal pure returns (bool withinTolerance) {
         /// we calculate the absolute difference to avoid overflow/underflow
         uint diff = absoluteDiff(x, y);
         /// we calculate difference percentage as diff/(smaller number unless 0) to get the bigger difference "percentage".
