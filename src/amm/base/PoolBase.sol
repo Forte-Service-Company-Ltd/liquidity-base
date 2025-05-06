@@ -27,6 +27,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
     using SafeCast for uint256;
 
     int256 constant POOL_NATIVE_DECIMALS_NEGATIVE = 0 - int(POOL_NATIVE_DECIMALS);
+    packedFloat constant LIFETIME_MAX_X = packedFloat.wrap(57765397935864497271396328489288977956463758524451486216827793145060910956544); // 1e52
 
     address public immutable xToken;
     address public immutable yToken;

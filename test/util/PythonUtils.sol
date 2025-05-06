@@ -122,18 +122,20 @@ abstract contract PythonUtils is Test {
     }
 
     function _buildFIICalculateLastRevenueClaim(
+        int256 wjMan,
+        int256 wjExp,
         uint256 hn,
-        uint256 wj,
-        uint256 r_hat,
-        uint256 w_hat
+        uint256 w_hat,
+        uint256 r_hat
     ) internal pure returns (string[] memory) {
-        string[] memory inputs = new string[](6);
+        string[] memory inputs = new string[](7);
         inputs[0] = "python3";
         inputs[1] = "lib/liquidity-base/script/python/equations/calculate_last_revenue_claim.py";
-        inputs[2] = vm.toString(hn);
-        inputs[3] = vm.toString(wj);
-        inputs[4] = vm.toString(r_hat);
+        inputs[2] = vm.toString(wjMan);
+        inputs[3] = vm.toString(wjExp);
+        inputs[4] = vm.toString(hn);
         inputs[5] = vm.toString(w_hat);
+        inputs[6] = vm.toString(r_hat);
         return inputs;
     }
 
@@ -145,7 +147,12 @@ abstract contract PythonUtils is Test {
      * @param tolerancePrecision the number of decimals of the tolerance. For instance, 11 will mean maxTolerance / 10 ** 11.
      * @return withinTolerance true if the difference expressed as a normalized value is less or equal than the tolerance.
      */
-    function areWithinTolerance(uint x, uint y, uint8 maxTolerance, uint256 tolerancePrecision) internal pure returns (bool withinTolerance) {
+    function areWithinTolerance(
+        uint x,
+        uint y,
+        uint8 maxTolerance,
+        uint256 tolerancePrecision
+    ) internal pure returns (bool withinTolerance) {
         /// we calculate the absolute difference to avoid overflow/underflow
         uint diff = absoluteDiff(x, y);
         /// we calculate difference percentage as diff/(smaller number unless 0) to get the bigger difference "percentage".
