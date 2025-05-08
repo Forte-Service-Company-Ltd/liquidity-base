@@ -151,15 +151,44 @@ abstract contract PythonUtils is Test {
         uint8 maxTolerance,
         uint256 tolerancePrecision
     ) internal pure returns (bool withinTolerance) {
+        console2.log("x: ", x);
+        console2.log("y: ", y);
+        console2.log("maxTolerance: ", maxTolerance);
+        console2.log("tolerancePrecision: ", tolerancePrecision);
         /// we calculate the absolute difference to avoid overflow/underflow
         uint diff = absoluteDiff(x, y);
         /// we calculate difference percentage as diff/(smaller number unless 0) to get the bigger difference "percentage".
         withinTolerance = true;
         if (diff != 0) {
             packedFloat relativeDiff = int(diff).toPackedFloat(0).div(int(y).toPackedFloat(0));
+            console2.log("relativeDiff: ", packedFloat.unwrap(relativeDiff));
             packedFloat _maxTolerance = int(uint(maxTolerance)).toPackedFloat(0 - int(tolerancePrecision));
+            console2.log("_maxTolerance: ", packedFloat.unwrap(_maxTolerance));
             if (relativeDiff.gt(_maxTolerance)) withinTolerance = false;
         }
+    }
+
+    /**
+     * compares if 2 uints are similar enough.
+     * @param x value to compare against *y*
+     * @param y value to compare against *x*
+     * @param maxTolerance the maximum allowed difference tolerance based on the precision
+     * @return withinTolerance true if the difference expressed as a normalized value is less or equal than the tolerance.
+     */
+    function areWithinTolerance(
+        packedFloat x,
+        packedFloat y,
+        packedFloat maxTolerance
+    ) internal pure returns (bool withinTolerance) {
+        /// we calculate the absolute difference to avoid overflow/underflow
+        packedFloat diff = x.sub( y);
+        if (diff.lt(packedFloat.wrap(0))) diff = diff.mul(int(-1).toPackedFloat(0));
+        /// we calculate difference percentage as diff/(smaller number unless 0) to get the bigger difference "percentage".
+        withinTolerance = true;
+            packedFloat relativeDiff = diff.div(y);
+            console2.log("relativeDiff: ", packedFloat.unwrap(relativeDiff));
+            console2.log("maxTolerance: ", packedFloat.unwrap(maxTolerance));
+            if (relativeDiff.gt(maxTolerance)) withinTolerance = false;
     }
 
     /**
