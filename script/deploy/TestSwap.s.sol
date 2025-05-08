@@ -14,7 +14,7 @@ contract TestSwap is Script, StdAssertions {
         IPool pool = IPool(vm.envAddress("POOL_CONTRACT"));
         address tokenX = vm.envAddress("XTOKEN_ADDRESS");
         address tokenY = vm.envAddress("YTOKEN_ADDRESS");
-        uint256 amountY = 100000;
+        uint256 amountY = 10000000;
         vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
         console2.log("xToken", tokenX);
         console2.log("yToken", tokenY);
