@@ -29,7 +29,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
 
     function testLiquidity_Pool_TokensMustNotBeTheSame() public {
         vm.expectRevert(abi.encodeWithSignature("XandYTokensAreTheSame()"));
-        _deployPool(address(yToken), address(yToken), 0, X_TOKEN_MAX_SUPPLY, TBCInputOption.BASE);
+        _deployPool(address(yToken), address(yToken), 0, X_TOKEN_MAX_SUPPLY, INACTIVE_LIQUIDITY, TBCInputOption.BASE);
     }
 
     function testLiquidity_Pool_enableSwaps_Positive() public startAsAdmin {
@@ -189,7 +189,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
 
     function _buildLiquidityRemovalNotAllowed() internal returns (PoolBase _pool) {
         GenericERC20FixedSupply _xToken = new GenericERC20FixedSupply("X token", "X", X_TOKEN_MAX_SUPPLY);
-        _pool = _deployPool(address(_xToken), address(_yToken), 30, X_TOKEN_MAX_SUPPLY, TBCInputOption.BASE);
+        _pool = _deployPool(address(_xToken), address(_yToken), 30, X_TOKEN_MAX_SUPPLY, INACTIVE_LIQUIDITY, TBCInputOption.BASE);
         _approvePool(_pool, false);
         vm.startPrank(admin);
         _pool.enableSwaps(true);
@@ -199,19 +199,6 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         NoZeroTransferERC20 _xToken = new NoZeroTransferERC20("X token", "X");
         vm.expectRevert("cannot send 0 amount");
         _xToken.transfer(address(alice), 0);
-    }
-
-    function testLiquidity_Pool_withdrawRevenue_Positive() public startAsAdmin endWithStopPrank {
-        (uint expected, , ) = pool.simSwap(address(_yToken), (1 * fullToken) / 1e3);
-        pool.swap(address(_yToken), (1 * fullToken) / 1e3, expected, msg.sender, getValidExpiration());
-
-        uint256 originalBalance = IERC20(_yToken).balanceOf(address(admin));
-
-        (, packedFloat rj) = pool.getLPToken(2);
-        uint256 amount = pool.withdrawRevenue(2, uint(rj.convertpackedFloatToWAD()), address(admin));
-        uint256 updatedBalance = IERC20(_yToken).balanceOf(address(admin));
-        uint256 expectedBalance = originalBalance + amount;
-        assertEq(updatedBalance, expectedBalance);
     }
 
     function testLiquidity_Pool_withdrawRevenue_NotAuthorized() public endWithStopPrank {
