@@ -20,6 +20,8 @@ contract TestSwap is Script, StdAssertions {
         console2.log("yToken", tokenY);
         console2.log("deployment owner", vm.envUint("DEPLOYMENT_OWNER_KEY"));
         console2.log("pool", address(pool));
+        console2.log("amountY", amountY);
+        console2.log("poolXtoken", pool.xToken());
         IERC20(tokenY).approve(address(pool), amountY);
         (uint256 expectedAmountX, , ) = pool.simSwap(tokenY, amountY);
         pool.swap(tokenY, amountY, expectedAmountX, address(vm.envAddress("DEPLOYMENT_OWNER")), validExpiration);
