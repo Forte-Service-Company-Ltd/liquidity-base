@@ -192,6 +192,21 @@ abstract contract PythonUtils is Test {
     }
 
     /**
+     * compares if 2 packed floats have an absolute error small enough.
+     * @param x value to compare against *y*
+     * @param y value to compare against *x*
+     * @param maxErrorAllowed the maximum absolute difference allowed between *x* and *y*
+     * @return withinTolerance true if the difference expressed as a normalized value is less or equal than the tolerance.
+     */
+    function checkAbosoluteError(packedFloat x, packedFloat y, packedFloat maxErrorAllowed) internal pure returns (bool withinTolerance) {
+        packedFloat diff = x.sub(y);
+        if (diff.lt(packedFloat.wrap(0))) diff = diff.mul(int(-1).toPackedFloat(0));
+        console2.log("relativeDiff: ", packedFloat.unwrap(relativeDiff));
+        console2.log("maxTolerance: ", packedFloat.unwrap(maxErrorAllowed));
+        return diff.le(maxErrorAllowed);
+    }
+
+    /**
      * Tries to find the decimal place from the python output in the tests so that we can create a decimal places long enough to hold the int
      * @param pythonReturn the python output that was returned from the ffi command
      * @return uint This is the number of places that should house the decimal digits precision. Otherwise 0 if not a decimal.
