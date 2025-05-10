@@ -54,8 +54,7 @@ An online Keccak-256 hash digester can be found at https://emn178.github.io/onli
 | 0x2d281418 | VTooHigh()                                             |
 | 0x34477cc0 | NotEnoughCollateral()                                  |
 | 0x7445fc7e | CannotDepositInactiveLiquidity()                       |
-| 0xc8943938 | AllLiquidityCannotBeInactive()                         |
-| 0xbd79fed7 | NoInitialLiquidity()                                   |
+| 0x5195ca46 | InactiveLiquidityExceedsLimit()                         |                                  |
 | 0x34173478 | CCannotBeZero()                                        |
 | 0xc999f51d | VCannotBeZero()                                        |
 | 0x1ba7a2f9 | xMinCannotBeZero()                                     |
