@@ -87,7 +87,6 @@ contract ExternalDeployments is Script, PythonUtils {
 
 contract allowlistsDeployment is ExternalDeployments {
     function run() external {
-        uint256 privateKey = vm.envUint("DEPLOYMENT_OWNER_KEY");
         deployAllowLists();
     }
 }
