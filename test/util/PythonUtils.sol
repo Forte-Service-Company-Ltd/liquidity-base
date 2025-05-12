@@ -201,7 +201,6 @@ abstract contract PythonUtils is Test {
     function checkAbosoluteError(packedFloat x, packedFloat y, packedFloat maxErrorAllowed) internal pure returns (bool withinTolerance) {
         packedFloat diff = x.sub(y);
         if (diff.lt(packedFloat.wrap(0))) diff = diff.mul(int(-1).toPackedFloat(0));
-        console2.log("relativeDiff: ", packedFloat.unwrap(relativeDiff));
         console2.log("maxTolerance: ", packedFloat.unwrap(maxErrorAllowed));
         return diff.le(maxErrorAllowed);
     }
