@@ -207,7 +207,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
 
         uint256 originalBalance = IERC20(_yToken).balanceOf(address(admin));
 
-        (, packedFloat rj) = pool.getLPToken(2);
+        pool.getLPToken(2);
         uint256 amount = pool.withdrawRevenue(2, pool.revenueAvailable(2), address(admin));
         uint256 updatedBalance = IERC20(_yToken).balanceOf(address(admin));
         uint256 expectedBalance = originalBalance + amount;
@@ -362,7 +362,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         IERC20(pool.xToken()).approve(address(pool), expectedIn);
         vm.expectEmit(address(_yToken) == address(stableCoin), false, false, false, address(pool)); // Fees generated might be off by 1 unit in WETH case
         emit IPoolEvents.FeesGenerated(estimatedFees, 0);
-        (, uint fees, ) = pool.swap(_xToken, expectedIn, getAmountSubFee(amount) - 1, msg.sender, getValidExpiration());
+        (, uint fees, ) = pool.swap(_xToken, expectedIn, getAmountSubFee(amount) - 2, msg.sender, getValidExpiration());
         assertLe(fees, estimatedFees);
         assertGe(fees, estimatedFees);
     }

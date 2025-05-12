@@ -25,6 +25,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
     using MathLibs for int256;
     using MathLibs for packedFloat;
     using SafeCast for uint256;
+    using SafeCast for int256;
 
     int256 constant POOL_NATIVE_DECIMALS_NEGATIVE = 0 - int(POOL_NATIVE_DECIMALS);
     packedFloat constant ACTIVE_LIQUIDITY_MINIMUM =
@@ -193,7 +194,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
         packedFloat rawAmountOut = sellingX
             ? _calculateAmountOfYReceivedSellingX((_amountIn).toInt256().toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE))
             : _calculateAmountOfXReceivedSellingY((_amountIn).toInt256().toPackedFloat(POOL_NATIVE_DECIMALS_NEGATIVE));
-        amountOut = uint(rawAmountOut.convertpackedFloatToWAD());
+        amountOut = rawAmountOut.convertpackedFloatToWAD().toUint256();
         if (sellingX) {
             amountOut = _normalizeTokenDecimals(false, amountOut);
             // slither-disable-start incorrect-equality
