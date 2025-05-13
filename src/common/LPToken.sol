@@ -33,7 +33,17 @@ contract LPToken is ERC721, ERC721Enumerable {
      * @return wj the amount of the lpToken
      * @return rj the last revenue claim of the lpToken
      */
-    function getLPToken(uint256 tokenId) public view returns (packedFloat wj, packedFloat rj) {
+    function getLPToken(uint256 tokenId) external view returns (packedFloat wj, packedFloat rj) {
+        return _getLPToken( tokenId);
+    }
+
+    /**
+     * @dev Get the liquidity share and last claimed amount for an lpToken
+     * @param tokenId The token id of the lpToken being updated
+     * @return wj the amount of the lpToken
+     * @return rj the last revenue claim of the lpToken
+     */
+    function _getLPToken(uint256 tokenId) internal view returns (packedFloat wj, packedFloat rj) {
         LPTokenS memory token = lpToken[tokenId];
         return (token.wj, token.rj);
     }

@@ -427,7 +427,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
     }
 
     function _wInactive() internal view returns (packedFloat wI) {
-        (wI, ) = getLPToken(INACTIVE_ID);
+        (wI, ) = _getLPToken(INACTIVE_ID);
     }
 
     /**
