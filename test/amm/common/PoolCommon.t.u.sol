@@ -376,13 +376,13 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         // Set initial X value to something above 0 before starting to swap for X
         (uint expected, , ) = pool.simSwap(address(_yToken), initialAmount);
 
-        pool.swap(address(_yToken), initialAmount, getAmountSubFee(expected), bob, getValidExpiration());
+        pool.swap(address(_yToken), initialAmount, getAmountSubFee(expected) - 2, bob, getValidExpiration());
         /// now we test
         (uint expectedIn, uint lpFees, uint protocolFees) = pool.simSwapReversed(address(_yToken), amount);
         IERC20(pool.xToken()).approve(address(pool), expectedIn);
         vm.expectEmit(false, false, false, false, address(pool)); // Fees generated might be off by 1 unit
         emit IPoolEvents.FeesGenerated(lpFees, protocolFees);
-        (, uint realLPFees, uint realProtocolFees) = pool.swap(_xToken, expectedIn, getAmountSubFee(amount - 1), bob, getValidExpiration());
+        (, uint realLPFees, uint realProtocolFees) = pool.swap(_xToken, expectedIn, getAmountSubFee(amount) - 2, bob, getValidExpiration());
         if (transferFee == 0) {
             assertLe(realLPFees, lpFees + 1); // we add 1 to account for rounding issues
             assertGe(realLPFees, lpFees - 1); // we subtract 1 to account for rounding issues
