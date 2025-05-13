@@ -183,12 +183,18 @@ abstract contract PythonUtils is Test {
         /// we calculate the absolute difference to avoid overflow/underflow
         packedFloat diff = x.sub( y);
         if (diff.lt(packedFloat.wrap(0))) diff = diff.mul(int(-1).toPackedFloat(0));
+        
+        
         /// we calculate difference percentage as diff/(smaller number unless 0) to get the bigger difference "percentage".
         withinTolerance = true;
-            packedFloat relativeDiff = diff.div(y);
-            console2.log("relativeDiff: ", packedFloat.unwrap(relativeDiff));
-            console2.log("maxTolerance: ", packedFloat.unwrap(maxTolerance));
-            if (relativeDiff.gt(maxTolerance)) withinTolerance = false;
+        if(y.eq(packedFloat.wrap(0))){ 
+            if (diff.eq(packedFloat.wrap(0))) return true;
+            else return false;
+        }
+        packedFloat relativeDiff = diff.div(y);
+        console2.log("relativeDiff: ", packedFloat.unwrap(relativeDiff));
+        console2.log("maxTolerance: ", packedFloat.unwrap(maxTolerance));
+        if (relativeDiff.gt(maxTolerance)) withinTolerance = false;
     }
 
     /**
