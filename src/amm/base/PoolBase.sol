@@ -12,7 +12,7 @@ import {CalculatorBase, packedFloat} from "./CalculatorBase.sol";
 import {FeeInfo, TBCType} from "../../common/TBC.sol";
 import {MathLibs} from "../mathLibs/MathLibs.sol";
 import {LPToken} from "../../../src/common/LPToken.sol";
-
+import {Descriptor} from "../../common/SVG/NFTSVG.sol";
 
 /**
  * @title Pool Base
@@ -430,4 +430,14 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
         (wI, ) = getLPToken(INACTIVE_ID);
     }
 
+    /**
+     * @dev Overrides the tokenURI function from ERC721 to generate an NFT with pool information
+     * @param tokenId The token ID to generate the URI for
+     * @return The token URI with SVG image and metadata
+     * TODO remove this function from the base contract once all has been migrated
+     */
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
+        if (_ownerOf(tokenId) == address(0)) revert URIQueryForNonexistentToken();
+        return Descriptor.constructTokenURI(tokenId, address(this));
+    }
 }
