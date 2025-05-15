@@ -6,7 +6,7 @@ import {ERC721Enumerable} from "../../lib/openzeppelin-contracts/contracts/token
 import {IPoolEvents} from "./IEvents.sol";
 import "./IErrors.sol";
 import {packedFloat, MathLibs} from "../amm/mathLibs/MathLibs.sol";
-import {ILPToken} from "./ILPToken.sol";
+import {ILPToken, LPTokenS} from "./ILPToken.sol";
 
 /**
  * @title Liquidity provider token
