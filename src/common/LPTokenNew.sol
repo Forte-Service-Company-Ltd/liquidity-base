@@ -54,7 +54,7 @@ contract LPToken is ERC721, ERC721Enumerable, ILPToken {
         // gate to only allwed pools
         currentTokenId++;
         _mint(lp, currentTokenId);
-        _updateLPToken(currentTokenId, wj, hn);
+        updateLPToken(currentTokenId, wj, hn);
     }
 
     /**
@@ -78,12 +78,12 @@ contract LPToken is ERC721, ERC721Enumerable, ILPToken {
      * @param _wj The amount of liquidity the LP would like to withdraw
      * @param _rj The new value of _rj
      */
-    function _updateLPTokenWithdrawal(uint256 _tokenId, packedFloat _wj, packedFloat _rj) external {
+    function updateLPTokenWithdrawal(uint256 _tokenId, packedFloat _wj, packedFloat _rj) external {
         // gate to only allwed pools
         if (_wj.eq(packedFloat.wrap(0))) {
             _burn(_tokenId);
             delete lpToken[_tokenId];
-        } else _updateLPToken(_tokenId, _wj, _rj);
+        } else updateLPToken(_tokenId, _wj, _rj);
     }
 
     /**
