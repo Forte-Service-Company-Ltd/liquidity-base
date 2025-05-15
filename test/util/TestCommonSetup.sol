@@ -34,7 +34,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         fullToken = address(_yToken) == address(stableCoin) ? STABLECOIN_DEC : ERC20_DECIMALS;
     }
 
-    function _deployLPToken() startAsAdmin internal{
+    function _deployLPToken() internal{
         lpToken = new LPTokenNew("ALTBC Position Token", "ALTBC-POS");
     }
 

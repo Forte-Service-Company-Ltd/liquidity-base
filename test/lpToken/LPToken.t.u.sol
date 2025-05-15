@@ -16,7 +16,7 @@ abstract contract LPTokenTest is TestCommonSetup {
     address mockMaliciousFactory = address(0xB0b);
     address mockMaliciousPool = address(0xC0C0);
     address cade = address(0xCade);
-    function setUp() public {
+    function setUp() startAsAdmin public {
         _deployLPToken();
     }
 
