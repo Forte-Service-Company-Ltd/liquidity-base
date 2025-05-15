@@ -13,7 +13,7 @@ import {TwentyTwoDecimalERC20} from "src/example/ERC20/TwentyTwoDecimalERC20.sol
 import {FeeOnTransferERC20} from "src/example/ERC20/FeeOnTransferERC20.sol";
 import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {PythonUtils} from "test/util/PythonUtils.sol";
-import {LPToken} from "src/common/LPToken.sol";
+import {LPTokenNew} from "src/common/LPTokenNew.sol";
 
 /**
  * @title Test Common
@@ -42,7 +42,7 @@ abstract contract TestCommon is PythonUtils {
     SixDecimalERC20 public stableCoin;
     TwentyTwoDecimalERC20 public highDecimalCoin;
     FeeOnTransferERC20 public fotCoin;
-    LPToken public lpToken;
+    LPTokenNew public lpToken;
 
     AllowList deployerAllowList;
     AllowList yTokenAllowList;

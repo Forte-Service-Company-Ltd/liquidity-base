@@ -35,7 +35,7 @@ interface ILPToken is IERC721, IERC721Enumerable {
      * @param hn The revenue parameter of the pool associated with the lpToken contract
      * @notice this function should be gated to only allwed pools
      */
-    function mintTokenAndUpdate(address lp, packedFloat wj, packedFloat hn) external;
+    function mintTokenAndUpdate(address lp, packedFloat wj, packedFloat hn) external returns (uint256 tokenId);
 
     /**
      * @dev Updates the values wj and rj of tokenId
@@ -58,7 +58,7 @@ interface ILPToken is IERC721, IERC721Enumerable {
      * @dev gets current token id which means the next token id to be minted
      * @return the current token id
      */
-    function getCurrentTokenId() external view returns (uint256);
+    function currentTokenId() external view returns (uint256);
 
     /**
      * @dev add a pool to the allow list
@@ -82,6 +82,12 @@ interface ILPToken is IERC721, IERC721Enumerable {
     function proposeFactoryAddress(address factory) external;
 
     /**
+     * @dev gets the factory address
+     * @return the address of the factory
+     */
+    function factoryAddressProposed() external view returns (address);
+
+    /**
      * @dev confirm the factory address
      * @notice Only the proposed factory should be able to confirm the factory address
      */
@@ -91,5 +97,5 @@ interface ILPToken is IERC721, IERC721Enumerable {
      * @dev gets the factory address
      * @return the address of the factory
      */
-    function getFactoryAddress() external view returns (address);
+    function factoryAddress() external view returns (address);
 }
