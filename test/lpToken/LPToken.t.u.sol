@@ -134,11 +134,11 @@ abstract contract LPTokenTest is TestCommonSetup {
         uint tokenIdPool2 = lpToken.mintTokenAndUpdate(alice, int(1e36).toPackedFloat(0), int(1e36).toPackedFloat(0));
         assertEq(lpToken.ownerOf(tokenIdPool2), alice);
         assertEq(lpToken.balanceOf(alice), 2);
-        // test not allowed pool
+        // test not-allowed-pool error through token-not-from-pool error
         vm.startPrank(mockMaliciousPool);
-        vm.expectRevert(abi.encodeWithSelector(PoolNotAllowed.selector));
+        vm.expectRevert(abi.encodeWithSelector(TokenNotFromPool.selector));
         lpToken.updateLPTokenWithdrawal(tokenIdPool1, int(1e18).toPackedFloat(0), int(1e18).toPackedFloat(0));
-        vm.expectRevert(abi.encodeWithSelector(PoolNotAllowed.selector));
+        vm.expectRevert(abi.encodeWithSelector(TokenNotFromPool.selector));
         lpToken.updateLPTokenWithdrawal(tokenIdPool2, int(1e18).toPackedFloat(0), int(1e18).toPackedFloat(0));
         // test token not from pool
         vm.startPrank(mockPool1);

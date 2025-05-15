@@ -7,6 +7,7 @@ import {ILPTokenEvents} from "./IEvents.sol";
 import "./IErrors.sol";
 import {packedFloat, MathLibs} from "../amm/mathLibs/MathLibs.sol";
 import {ILPToken, LPTokenS} from "./ILPToken.sol";
+import {Descriptor} from "../common/SVG/NFTSVG.sol";
 import "../../lib/openzeppelin-contracts/contracts/access/Ownable2Step.sol";
 
 /**
@@ -103,8 +104,9 @@ contract LPTokenNew is Ownable2Step, ERC721, ERC721Enumerable, ILPToken {
      * @param _wj The amount of liquidity the LP would like to withdraw
      * @param _rj The new value of _rj
      */
-    function updateLPTokenWithdrawal(uint256 _tokenId, packedFloat _wj, packedFloat _rj) onlyAllowedPools external {
+    function updateLPTokenWithdrawal(uint256 _tokenId, packedFloat _wj, packedFloat _rj) external {
         if (_wj.eq(packedFloat.wrap(0))) {
+             if (msg.sender != idToPool[_tokenId]) revert TokenNotFromPool();
             _burn(_tokenId);
             delete lpToken[_tokenId];
         } else updateLPToken(_tokenId, _wj, _rj);
@@ -167,5 +169,15 @@ contract LPTokenNew is Ownable2Step, ERC721, ERC721Enumerable, ILPToken {
         delete factoryAddressProposed;
         factoryAddress = msg.sender;
         emit ILPTokenEvents.FactoryConfirmed(msg.sender);
+    }
+
+    /**
+     * @dev Overrides the tokenURI function from ERC721 to generate an NFT with pool information
+     * @param tokenId The token ID to generate the URI for
+     * @return The token URI with SVG image and metadata
+     */
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
+        if (_ownerOf(tokenId) == address(0)) revert URIQueryForNonexistentToken();
+        return Descriptor.constructTokenURI(tokenId, address(this));
     }
 }
