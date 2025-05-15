@@ -21,12 +21,20 @@ contract LPTokenNew is Ownable2Step, ERC721, ERC721Enumerable, ILPToken {
     uint256 public currentTokenId;
     address public factoryAddress;
     address public factoryAddressProposed;
+
+    // id => (wj, rj)
     mapping(uint256 tokenId => LPTokenS lpToken) lpToken;
-    mapping(uint256 tokenId => address pool) idToPool;
-    mapping(address pool => bool isAllowed) allowedPools;
+    // id => pool it belongs to
+    mapping(uint256 tokenId => address pool) public idToPool;
+    // pool allowlist
+    mapping(address pool => bool isAllowed) allowedPool;
+    // inactive tokens
+    mapping(uint256 tokenId => bool isInactive) public inactiveToken;
+    // pool name
+    mapping(address pool => string name) public poolName;
 
     modifier onlyAllowedPools() {
-        if (!allowedPools[msg.sender]) revert PoolNotAllowed();
+        if (!allowedPool[msg.sender]) revert PoolNotAllowed();
         _;
     }
      
@@ -121,10 +129,12 @@ contract LPTokenNew is Ownable2Step, ERC721, ERC721Enumerable, ILPToken {
      * @param pool the address of the pool to be added
      * @notice Only the factory should be able to add pools to the allow list
      */
-    function addPoolToAllowList(address pool) onlyFactory external{
+    function addPoolToAllowList(address pool, string memory _name) onlyFactory external{
         if (pool == address(0)) revert ZeroAddress();
-        if (allowedPools[pool]) revert PoolAlreadyAllowed();
-        allowedPools[pool] = true;
+        if (allowedPool[pool]) revert PoolAlreadyAllowed();
+        allowedPool[pool] = true;
+        inactiveToken[currentTokenId + 1] = true;
+        poolName[pool] = _name;
         emit ILPTokenEvents.PoolAddedToAllowList(pool);
     }
 
@@ -134,7 +144,7 @@ contract LPTokenNew is Ownable2Step, ERC721, ERC721Enumerable, ILPToken {
      * @return true if the pool is allowed
      */
     function isPoolAllowed(address pool) external view returns (bool){
-        return allowedPools[pool];
+        return allowedPool[pool];
     }
 
     /**

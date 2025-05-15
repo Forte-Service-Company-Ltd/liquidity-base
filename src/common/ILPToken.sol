@@ -65,7 +65,7 @@ interface ILPToken is IERC721, IERC721Enumerable {
      * @param pool the address of the pool to be added
      * @notice Only the factory should be able to add pools to the allow list
      */
-    function addPoolToAllowList(address pool) external;
+    function addPoolToAllowList(address pool, string memory _name) external;
 
     /**
      * @dev tells is a pool is allowed

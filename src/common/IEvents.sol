@@ -58,7 +58,6 @@ interface IAllowListEvents {
 }
 
 interface ILPTokenEvents{
-    event PoolRemovedFromAllowList(address indexed pool);
     event PoolAddedToAllowList(address indexed pool);
     event FactoryProposed(address indexed factory);
     event FactoryConfirmed(address indexed factory);

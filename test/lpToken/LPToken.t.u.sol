@@ -16,6 +16,7 @@ abstract contract LPTokenTest is TestCommonSetup {
     address mockMaliciousFactory = address(0xB0b);
     address mockMaliciousPool = address(0xC0C0);
     address cade = address(0xCade);
+    string mockPoolName = "ABC / DEF";
     function setUp() startAsAdmin public {
         _deployLPToken();
     }
@@ -48,16 +49,18 @@ abstract contract LPTokenTest is TestCommonSetup {
         vm.startPrank(mockFactory);
         // test zero address
         vm.expectRevert(abi.encodeWithSelector(ZeroAddress.selector));
-        lpToken.addPoolToAllowList(address(0));
+        lpToken.addPoolToAllowList(address(0),mockPoolName);
         // test positive case
-        lpToken.addPoolToAllowList(mockPool1);
+        lpToken.addPoolToAllowList(mockPool1,mockPoolName);
         // test pool already allowed
         vm.expectRevert(abi.encodeWithSelector(PoolAlreadyAllowed.selector));
-        lpToken.addPoolToAllowList(mockPool1);
+        lpToken.addPoolToAllowList(mockPool1,mockPoolName);
         // test not factory
         vm.startPrank(mockMaliciousFactory);
         vm.expectRevert(abi.encodeWithSelector(NotFactory.selector));
-        lpToken.addPoolToAllowList(mockPool2);
+        lpToken.addPoolToAllowList(mockPool2,mockPoolName);
+        assertTrue(lpToken.isPoolAllowed(mockPool1));
+        assertEq(lpToken.poolName(mockPool1), mockPoolName);
     }
 
     function testLPToken_mintTokenAndUpdate() public {
@@ -65,8 +68,7 @@ abstract contract LPTokenTest is TestCommonSetup {
         lpToken.proposeFactoryAddress(mockFactory);
         vm.startPrank(mockFactory);
         lpToken.confirmFactoryAddress();
-        lpToken.addPoolToAllowList(mockPool1);
-        lpToken.addPoolToAllowList(mockPool2);
+        lpToken.addPoolToAllowList(mockPool1,mockPoolName);
         // test not allowed pool
         vm.startPrank(mockMaliciousPool);
         vm.expectRevert(abi.encodeWithSelector(PoolNotAllowed.selector));
@@ -76,6 +78,23 @@ abstract contract LPTokenTest is TestCommonSetup {
         uint tokenId = lpToken.mintTokenAndUpdate(alice, int(1e18).toPackedFloat(0), int(1e18).toPackedFloat(0));
         assertEq(lpToken.ownerOf(tokenId), alice);
         assertEq(lpToken.balanceOf(alice), 1);
+        // test inactive token
+        assertTrue(lpToken.inactiveToken(tokenId));
+        uint activeTokenId = lpToken.mintTokenAndUpdate(alice, int(1e18).toPackedFloat(0), int(1e18).toPackedFloat(0));
+        assertFalse(lpToken.inactiveToken(activeTokenId));
+        assertEq(lpToken.balanceOf(alice), 2);
+        // test inactive in another pool
+        vm.startPrank(mockFactory);
+        lpToken.addPoolToAllowList(mockPool2,mockPoolName);
+         vm.startPrank(mockPool2);
+        tokenId = lpToken.mintTokenAndUpdate(alice, int(1e18).toPackedFloat(0), int(1e18).toPackedFloat(0));
+        assertEq(lpToken.ownerOf(tokenId), alice);
+        assertEq(lpToken.balanceOf(alice), 3);
+        // test inactive token
+        assertTrue(lpToken.inactiveToken(tokenId));
+        activeTokenId = lpToken.mintTokenAndUpdate(alice, int(1e18).toPackedFloat(0), int(1e18).toPackedFloat(0));
+        assertFalse(lpToken.inactiveToken(activeTokenId));
+        assertEq(lpToken.balanceOf(alice), 4);
     }
 
     function testLPToken_update() public {
@@ -83,8 +102,8 @@ abstract contract LPTokenTest is TestCommonSetup {
         lpToken.proposeFactoryAddress(mockFactory);
         vm.startPrank(mockFactory);
         lpToken.confirmFactoryAddress();
-        lpToken.addPoolToAllowList(mockPool1);
-        lpToken.addPoolToAllowList(mockPool2);
+        lpToken.addPoolToAllowList(mockPool1,mockPoolName);
+        lpToken.addPoolToAllowList(mockPool2,mockPoolName);
         vm.startPrank(mockPool1);
         uint tokenIdPool1 = lpToken.mintTokenAndUpdate(alice, int(1e18).toPackedFloat(0), int(1e18).toPackedFloat(0));
         vm.startPrank(mockPool2);
@@ -105,8 +124,8 @@ abstract contract LPTokenTest is TestCommonSetup {
         lpToken.proposeFactoryAddress(mockFactory);
         vm.startPrank(mockFactory);
         lpToken.confirmFactoryAddress();
-        lpToken.addPoolToAllowList(mockPool1);
-        lpToken.addPoolToAllowList(mockPool2);
+        lpToken.addPoolToAllowList(mockPool1,mockPoolName);
+        lpToken.addPoolToAllowList(mockPool2,mockPoolName);
         vm.startPrank(mockPool1);
         uint tokenIdPool1 = lpToken.mintTokenAndUpdate(alice, int(1e18).toPackedFloat(0), int(1e18).toPackedFloat(0));
         assertEq(lpToken.ownerOf(tokenIdPool1), alice);
@@ -179,8 +198,8 @@ abstract contract LPTokenTest is TestCommonSetup {
         lpToken.proposeFactoryAddress(mockFactory);
         vm.startPrank(mockFactory);
         lpToken.confirmFactoryAddress();
-        lpToken.addPoolToAllowList(mockPool1);
-        lpToken.addPoolToAllowList(mockPool2);
+        lpToken.addPoolToAllowList(mockPool1,mockPoolName);
+        lpToken.addPoolToAllowList(mockPool2,mockPoolName);
         vm.startPrank(mockPool1);
         uint tokenIdPool1 = lpToken.mintTokenAndUpdate(alice, int(1e18).toPackedFloat(0), int(1e18).toPackedFloat(0));
         vm.startPrank(mockPool2);
