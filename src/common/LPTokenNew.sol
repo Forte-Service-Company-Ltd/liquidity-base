@@ -6,7 +6,7 @@ import {ERC721Enumerable} from "../../lib/openzeppelin-contracts/contracts/token
 import {IPoolEvents} from "./IEvents.sol";
 import "./IErrors.sol";
 import {packedFloat, MathLibs} from "../amm/mathLibs/MathLibs.sol";
-import {ILPtoken} from "./ILPToken.sol";
+import {ILPToken} from "./ILPToken.sol";
 
 /**
  * @title Liquidity provider token
@@ -14,7 +14,7 @@ import {ILPtoken} from "./ILPToken.sol";
  * @dev Revenue and liquidity position are stored in the LP Token metadata and updated by the pool contract.
  * @author @palmerg4 @oscarsernarosero @cirsteve
  */
-contract LPToken is ERC721, ERC721Enumerable, ILPtoken {
+contract LPToken is ERC721, ERC721Enumerable, ILPToken {
     using MathLibs for packedFloat;
 
     uint256 public currentTokenId;
