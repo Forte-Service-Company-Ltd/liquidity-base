@@ -137,7 +137,7 @@ contract LPTokenNew is Ownable2Step, ERC721, ERC721Enumerable, ILPToken {
         allowedPool[pool] = true;
         inactiveToken[currentTokenId + 1] = true;
         poolName[pool] = _name;
-        emit ILPTokenEvents.PoolAddedToAllowList(pool);
+        emit ILPTokenEvents.PoolAddedToAllowList(pool, currentTokenId + 1);
     }
 
     /**
