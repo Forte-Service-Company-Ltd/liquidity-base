@@ -3,7 +3,7 @@ pragma solidity ^0.8.24;
 
 import {ERC721} from "../../lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
 import {ERC721Enumerable} from "../../lib/openzeppelin-contracts/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import {IPoolEvents} from "./IEvents.sol";
+import {IPoolEvents, ILPTokenEvents} from "./IEvents.sol";
 import "./IErrors.sol";
 import {packedFloat, MathLibs} from "../amm/mathLibs/MathLibs.sol";
 
@@ -68,7 +68,7 @@ contract LPToken is ERC721, ERC721Enumerable {
     function _updateLPToken(uint256 tokenId, packedFloat _wj, packedFloat _rj) internal {
         lpToken[tokenId].rj = _rj;
         lpToken[tokenId].wj = _wj;
-        emit IPoolEvents.LPTokenUpdated(tokenId, _wj, _rj);
+        emit ILPTokenEvents.LPTokenUpdated(tokenId, _wj, _rj);
     }
 
     /**

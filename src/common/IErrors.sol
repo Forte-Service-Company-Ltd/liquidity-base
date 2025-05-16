@@ -47,6 +47,11 @@ error ZeroAddress();
 
 /**** ERC721 Errors ****/
 error URIQueryForNonexistentToken();
+error PoolNotAllowed();
+error TokenNotFromPool();
+error PoolAlreadyAllowed();
+error NotProposedFactory(address factoryAddressProposed);
+error NotFactory();
 
 /**** Ownership Errors ****/
 error RenouncingOwnershipForbidden();

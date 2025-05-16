@@ -434,6 +434,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
      * @dev Overrides the tokenURI function from ERC721 to generate an NFT with pool information
      * @param tokenId The token ID to generate the URI for
      * @return The token URI with SVG image and metadata
+     * TODO remove this function from the base contract once all has been migrated
      */
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         if (_ownerOf(tokenId) == address(0)) revert URIQueryForNonexistentToken();

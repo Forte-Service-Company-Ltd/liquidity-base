@@ -39,7 +39,6 @@ interface IPoolEvents is CommonEvents {
         address _recipient
     );
     event LiquidityDeposited(address indexed _sender, uint256 indexed _tokenId, uint256 _A, uint256 _B);
-    event LPTokenUpdated(uint256 indexed tokenId, packedFloat wj, packedFloat hn);
     event FeesGenerated(uint256 indexed lpFee, uint256 indexed protocolFee);
 }
 
@@ -56,4 +55,11 @@ interface IFactoryEvents is CommonEvents {
 interface IAllowListEvents {
     event AllowListDeployed();
     event AddressAllowed(address indexed _address, bool indexed _allowed);
+}
+
+interface ILPTokenEvents{
+    event PoolAddedToAllowList(address indexed pool);
+    event FactoryProposed(address indexed factory);
+    event FactoryConfirmed(address indexed factory);
+    event LPTokenUpdated(uint256 indexed tokenId, packedFloat wj, packedFloat hn);
 }
