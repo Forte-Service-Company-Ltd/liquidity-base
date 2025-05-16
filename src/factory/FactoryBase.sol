@@ -6,7 +6,7 @@ import "../common/IErrors.sol";
 import {IFactory} from "../factory/IFactory.sol";
 import {IAllowList} from "../allowList/IAllowList.sol";
 import {CommonEvents, IPoolEvents} from "../common/IEvents.sol";
-import {ILPToken} from "lib/liquidity-base/src/common/ILPToken.sol";
+import {ILPToken} from "../../src/common/ILPToken.sol";
 /**
  * @title Pool Factory
  * @dev creates the pools in an automated and permissioned fashion
