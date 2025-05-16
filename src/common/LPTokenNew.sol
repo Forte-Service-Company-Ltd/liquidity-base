@@ -38,7 +38,7 @@ contract LPTokenNew is Ownable2Step, ERC721, ERC721Enumerable, ILPToken {
         if (!allowedPool[msg.sender]) revert PoolNotAllowed();
         _;
     }
-     
+
     modifier onlyTokensFromPool(uint256 tokenId) {
         if (msg.sender != idToPool[tokenId]) revert TokenNotFromPool();
         _;
@@ -76,7 +76,7 @@ contract LPTokenNew is Ownable2Step, ERC721, ERC721Enumerable, ILPToken {
      * @param wj The amount of liquidity provided by the liquidity provider
      * @param hn The revenue parameter of the pool associated with the lpToken contract
      */
-    function mintTokenAndUpdate(address lp, packedFloat wj, packedFloat hn) onlyAllowedPools external returns (uint256 tokenId){
+    function mintTokenAndUpdate(address lp, packedFloat wj, packedFloat hn) external onlyAllowedPools returns (uint256 tokenId) {
         currentTokenId++;
         _mint(lp, currentTokenId);
         idToPool[currentTokenId] = msg.sender;
@@ -91,7 +91,7 @@ contract LPTokenNew is Ownable2Step, ERC721, ERC721Enumerable, ILPToken {
      * @param _wj The amount of liquidity associated with the lpToken being updated
      * @param _rj The amount of revenue associated with the lpToken being updated
      */
-    function updateLPToken(uint256 tokenId, packedFloat _wj, packedFloat _rj) onlyTokensFromPool(tokenId) public {
+    function updateLPToken(uint256 tokenId, packedFloat _wj, packedFloat _rj) public onlyTokensFromPool(tokenId) {
         lpToken[tokenId].rj = _rj;
         lpToken[tokenId].wj = _wj;
         emit ILPTokenEvents.LPTokenUpdated(tokenId, _wj, _rj);
@@ -106,7 +106,7 @@ contract LPTokenNew is Ownable2Step, ERC721, ERC721Enumerable, ILPToken {
      */
     function updateLPTokenWithdrawal(uint256 _tokenId, packedFloat _wj, packedFloat _rj) external {
         if (_wj.eq(packedFloat.wrap(0))) {
-             if (msg.sender != idToPool[_tokenId]) revert TokenNotFromPool();
+            if (msg.sender != idToPool[_tokenId]) revert TokenNotFromPool();
             _burn(_tokenId);
             delete lpToken[_tokenId];
         } else updateLPToken(_tokenId, _wj, _rj);
@@ -131,7 +131,7 @@ contract LPTokenNew is Ownable2Step, ERC721, ERC721Enumerable, ILPToken {
      * @param pool the address of the pool to be added
      * @notice Only the factory should be able to add pools to the allow list
      */
-    function addPoolToAllowList(address pool, string memory _name) onlyFactory external{
+    function addPoolToAllowList(address pool, string memory _name) external onlyFactory {
         if (pool == address(0)) revert ZeroAddress();
         if (allowedPool[pool]) revert PoolAlreadyAllowed();
         allowedPool[pool] = true;
@@ -145,7 +145,7 @@ contract LPTokenNew is Ownable2Step, ERC721, ERC721Enumerable, ILPToken {
      * @param pool the address of the pool to be added
      * @return true if the pool is allowed
      */
-    function isPoolAllowed(address pool) external view returns (bool){
+    function isPoolAllowed(address pool) external view returns (bool) {
         return allowedPool[pool];
     }
 
@@ -154,7 +154,7 @@ contract LPTokenNew is Ownable2Step, ERC721, ERC721Enumerable, ILPToken {
      * @param factory the address of the proposed factory
      * @notice Only the owner should be able to propose a factory
      */
-    function proposeFactoryAddress(address factory) onlyOwner external{
+    function proposeFactoryAddress(address factory) external onlyOwner {
         if (factory == address(0)) revert ZeroAddress();
         factoryAddressProposed = factory;
         emit ILPTokenEvents.FactoryProposed(factory);
@@ -164,7 +164,7 @@ contract LPTokenNew is Ownable2Step, ERC721, ERC721Enumerable, ILPToken {
      * @dev confirm the factory address
      * @notice Only the proposed factory should be able to confirm the factory address
      */
-    function confirmFactoryAddress() external{
+    function confirmFactoryAddress() external {
         if (msg.sender != factoryAddressProposed) revert NotProposedFactory(factoryAddressProposed);
         delete factoryAddressProposed;
         factoryAddress = msg.sender;

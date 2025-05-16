@@ -6,6 +6,7 @@ import "../common/IErrors.sol";
 import {IFactory} from "../factory/IFactory.sol";
 import {IAllowList} from "../allowList/IAllowList.sol";
 import {CommonEvents, IPoolEvents} from "../common/IEvents.sol";
+import {ILPToken} from "lib/liquidity-base/src/common/ILPToken.sol";
 /**
  * @title Pool Factory
  * @dev creates the pools in an automated and permissioned fashion
@@ -20,6 +21,7 @@ abstract contract FactoryBase is Ownable2Step, IFactory {
     address deployerAllowList;
     address public protocolFeeCollector;
     address public proposedProtocolFeeCollector;
+    address public lpTokenAddress;
     uint16 public protocolFee;
 
     constructor() Ownable(_msgSender()) {}
@@ -116,5 +118,33 @@ abstract contract FactoryBase is Ownable2Step, IFactory {
      */
     function renounceOwnership() public pure override {
         revert RenouncingOwnershipForbidden();
+    }
+
+    /**
+     * @dev confirm the factory address
+     * @notice Used for the LPToken facotry role. Only the owner is allowed to accept the factory role
+     */
+    function acceptLPTokenRole() external onlyOwner {
+        ILPToken(lpTokenAddress).confirmFactoryAddress();
+    }
+
+    /**
+     * @dev set the LPToken address
+     * @param LPTokenAddress the address of the LPToken contract
+     * @notice Only the owner can set the LPToken address
+     * @notice This function is used to set the LPToken address for the factory
+     */
+    function setLPTokenAddress(address LPTokenAddress) external onlyOwner {
+        lpTokenAddress = LPTokenAddress;
+    }
+
+    /**
+     * @dev add pool address to LPToken allow list
+     * @param pool the address of the pool to be added to the LPToken allow list
+     * @notice Only the owner can set the LPToken address
+     * @notice Used to allow pools to update LPTokens
+     */
+    function _addPoolToAllowList(address pool) internal {
+        ILPToken(lpTokenAddress).addPoolToAllowList(pool);
     }
 }
