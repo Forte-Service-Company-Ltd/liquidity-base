@@ -77,4 +77,18 @@ interface IFactory is IFactoryEvents {
      * @notice that only the already proposed fee collector can call this function
      */
     function confirmProtocolFeeCollector() external;
+
+    /**
+     * @dev confirm the factory address
+     * @notice Used for the LPToken facotry role. Only the owner is allowed to accept the factory role
+     */
+    function acceptLPTokenRole() external;
+
+    /**
+     * @dev set the LPToken address
+     * @param LPTokenAddress the address of the LPToken contract
+     * @notice Only the owner can set the LPToken address
+     * @notice This function is used to set the LPToken address for the factory
+     */
+    function setLPTokenAddress(address LPTokenAddress) external;
 }

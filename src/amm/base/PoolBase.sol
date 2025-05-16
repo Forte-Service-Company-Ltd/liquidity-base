@@ -11,7 +11,8 @@ import "../../common/IErrors.sol";
 import {CalculatorBase, packedFloat} from "./CalculatorBase.sol";
 import {FeeInfo, TBCType} from "../../common/TBC.sol";
 import {MathLibs} from "../mathLibs/MathLibs.sol";
-import {LPToken} from "../../../src/common/LPToken.sol";
+import {Descriptor} from "../../common/SVG/NFTSVG.sol";
+import {ILPToken} from "../../common/ILPToken.sol";
 
 /**
  * @title Pool Base
@@ -19,7 +20,7 @@ import {LPToken} from "../../../src/common/LPToken.sol";
  * Any pool implementation must inherits this contract and implement all the functions from CalculatorBase.
  * @author  @oscarsernarosero @mpetersoCode55 @cirsteve
  */
-abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPToken {
+abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable {
     using SafeERC20 for IERC20;
     using MathLibs for int256;
     using MathLibs for packedFloat;
@@ -32,6 +33,10 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
 
     address public immutable xToken;
     address public immutable yToken;
+    address public immutable lpToken;
+
+    uint256 public immutable inactiveLpId;
+    uint256 public immutable activeLpId;
 
     /**
      * @dev difference in decimal precision between y token and x token
@@ -100,17 +105,14 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
      * @param _yToken address of the Y token (y axis)
      * @param fees fee information
      */
-    constructor(
-        address _xToken,
-        address _yToken,
-        FeeInfo memory fees,
-        string memory _name,
-        string memory _symbol
-    ) Ownable(_msgSender()) LPToken(_name, _symbol) {
+    constructor(address _xToken, address _yToken, address _lpToken, uint _inactiveLpId, FeeInfo memory fees) Ownable(_msgSender()) {
         _validateInput(_xToken, _yToken, fees._protocolFeeCollector);
         // slither-disable-start missing-zero-check // This is done in the _validateInput function
         xToken = _xToken;
         yToken = _yToken;
+        lpToken = _lpToken;
+        inactiveLpId = _inactiveLpId;
+        activeLpId = _inactiveLpId + 1;
         protocolFeeCollector = _msgSender(); // temporary measure to avoid role failure
         setLPFee(fees._lpFee);
         setProtocolFee(fees._protocolFee);
@@ -416,16 +418,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
         return uint(_w.convertpackedFloatToWAD());
     }
 
-    /**
-     * @dev returns the quantity of the deployer's inactive liquidity units at launch
-     * @dev This value can change if the deployer withdraws partial or full liquidity from the inactive
-     * @return wInactive
-     */
-    function wInactive() external view returns (uint256) {
-        return uint(_wInactive().convertpackedFloatToWAD());
-    }
-
     function _wInactive() internal view returns (packedFloat wI) {
-        (wI, ) = getLPToken(INACTIVE_ID);
+        (wI, ) = ILPToken(lpToken).getLPToken(inactiveLpId);
     }
 }

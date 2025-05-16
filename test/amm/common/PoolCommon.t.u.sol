@@ -75,10 +75,11 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
     }
 
     function testLiquidity_Pool_checkActiveLiquidityNFTAmount() public view {
-        uint256 ACTIVE_LIQUIDITY_NFT_ID = 2;
-        (packedFloat wj, ) = pool.getLPToken(ACTIVE_LIQUIDITY_NFT_ID);
+        uint256 ACTIVE_LIQUIDITY_NFT_ID = pool.activeLpId();
+        (packedFloat wj, ) = lpToken.getLPToken(ACTIVE_LIQUIDITY_NFT_ID);
         uint256 w = pool.w();
-        uint256 wInactive = pool.wInactive();
+        (packedFloat _wIanctive, ) = lpToken.getLPToken(pool.inactiveLpId());
+        uint256 wInactive = uint256(_wIanctive.convertpackedFloatToWAD());
         assertEq(w - wInactive, uint256(wj.convertpackedFloatToWAD()), "Active Liquidity NFT wj should equal active liquidity");
     }
 
@@ -203,7 +204,7 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
 
         uint256 originalBalance = IERC20(_yToken).balanceOf(address(admin));
 
-        pool.getLPToken(2);
+        lpToken.getLPToken(2);
         uint256 amount = pool.withdrawRevenue(2, pool.revenueAvailable(2), address(admin));
         uint256 updatedBalance = IERC20(_yToken).balanceOf(address(admin));
         uint256 expectedBalance = originalBalance + amount;
