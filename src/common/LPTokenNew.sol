@@ -7,7 +7,7 @@ import {ILPTokenEvents} from "./IEvents.sol";
 import "./IErrors.sol";
 import {packedFloat, MathLibs} from "../amm/mathLibs/MathLibs.sol";
 import {ILPToken, LPTokenS} from "./ILPToken.sol";
-import {Descriptor} from "../common/SVG/NFTSVG.sol";
+import {Descriptor} from "../common/SVG/NFTSVGNew.sol";
 import "../../lib/openzeppelin-contracts/contracts/access/Ownable2Step.sol";
 
 /**
@@ -180,6 +180,6 @@ contract LPTokenNew is Ownable2Step, ERC721, ERC721Enumerable, ILPToken {
      */
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         if (_ownerOf(tokenId) == address(0)) revert URIQueryForNonexistentToken();
-        return Descriptor.constructTokenURI(tokenId, address(this));
+        return Descriptor.constructTokenURI(tokenId, idToPool[tokenId], inactiveToken[tokenId]);
     }
 }
