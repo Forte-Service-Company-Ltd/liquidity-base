@@ -15,7 +15,7 @@ import {PythonUtils} from "./pythonUtils.s.sol";
 import {SixDecimalERC20} from "src/example/ERC20/SixDecimalERC20.sol";
 import {ExampleERC721URI} from "src/example/ERC721/ExampleERC721URI.sol";
 import {Descriptor, SVGLinesPart1, SVGLinesPart2, SVGLinesPart3, SVG, HexStrings} from "../../src/common/SVG/NFTSVG.sol";
-import {LPToken, ILPToken} from "lib/liquidity-base/src/common/LPTokenNew.sol";
+import {LPTokenNew, ILPToken} from "lib/liquidity-base/src/common/LPTokenNew.sol";
 
 contract ExternalDeployments is Script, PythonUtils {
     function deployAllowLists() internal returns (AllowList yTokenAllowList, AllowList deployerAllowList) {
@@ -85,9 +85,9 @@ contract ExternalDeployments is Script, PythonUtils {
         deployTokens(_supply);
     }
 
-    function deployLPToken() internal returns (LPToken lpToken) {
+    function deployLPToken() internal returns (LPTokenNew lpToken) {
         vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
-        lpToken = new LPToken(vm.envString("NAME"), vm.envString("SYMBOL"));
+        lpToken = new LPTokenNew(vm.envString("NAME"), vm.envString("SYMBOL"));
         vm.stopBroadcast();
         setENVAddress("LP_TOKEN_ADDRESS", vm.toString(address(lpToken)));
         console2.log("LP Token (LPT):", address(lpToken));
@@ -146,7 +146,7 @@ abstract contract FactoryDeployment is ExternalDeployments {
         if (vm.envAddress("LP_TOKEN_ADDRESS") == address(0)) {
             _lpToken = deployLPToken();
         } else {
-            _lpToken = LPToken(vm.envAddress("LP_TOKEN_ADDRESS"));
+            _lpToken = LPTokenNew(vm.envAddress("LP_TOKEN_ADDRESS"));
         }
         vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
         uint size;

@@ -145,6 +145,6 @@ abstract contract FactoryBase is Ownable2Step, IFactory {
      * @notice Used to allow pools to update LPTokens
      */
     function _addPoolToAllowList(address pool) internal {
-        ILPToken(lpTokenAddress).addPoolToAllowList(pool);
+        ILPToken(lpTokenAddress).addPoolToAllowList(pool, "Pool Name");
     }
 }
