@@ -59,6 +59,7 @@ interface IAllowListEvents {
 }
 
 interface ILPTokenEvents{
+    event ALTBCPositionTokenDeployed();
     event PoolAddedToAllowList(address pool, uint256 inactiveTokenId);
     event FactoryProposed(address factory);
     event FactoryConfirmed(address factory);

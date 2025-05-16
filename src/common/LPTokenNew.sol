@@ -49,7 +49,9 @@ contract LPTokenNew is Ownable2Step, ERC721, ERC721Enumerable, ILPToken {
         _;
     }
 
-    constructor(string memory _name, string memory _symbol) Ownable(msg.sender) ERC721(_name, _symbol) {}
+    constructor(string memory _name, string memory _symbol) Ownable(msg.sender) ERC721(_name, _symbol) {
+        emit ALTBCPositionTokenDeployed();
+    }
 
     /**
      * @dev Get the liquidity share and last claimed amount for an lpToken
