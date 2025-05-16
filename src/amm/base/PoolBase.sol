@@ -11,7 +11,6 @@ import "../../common/IErrors.sol";
 import {CalculatorBase, packedFloat} from "./CalculatorBase.sol";
 import {FeeInfo, TBCType} from "../../common/TBC.sol";
 import {MathLibs} from "../mathLibs/MathLibs.sol";
-import {LPToken} from "../../../src/common/LPToken.sol";
 import {Descriptor} from "../../common/SVG/NFTSVG.sol";
 
 /**
@@ -20,7 +19,7 @@ import {Descriptor} from "../../common/SVG/NFTSVG.sol";
  * Any pool implementation must inherits this contract and implement all the functions from CalculatorBase.
  * @author  @oscarsernarosero @mpetersoCode55 @cirsteve
  */
-abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPToken {
+abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable {
     using SafeERC20 for IERC20;
     using MathLibs for int256;
     using MathLibs for packedFloat;
@@ -33,6 +32,11 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
 
     address public immutable xToken;
     address public immutable yToken;
+    address public immutable lpToken;
+
+    uint256 public immutable inactiveLpId;
+    uint256 public immutable activeLpId
+    uint activeId
 
     /**
      * @dev difference in decimal precision between y token and x token
@@ -104,14 +108,19 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable, LPT
     constructor(
         address _xToken,
         address _yToken,
+        address _lpToken,
+        uint _inactiveLpId,
         FeeInfo memory fees,
         string memory _name,
         string memory _symbol
-    ) Ownable(_msgSender()) LPToken(_name, _symbol) {
+    ) Ownable(_msgSender()) {
         _validateInput(_xToken, _yToken, fees._protocolFeeCollector);
         // slither-disable-start missing-zero-check // This is done in the _validateInput function
         xToken = _xToken;
         yToken = _yToken;
+        lpToken = _lpToken;
+        inactiveLpId = _inactiveLpId;
+        activeLpId = _inactiveLpId + 1;
         protocolFeeCollector = _msgSender(); // temporary measure to avoid role failure
         setLPFee(fees._lpFee);
         setProtocolFee(fees._protocolFee);

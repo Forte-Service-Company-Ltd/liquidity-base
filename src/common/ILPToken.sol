@@ -13,12 +13,11 @@ import {packedFloat} from "../amm/mathLibs/MathLibs.sol";
  */
 
 struct LPTokenS {
-        packedFloat wj;
-        packedFloat rj;
-    }
+    packedFloat wj;
+    packedFloat rj;
+}
 
 interface ILPToken is IERC721, IERC721Enumerable {
-
     /**
      * @dev Get the liquidity share and last claimed amount for an lpToken
      * @param tokenId The token id of the lpToken being updated
@@ -26,6 +25,13 @@ interface ILPToken is IERC721, IERC721Enumerable {
      * @return rj the last revenue claim of the lpToken
      */
     function getLPToken(uint256 tokenId) external view returns (packedFloat wj, packedFloat rj);
+
+    /**
+     * @dev Get the inactive status tokenId
+     * @param tokenId The token id of the lpToken being queried
+     * @return bool true if the token is inactive
+     */
+    function inactiveToken(uint256 tokenId) external view returns (bool);
 
     /**
      * @dev Mints a new lpToken to a liquidity provider and updated the value associated with this new lpToken
@@ -55,7 +61,7 @@ interface ILPToken is IERC721, IERC721Enumerable {
     function updateLPTokenWithdrawal(uint256 _tokenId, packedFloat _wj, packedFloat _rj) external;
 
     /**
-     * @dev gets current token id which means the next token id to be minted
+     * @dev gets current token id which means the latest token id to be minted
      * @return the current token id
      */
     function currentTokenId() external view returns (uint256);
