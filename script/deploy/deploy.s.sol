@@ -15,7 +15,7 @@ import {PythonUtils} from "./pythonUtils.s.sol";
 import {SixDecimalERC20} from "src/example/ERC20/SixDecimalERC20.sol";
 import {ExampleERC721URI} from "src/example/ERC721/ExampleERC721URI.sol";
 import {Descriptor, SVGLinesPart1, SVGLinesPart2, SVGLinesPart3, SVG, HexStrings} from "../../src/common/SVG/NFTSVG.sol";
-import {LPTokenNew, ILPToken} from "lib/liquidity-base/src/common/LPTokenNew.sol";
+import {LPTokenNew, ILPToken} from "../../src/common/LPTokenNew.sol";
 
 contract ExternalDeployments is Script, PythonUtils {
     function deployAllowLists() internal returns (AllowList yTokenAllowList, AllowList deployerAllowList) {
