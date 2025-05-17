@@ -12,6 +12,7 @@ import {CalculatorBase, packedFloat} from "./CalculatorBase.sol";
 import {FeeInfo, TBCType} from "../../common/TBC.sol";
 import {MathLibs} from "../mathLibs/MathLibs.sol";
 import {Descriptor} from "../../common/SVG/NFTSVG.sol";
+import {ILPToken} from "../../common/ILPToken.sol";
 
 /**
  * @title Pool Base
@@ -35,8 +36,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable {
     address public immutable lpToken;
 
     uint256 public immutable inactiveLpId;
-    uint256 public immutable activeLpId
-    uint activeId
+    uint256 public immutable activeLpId;
 
     /**
      * @dev difference in decimal precision between y token and x token
@@ -436,17 +436,10 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable {
     }
 
     function _wInactive() internal view returns (packedFloat wI) {
-        (wI, ) = getLPToken(INACTIVE_ID);
+        (wI, ) = ILPToken(lpToken).getLPToken(inactiveLpId);
     }
 
-    /**
-     * @dev Overrides the tokenURI function from ERC721 to generate an NFT with pool information
-     * @param tokenId The token ID to generate the URI for
-     * @return The token URI with SVG image and metadata
-     * TODO remove this function from the base contract once all has been migrated
-     */
-    function tokenURI(uint256 tokenId) public view override returns (string memory) {
-        if (_ownerOf(tokenId) == address(0)) revert URIQueryForNonexistentToken();
-        return Descriptor.constructTokenURI(tokenId, address(this));
+    function getLPToken(uint tokenId) external view returns (packedFloat wj, packedFloat rj) {
+        (wj, rj) = ILPToken(lpToken).getLPToken(tokenId);
     }
 }
