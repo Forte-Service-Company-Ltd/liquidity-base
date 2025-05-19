@@ -418,20 +418,8 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable {
         return uint(_w.convertpackedFloatToWAD());
     }
 
-    /**
-     * @dev returns the quantity of the deployer's inactive liquidity units at launch
-     * @dev This value can change if the deployer withdraws partial or full liquidity from the inactive
-     * @return wInactive
-     */
-    function wInactive() external view returns (uint256) {
-        return uint(_wInactive().convertpackedFloatToWAD());
-    }
-
     function _wInactive() internal view returns (packedFloat wI) {
         (wI, ) = ILPToken(lpToken).getLPToken(inactiveLpId);
     }
 
-    function getLPToken(uint tokenId) external view returns (packedFloat wj, packedFloat rj) {
-        (wj, rj) = ILPToken(lpToken).getLPToken(tokenId);
-    }
 }
