@@ -82,7 +82,8 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
         uint256 ACTIVE_LIQUIDITY_NFT_ID = 2;
         (packedFloat wj, ) = lpToken.getLPToken(ACTIVE_LIQUIDITY_NFT_ID);
         uint256 w = pool.w();
-        uint256 wInactive = pool.wInactive();
+        (packedFloat _wIanctive, ) = lpToken.getLPToken(pool.activeLpId());
+        uint256 wInactive = uint256(_wIanctive.convertpackedFloatToWAD());
         assertEq(w - wInactive, uint256(wj.convertpackedFloatToWAD()), "Active Liquidity NFT wj should equal active liquidity");
     }
 
