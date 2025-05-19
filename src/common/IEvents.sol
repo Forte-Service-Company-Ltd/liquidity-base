@@ -50,6 +50,7 @@ interface IFactoryEvents is CommonEvents {
     event PoolCreated(address indexed _pool);
     event SetYTokenAllowList(address indexed _allowedList);
     event SetDeployerAllowList(address indexed _allowedList);
+    event LPTokenAddressSet(address indexed _LPTokenAddres);
 }
 
 interface IAllowListEvents {
@@ -57,7 +58,7 @@ interface IAllowListEvents {
     event AddressAllowed(address indexed _address, bool indexed _allowed);
 }
 
-interface ILPTokenEvents{
+interface ILPTokenEvents {
     event PoolAddedToAllowList(address indexed pool);
     event FactoryProposed(address indexed factory);
     event FactoryConfirmed(address indexed factory);
