@@ -5,7 +5,7 @@ import {Ownable2Step, Ownable} from "@openzeppelin/contracts/access/Ownable2Step
 import "../common/IErrors.sol";
 import {IFactory} from "../factory/IFactory.sol";
 import {IAllowList} from "../allowList/IAllowList.sol";
-import {CommonEvents, IPoolEvents} from "../common/IEvents.sol";
+import {CommonEvents, IPoolEvents, IFactoryEvents} from "../common/IEvents.sol";
 import {ILPToken} from "../../src/common/ILPToken.sol";
 /**
  * @title Pool Factory
@@ -136,6 +136,7 @@ abstract contract FactoryBase is Ownable2Step, IFactory {
      */
     function setLPTokenAddress(address LPTokenAddress) external onlyOwner {
         lpTokenAddress = LPTokenAddress;
+        emit LPTokenAddressSet(LPTokenAddress);
     }
 
     /**
