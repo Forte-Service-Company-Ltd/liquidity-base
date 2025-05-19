@@ -105,15 +105,7 @@ abstract contract PoolBase is IPool, CalculatorBase, Ownable2Step, Pausable {
      * @param _yToken address of the Y token (y axis)
      * @param fees fee information
      */
-    constructor(
-        address _xToken,
-        address _yToken,
-        address _lpToken,
-        uint _inactiveLpId,
-        FeeInfo memory fees,
-        string memory _name,
-        string memory _symbol
-    ) Ownable(_msgSender()) {
+    constructor(address _xToken, address _yToken, address _lpToken, uint _inactiveLpId, FeeInfo memory fees) Ownable(_msgSender()) {
         _validateInput(_xToken, _yToken, fees._protocolFeeCollector);
         // slither-disable-start missing-zero-check // This is done in the _validateInput function
         xToken = _xToken;

@@ -131,12 +131,11 @@ contract LPTokenNew is Ownable2Step, ERC721, ERC721Enumerable, ILPToken {
      * @param pool the address of the pool to be added
      * @notice Only the factory should be able to add pools to the allow list
      */
-    function addPoolToAllowList(address pool, string memory _name) external onlyFactory {
+    function addPoolToAllowList(address pool) external onlyFactory {
         if (pool == address(0)) revert ZeroAddress();
         if (allowedPool[pool]) revert PoolAlreadyAllowed();
         allowedPool[pool] = true;
         inactiveToken[currentTokenId + 1] = true;
-        poolName[pool] = _name;
         emit ILPTokenEvents.PoolAddedToAllowList(pool);
     }
 
