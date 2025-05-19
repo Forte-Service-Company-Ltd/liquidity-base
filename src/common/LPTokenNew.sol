@@ -50,7 +50,7 @@ contract LPTokenNew is Ownable2Step, ERC721, ERC721Enumerable, ILPToken {
     }
 
     constructor(string memory _name, string memory _symbol) Ownable(msg.sender) ERC721(_name, _symbol) {
-        emit ALTBCPositionTokenDeployed();
+        emit ILPTokenEvents.ALTBCPositionTokenDeployed();
     }
 
     /**
