@@ -5,6 +5,7 @@ import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
 import {IPool} from "src/amm/base/IPool.sol";
 import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import {console} from "forge-std/console.sol";
 
 library SVGLinesPart1 {
     string constant SVG_LINES_PART_1 =
@@ -192,13 +193,23 @@ library SVG {
     }
 
     function generateFeeTier(SVGParams memory params) private pure returns (string memory svg) {
-        svg = string(
-            abi.encodePacked(
-                '<text fill="white" xml:space="preserve" style="white-space: pre" font-family="Helvetica, Arial, sans-serif" font-size="96" letter-spacing="0px"><tspan x="48" y="193.117">',
-                params.feeTier,
-                "</tspan></text>"
-            )
-        );
+        if (keccak256(abi.encodePacked(params.feeTier)) == keccak256(abi.encodePacked("INACTIVE"))) {
+            svg = string(
+                abi.encodePacked(
+                    '<text fill="white" xml:space="preserve" style="white-space: pre" font-family="Helvetica, Arial, sans-serif" font-size="72" letter-spacing="0px"><tspan x="48" y="193.117">',
+                    params.feeTier,
+                    "</tspan></text>"
+                )
+            );
+        } else {
+            svg = string(
+                abi.encodePacked(
+                    '<text fill="white" xml:space="preserve" style="white-space: pre" font-family="Helvetica, Arial, sans-serif" font-size="96" letter-spacing="0px"><tspan x="48" y="193.117">',
+                    params.feeTier,
+                    "</tspan></text>"
+                )
+            );
+        }
     }
 
     /// @notice returns the token ID of the SVG
@@ -357,6 +368,8 @@ library Descriptor {
         IPool pool = IPool(poolAddress);
         (uint16 _fee, , , , ) = pool.getFeeInfo();
 
+        console.log(IERC20Metadata(pool.xToken()).symbol());
+        console.log(IERC20Metadata(pool.yToken()).symbol());
         ConstructTokenURIParams memory params = ConstructTokenURIParams({
             tokenId: tokenId,
             xTokenAddress: pool.xToken(),
