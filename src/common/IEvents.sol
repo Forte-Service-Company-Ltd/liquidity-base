@@ -39,6 +39,7 @@ interface IPoolEvents is CommonEvents {
         address _recipient
     );
     event LiquidityDeposited(address indexed _sender, uint256 indexed _tokenId, uint256 _A, uint256 _B);
+    event LPTokenUpdated(uint256 indexed tokenId, packedFloat wj, packedFloat hn);
     event FeesGenerated(uint256 indexed lpFee, uint256 indexed protocolFee);
 }
 
