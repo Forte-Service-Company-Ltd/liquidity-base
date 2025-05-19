@@ -34,7 +34,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         fullToken = address(_yToken) == address(stableCoin) ? STABLECOIN_DEC : ERC20_DECIMALS;
     }
 
-    function _deployLPToken() internal{
+    function _deployLPToken() internal {
         lpToken = new LPTokenNew("ALTBC Position Token", "ALTBC-POS");
     }
 
@@ -68,7 +68,11 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
     }
 
     function _setupFactory(address factory) internal startAsAdmin endWithStopPrank {
+        FactoryBase(factory).setLPTokenAddress(address(lpToken));
+        lpToken.proposeFactoryAddress(factory);
+        FactoryBase(factory).acceptLPTokenRole();
         FactoryBase(factory).setDeployerAllowList(address(deployerAllowList));
+        FactoryBase(factory).setYTokenAllowList(address(yTokenAllowList));
         FactoryBase(factory).setYTokenAllowList(address(yTokenAllowList));
         FactoryBase(factory).proposeProtocolFeeCollector(address(0xb0b));
         vm.startPrank(address(0xb0b));
