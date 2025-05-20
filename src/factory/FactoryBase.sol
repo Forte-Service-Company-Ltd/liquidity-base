@@ -13,7 +13,6 @@ import {CommonEvents, IPoolEvents} from "../common/IEvents.sol";
  */
 
 abstract contract FactoryBase is Ownable2Step, IFactory {
-    string public constant VERSION = "v0.3.0";
     uint16 public constant MAX_PROTOCOL_FEE = 20;
 
     address yTokenAllowList;
