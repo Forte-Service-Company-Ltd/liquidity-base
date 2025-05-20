@@ -11,7 +11,6 @@ contract Constants {
     uint256 constant PERCENTAGE_DENOM = 10_000;
     uint16 constant MAX_PROTOCOL_FEE = 20;
     uint16 constant MAX_LP_FEE = 5_000 - MAX_PROTOCOL_FEE;
-    string public constant VERSION = "v0.3.0";
 
     function getPoolConstants() public pure returns (uint, uint, uint, uint16, uint16) {
         return (POOL_NATIVE_DECIMALS, FULL_NATIVE_TOKEN, PERCENTAGE_DENOM, MAX_PROTOCOL_FEE, MAX_LP_FEE);

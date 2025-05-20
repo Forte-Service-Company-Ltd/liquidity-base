@@ -23,10 +23,6 @@ abstract contract PoolCommonTest is TestCommonSetup, PoolCommonAbs {
     using MathLibs for packedFloat;
     using MathLibs for int256;
 
-    function testLiquidity_Pool_version() public view {
-        assertEq(pool.VERSION(), "v0.3.0");
-    }
-
     function testLiquidity_Pool_TokensMustNotBeTheSame() public {
         vm.expectRevert(abi.encodeWithSignature("XandYTokensAreTheSame()"));
         _deployPool(address(yToken), address(yToken), 0, X_TOKEN_MAX_SUPPLY, TBCInputOption.BASE);

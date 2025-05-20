@@ -25,7 +25,7 @@ abstract contract FactoryCommon is TestCommonSetup {
 
     function testLiquidity_PoolFactory_version() public {
         _buildDeployment();
-        assertEq(factory.VERSION(), "v0.3.0");
+        assertEq(factory.VERSION(), "v1.0.0");
     }
 
     function testLiquidity_PoolFactory_deployment() public {
