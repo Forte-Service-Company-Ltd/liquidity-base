@@ -192,13 +192,23 @@ library SVG {
     }
 
     function generateFeeTier(SVGParams memory params) private pure returns (string memory svg) {
-        svg = string(
-            abi.encodePacked(
-                '<text fill="white" xml:space="preserve" style="white-space: pre" font-family="Helvetica, Arial, sans-serif" font-size="96" letter-spacing="0px"><tspan x="48" y="193.117">',
-                params.feeTier,
-                "</tspan></text>"
-            )
-        );
+        if (keccak256(abi.encodePacked(params.feeTier)) == keccak256(abi.encodePacked("INACTIVE"))) {
+            svg = string(
+                abi.encodePacked(
+                    '<text fill="white" xml:space="preserve" style="white-space: pre" font-family="Helvetica, Arial, sans-serif" font-size="72" letter-spacing="0px"><tspan x="48" y="193.117">',
+                    params.feeTier,
+                    "</tspan></text>"
+                )
+            );
+        } else {
+            svg = string(
+                abi.encodePacked(
+                    '<text fill="white" xml:space="preserve" style="white-space: pre" font-family="Helvetica, Arial, sans-serif" font-size="96" letter-spacing="0px"><tspan x="48" y="193.117">',
+                    params.feeTier,
+                    "</tspan></text>"
+                )
+            );
+        }
     }
 
     /// @notice returns the token ID of the SVG
@@ -347,12 +357,13 @@ library Descriptor {
         string yTokenSymbol;
         uint16 fee;
         address poolManager;
+        bool isInactive;
     }
 
     /// @notice Constructs the token URI for a ALTBC NFT
     /// @param tokenId The token ID
     /// @return The token URI as a string
-    function constructTokenURI(uint256 tokenId, address poolAddress) external view returns (string memory) {
+    function constructTokenURI(uint256 tokenId, address poolAddress, bool isInactive) external view returns (string memory) {
         IPool pool = IPool(poolAddress);
         (uint16 _fee, , , , ) = pool.getFeeInfo();
 
@@ -363,9 +374,10 @@ library Descriptor {
             xTokenSymbol: IERC20Metadata(pool.xToken()).symbol(),
             yTokenSymbol: IERC20Metadata(pool.yToken()).symbol(),
             fee: _fee,
-            poolManager: address(pool)
+            poolManager: address(pool),
+            isInactive: isInactive
         });
-        string memory name = generateName(params, feeToPercentString(params.fee, params.tokenId));
+        string memory name = generateName(params, feeToPercentString(params.fee, isInactive));
         string memory descriptionPartOne = generateDescriptionPartOne(
             escapeSpecialCharacters(params.xTokenSymbol),
             escapeSpecialCharacters(params.yTokenSymbol),
@@ -376,7 +388,7 @@ library Descriptor {
             escapeSpecialCharacters(params.xTokenSymbol),
             params.yTokenAddress == address(0) ? "Native" : addressToString(params.yTokenAddress),
             params.xTokenAddress == address(0) ? "Native" : addressToString(params.xTokenAddress),
-            feeToPercentString(params.fee, params.tokenId)
+            feeToPercentString(params.fee, isInactive)
         );
 
         string memory image = Base64.encode(bytes(generateSVGImage(params)));
@@ -535,10 +547,10 @@ library Descriptor {
 
     /// @notice Converts fee amount in hundredths of a percent (where 100 = 1%) to decimal string with percent sign
     /// @param fee fee amount as uint16 where 100 = 1%, 1 = 0.01%
-    /// @param tokenId The token ID, if tokenId is 1, the fee is set to INACTIVE as it is the inactive position
+    /// @param isInactive true if the position is inactive
     /// @return fee as a decimal string with percent sign
-    function feeToPercentString(uint16 fee, uint256 tokenId) internal pure returns (string memory) {
-        if (tokenId == 1) {
+    function feeToPercentString(uint16 fee, bool isInactive) internal pure returns (string memory) {
+        if (isInactive) {
             return "INACTIVE";
         }
 
@@ -591,7 +603,7 @@ library Descriptor {
             yToken: addressToString(params.yTokenAddress),
             xTokenSymbol: params.xTokenSymbol,
             yTokenSymbol: params.yTokenSymbol,
-            feeTier: feeToPercentString(params.fee, params.tokenId),
+            feeTier: feeToPercentString(params.fee, params.isInactive),
             poolAddress: addressToString(params.poolManager),
             tokenId: params.tokenId,
             color0: currencyToColorHex(uint256(uint160(params.xTokenAddress)), 136),

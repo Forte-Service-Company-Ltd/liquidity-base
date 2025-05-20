@@ -180,6 +180,6 @@ contract LPTokenNew is Ownable2Step, ERC721, ERC721Enumerable, ILPToken {
      */
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         if (_ownerOf(tokenId) == address(0)) revert URIQueryForNonexistentToken();
-        return Descriptor.constructTokenURI(tokenId, address(this));
+        return Descriptor.constructTokenURI(tokenId, idToPool[tokenId], inactiveToken[tokenId]);
     }
 }
