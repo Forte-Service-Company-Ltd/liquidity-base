@@ -7,7 +7,7 @@ import {ILPTokenEvents} from "./IEvents.sol";
 import "./IErrors.sol";
 import {packedFloat, MathLibs} from "../amm/mathLibs/MathLibs.sol";
 import {ILPToken, LPTokenS} from "./ILPToken.sol";
-import {Descriptor} from "../common/SVG/NFTSVGNew.sol";
+import {Descriptor} from "../common/SVG/NFTSVG.sol";
 import "../../lib/openzeppelin-contracts/contracts/access/Ownable2Step.sol";
 
 /**
