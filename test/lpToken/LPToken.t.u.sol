@@ -3,7 +3,7 @@ pragma solidity ^0.8.24;
 
 import {packedFloat, MathLibs} from "src/amm/mathLibs/MathLibs.sol";
 import "src/common/IErrors.sol";
-import {TestCommonSetup, LPTokenNew} from "test/util/TestCommonSetup.sol";
+import {TestCommonSetup, LPToken} from "test/util/TestCommonSetup.sol";
 
 abstract contract LPTokenTest is TestCommonSetup {
     using MathLibs for packedFloat;

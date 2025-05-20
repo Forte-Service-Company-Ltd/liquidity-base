@@ -13,7 +13,7 @@ import {TwentyTwoDecimalERC20} from "src/example/ERC20/TwentyTwoDecimalERC20.sol
 import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {TestCommonSetupAbs, TBCInputOption} from "test/util/TestCommonSetupAbs.sol";
 import {LPToken} from "src/common/LPToken.sol";
-import {LPTokenNew} from "src/common/LPTokenNew.sol";
+import {LPToken} from "src/common/LPToken.sol";
 import {Float128, packedFloat, MathLibs} from "src/amm/mathLibs/MathLibs.sol";
 import "forge-std/console2.sol";
 
@@ -35,7 +35,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
     }
 
     function _deployLPToken() internal {
-        lpToken = new LPTokenNew("ALTBC Position Token", "ALTBC-POS");
+        lpToken = new LPToken("ALTBC Position Token", "ALTBC-POS");
     }
 
     function _setUpTokens(uint256 _xTokenSupply) internal startAsAdmin endWithStopPrank {
