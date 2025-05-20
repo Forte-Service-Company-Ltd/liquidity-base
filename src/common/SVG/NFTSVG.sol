@@ -5,7 +5,6 @@ import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
 import {IPool} from "src/amm/base/IPool.sol";
 import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
-import {console} from "forge-std/console.sol";
 
 library SVGLinesPart1 {
     string constant SVG_LINES_PART_1 =
@@ -368,8 +367,6 @@ library Descriptor {
         IPool pool = IPool(poolAddress);
         (uint16 _fee, , , , ) = pool.getFeeInfo();
 
-        console.log(IERC20Metadata(pool.xToken()).symbol());
-        console.log(IERC20Metadata(pool.yToken()).symbol());
         ConstructTokenURIParams memory params = ConstructTokenURIParams({
             tokenId: tokenId,
             xTokenAddress: pool.xToken(),
