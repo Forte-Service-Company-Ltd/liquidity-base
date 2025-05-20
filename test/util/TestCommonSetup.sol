@@ -150,6 +150,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
     ) internal endWithStopPrank returns (PoolBase poolRet) {
         _deployFactory();
         _deployAllowLists();
+        _deployLPToken();
         _setupFactory(_getFactoryAddress());
         _setupAllowLists();
 
