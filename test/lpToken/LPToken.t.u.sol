@@ -50,7 +50,7 @@ abstract contract LPTokenTest is TestCommonSetup {
         vm.expectRevert(abi.encodeWithSelector(ZeroAddress.selector));
         lpToken.addPoolToAllowList(address(0));
         // test positive case
-        lpToken.addPoolToAllowList(mockPool1); // TODO: we have to rebase with latest main and revert the name in the LP token since it is not used
+        lpToken.addPoolToAllowList(mockPool1);
         // test pool already allowed
         vm.expectRevert(abi.encodeWithSelector(PoolAlreadyAllowed.selector));
         lpToken.addPoolToAllowList(mockPool1);
@@ -59,7 +59,6 @@ abstract contract LPTokenTest is TestCommonSetup {
         vm.expectRevert(abi.encodeWithSelector(NotFactory.selector));
         lpToken.addPoolToAllowList(mockPool2);
         assertTrue(lpToken.isPoolAllowed(mockPool1));
-        // assertEq(lpToken.poolName(mockPool1), mockPoolName); // TODO: we should get rid of this check as we are removing the name from the LP token
     }
 
     function testLPToken_mintTokenAndUpdate() public {

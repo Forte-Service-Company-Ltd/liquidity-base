@@ -94,7 +94,6 @@ contract LPToken is Ownable2Step, ERC721, ERC721Enumerable, ILPToken {
     function updateLPToken(uint256 tokenId, packedFloat _wj, packedFloat _rj) public onlyTokensFromPool(tokenId) {
         lpToken[tokenId].rj = _rj;
         lpToken[tokenId].wj = _wj;
-        // emit ILPTokenEvents.LPTokenUpdated(tokenId, _wj, _rj);
     }
 
     /**

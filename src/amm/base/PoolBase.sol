@@ -11,7 +11,6 @@ import "../../common/IErrors.sol";
 import {CalculatorBase, packedFloat} from "./CalculatorBase.sol";
 import {FeeInfo, TBCType} from "../../common/TBC.sol";
 import {MathLibs} from "../mathLibs/MathLibs.sol";
-import {Descriptor} from "../../common/SVG/NFTSVG.sol";
 import {ILPToken} from "../../common/ILPToken.sol";
 
 /**
