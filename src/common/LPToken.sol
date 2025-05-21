@@ -94,6 +94,7 @@ contract LPToken is Ownable2Step, ERC721, ERC721Enumerable, ILPToken {
     function updateLPToken(uint256 tokenId, packedFloat _wj, packedFloat _rj) public onlyTokensFromPool(tokenId) {
         lpToken[tokenId].rj = _rj;
         lpToken[tokenId].wj = _wj;
+        emit ILPTokenEvents.LPTokenUpdated(tokenId, _wj, _rj);
     }
 
     /**
@@ -104,11 +105,12 @@ contract LPToken is Ownable2Step, ERC721, ERC721Enumerable, ILPToken {
      * @param _rj The new value of _rj
      */
     function updateLPTokenWithdrawal(uint256 _tokenId, packedFloat _wj, packedFloat _rj) external {
+        updateLPToken(_tokenId, _wj, _rj);
         if (_wj.eq(packedFloat.wrap(0))) {
             if (msg.sender != idToPool[_tokenId]) revert TokenNotFromPool();
             _burn(_tokenId);
             delete lpToken[_tokenId];
-        } else updateLPToken(_tokenId, _wj, _rj);
+        }
     }
 
     /**
