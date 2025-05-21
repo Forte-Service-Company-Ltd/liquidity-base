@@ -31,8 +31,6 @@ contract LPToken is Ownable2Step, ERC721, ERC721Enumerable, ILPToken {
     mapping(address pool => bool isAllowed) allowedPool;
     // inactive tokens
     mapping(uint256 tokenId => bool isInactive) public inactiveToken;
-    // pool name
-    mapping(address pool => string name) public poolName;
 
     modifier onlyAllowedPools() {
         if (!allowedPool[msg.sender]) revert PoolNotAllowed();
