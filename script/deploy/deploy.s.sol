@@ -15,6 +15,7 @@ import {PythonUtils} from "./pythonUtils.s.sol";
 import {SixDecimalERC20} from "src/example/ERC20/SixDecimalERC20.sol";
 import {ExampleERC721URI} from "src/example/ERC721/ExampleERC721URI.sol";
 import {Descriptor, SVGLinesPart1, SVGLinesPart2, SVGLinesPart3, SVG, HexStrings} from "../../src/common/SVG/NFTSVG.sol";
+import {LPToken, ILPToken} from "../../src/common/LPToken.sol";
 
 contract ExternalDeployments is Script, PythonUtils {
     function deployAllowLists() internal returns (AllowList yTokenAllowList, AllowList deployerAllowList) {
@@ -83,6 +84,14 @@ contract ExternalDeployments is Script, PythonUtils {
         deployAllowLists();
         deployTokens(_supply);
     }
+
+    function deployLPToken() internal returns (LPToken lpToken) {
+        vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
+        lpToken = new LPToken(vm.envString("NAME"), vm.envString("SYMBOL"));
+        vm.stopBroadcast();
+        setENVAddress("LP_TOKEN_ADDRESS", vm.toString(address(lpToken)));
+        console2.log("LP Token (LPT):", address(lpToken));
+    }
 }
 
 contract allowlistsDeployment is ExternalDeployments {
@@ -109,8 +118,15 @@ contract StableCoinDeployment is ExternalDeployments {
     }
 }
 
-abstract contract FactoryDeployment is Script, PythonUtils {
+contract LPTokenDeployment is ExternalDeployments {
+    function run() external virtual {
+        deployLPToken();
+    }
+}
+
+abstract contract FactoryDeployment is ExternalDeployments {
     IFactory _factory;
+    ILPToken _lpToken;
 
     function _deployFactory() internal virtual returns (IFactory);
 
@@ -126,6 +142,11 @@ abstract contract FactoryDeployment is Script, PythonUtils {
     function prepareForDeployment() internal {
         if (address(_factory) == address(0)) {
             _factory = _deployFactory();
+        }
+        if (vm.envAddress("LP_TOKEN_ADDRESS") == address(0)) {
+            _lpToken = deployLPToken();
+        } else {
+            _lpToken = LPToken(vm.envAddress("LP_TOKEN_ADDRESS"));
         }
         vm.startBroadcast(vm.envUint("DEPLOYMENT_OWNER_KEY"));
         uint size;
@@ -169,6 +190,11 @@ abstract contract FactoryDeployment is Script, PythonUtils {
         {
             _factory.proposeProtocolFeeCollector(vm.envAddress("FEE_COLLECTOR"));
             _factory.setProtocolFee(uint16(vm.envUint("PROTOCOL_FEE_AMOUNT")));
+        }
+        {
+            _factory.setLPTokenAddress(vm.envAddress("LP_TOKEN_ADDRESS"));
+            _lpToken.proposeFactoryAddress(factoryAddress);
+            _factory.acceptLPTokenRole();
         }
         vm.stopBroadcast();
         {

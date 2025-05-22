@@ -13,7 +13,7 @@ import {TwentyTwoDecimalERC20} from "src/example/ERC20/TwentyTwoDecimalERC20.sol
 import {PoolBase} from "src/amm/base/PoolBase.sol";
 import {TestCommonSetupAbs, TBCInputOption} from "test/util/TestCommonSetupAbs.sol";
 import {LPToken} from "src/common/LPToken.sol";
-import {LPTokenNew} from "src/common/LPTokenNew.sol";
+import {LPToken} from "src/common/LPToken.sol";
 import {Float128, packedFloat, MathLibs} from "src/amm/mathLibs/MathLibs.sol";
 import "forge-std/console2.sol";
 
@@ -34,8 +34,8 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
         fullToken = address(_yToken) == address(stableCoin) ? STABLECOIN_DEC : ERC20_DECIMALS;
     }
 
-    function _deployLPToken() internal{
-        lpToken = new LPTokenNew("ALTBC Position Token", "ALTBC-POS");
+    function _deployLPToken() internal {
+        lpToken = new LPToken("ALTBC Position Token", "ALTBC-POS");
     }
 
     function _setUpTokens(uint256 _xTokenSupply) internal startAsAdmin endWithStopPrank {
@@ -68,7 +68,11 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
     }
 
     function _setupFactory(address factory) internal startAsAdmin endWithStopPrank {
+        FactoryBase(factory).setLPTokenAddress(address(lpToken));
+        lpToken.proposeFactoryAddress(factory);
+        FactoryBase(factory).acceptLPTokenRole();
         FactoryBase(factory).setDeployerAllowList(address(deployerAllowList));
+        FactoryBase(factory).setYTokenAllowList(address(yTokenAllowList));
         FactoryBase(factory).setYTokenAllowList(address(yTokenAllowList));
         FactoryBase(factory).proposeProtocolFeeCollector(address(0xb0b));
         vm.startPrank(address(0xb0b));
@@ -146,6 +150,7 @@ abstract contract TestCommonSetup is TestCommonSetupAbs {
     ) internal endWithStopPrank returns (PoolBase poolRet) {
         _deployFactory();
         _deployAllowLists();
+        _deployLPToken();
         _setupFactory(_getFactoryAddress());
         _setupAllowLists();
 
