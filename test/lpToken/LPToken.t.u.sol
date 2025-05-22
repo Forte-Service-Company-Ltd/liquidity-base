@@ -3,6 +3,7 @@ pragma solidity ^0.8.24;
 
 import {packedFloat, MathLibs} from "src/amm/mathLibs/MathLibs.sol";
 import "src/common/IErrors.sol";
+import "src/common/IEvents.sol";
 import {TestCommonSetup, LPToken} from "test/util/TestCommonSetup.sol";
 
 abstract contract LPTokenTest is TestCommonSetup {
@@ -17,6 +18,8 @@ abstract contract LPTokenTest is TestCommonSetup {
     address cade = address(0xCade);
     string mockPoolName = "ABC / DEF";
     function setUp() public startAsAdmin {
+        vm.expectEmit(true, true, true, true);
+        emit ILPTokenEvents.ALTBCPositionTokenDeployed();
         _deployLPToken();
     }
 

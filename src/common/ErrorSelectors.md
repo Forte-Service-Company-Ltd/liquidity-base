@@ -54,7 +54,7 @@ An online Keccak-256 hash digester can be found at https://emn178.github.io/onli
 | 0x2d281418 | VTooHigh()                                             |
 | 0x34477cc0 | NotEnoughCollateral()                                  |
 | 0x7445fc7e | CannotDepositInactiveLiquidity()                       |
-| 0x5195ca46 | InactiveLiquidityExceedsLimit()                         |                                  |
+| 0x5195ca46 | InactiveLiquidityExceedsLimit()                        |
 | 0x34173478 | CCannotBeZero()                                        |
 | 0xc999f51d | VCannotBeZero()                                        |
 | 0x1ba7a2f9 | xMinCannotBeZero()                                     |
@@ -64,3 +64,8 @@ An online Keccak-256 hash digester can be found at https://emn178.github.io/onli
 | 0xa14c4b50 | URIQueryForNonexistentToken()                          |
 | 0x781298c8 | RenouncingOwnershipForbidden()                         |
 | 0x2e397952 | TransactionExpired()                                   |
+| 0xf31017e5 | PoolNotAllowed()                                       |
+| 0x46e5c364 | TokenNotFromPool()                                     |
+| 0xb081fc31 | PoolAlreadyAllowed()                                   |
+| 0x9ebb32f0 | NotProposedFactory(address)                            |
+| 0x32cc7236 | NotFactory()                                           |
