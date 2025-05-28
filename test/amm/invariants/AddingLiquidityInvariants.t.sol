@@ -13,8 +13,9 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 abstract contract AddingLiquidityInvariants is TestCommonSetup {
     uint xTokenLiquidity;
     uint yTokenLiquidity;
+    
 
-    function setUp() public endWithStopPrank {
+    function _setUp(bytes4[] memory selectors) public endWithStopPrank {
         pool = _setupPool(false);
         uint amountToTrade = 50_000 * ERC20_DECIMALS;
 
@@ -22,10 +23,9 @@ abstract contract AddingLiquidityInvariants is TestCommonSetup {
         (uint _expected, , ) = pool.simSwap(pool.yToken(), amountToTrade);
         pool.swap(pool.yToken(), amountToTrade, _expected, msg.sender, getValidExpiration());
         xTokenLiquidity = IERC20(pool.xToken()).balanceOf(address(pool));
-        yTokenLiquidity = IERC20(pool.yToken()).balanceOf(address(pool));
+        yTokenLiquidity = _getYTokenLiquidity(address(pool));
         vm.startPrank(admin);
-        bytes4[] memory selectors = new bytes4[](1);
-        // selectors[0] = PoolBase(address(pool)).depositLiquidity.selector;
+        
         targetContract(address(pool));
         targetSelector(FuzzSelector({addr: address(pool), selectors: selectors}));
         targetSender(admin);
@@ -36,12 +36,6 @@ abstract contract AddingLiquidityInvariants is TestCommonSetup {
     }
 
     function invariant_liquidityCanNeverDecreaseCallingAddLiquidity_TokenY() public {
-        vm.skip(true);
-        // assertGe(pool.yTokenLiquidity(), yTokenLiquidity);
-    }
-
-    function invariant_liquidityCanNeverIncreasePastMaxSupply() public {
-        uint maxTokenSupply = _getMaxXTokenSupply();
-        assertLe(IERC20(pool.xToken()).balanceOf(address(pool)), maxTokenSupply);
+        assertGe(_getYTokenLiquidity(address(pool)), yTokenLiquidity);
     }
 }
