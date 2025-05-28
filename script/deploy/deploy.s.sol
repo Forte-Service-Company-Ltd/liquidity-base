@@ -192,7 +192,7 @@ abstract contract FactoryDeployment is ExternalDeployments {
             _factory.setProtocolFee(uint16(vm.envUint("PROTOCOL_FEE_AMOUNT")));
         }
         {
-            _factory.setLPTokenAddress(vm.envAddress("LP_TOKEN_ADDRESS"));
+            _factory.setLPTokenAddress(address(_lpToken));
             _lpToken.proposeFactoryAddress(factoryAddress);
             _factory.acceptLPTokenRole();
         }
