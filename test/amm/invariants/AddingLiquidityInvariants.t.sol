@@ -13,8 +13,9 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 abstract contract AddingLiquidityInvariants is TestCommonSetup {
     uint xTokenLiquidity;
     uint yTokenLiquidity;
+    
 
-    function setUp() public endWithStopPrank {
+    function _setUp(bytes4[] memory selectors) public endWithStopPrank {
         pool = _setupPool(false);
         uint amountToTrade = 50_000 * ERC20_DECIMALS;
 
@@ -24,8 +25,7 @@ abstract contract AddingLiquidityInvariants is TestCommonSetup {
         xTokenLiquidity = IERC20(pool.xToken()).balanceOf(address(pool));
         yTokenLiquidity = _getYTokenLiquidity(address(pool));
         vm.startPrank(admin);
-        bytes4[] memory selectors = new bytes4[](1);
-        selectors[0] = 0x2f27872c;
+        
         targetContract(address(pool));
         targetSelector(FuzzSelector({addr: address(pool), selectors: selectors}));
         targetSender(admin);
