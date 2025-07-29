@@ -9,4 +9,4 @@
 	url = https://github.com/Vectorized/solady
 [submodule "lib/float128"]
 	path = lib/float128
-	url = https://github.com/thrackle-io/float128.git
+	url = https://github.com/Forte-Service-Company-Ltd/float128.git
