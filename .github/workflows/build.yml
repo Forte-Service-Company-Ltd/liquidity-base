@@ -16,6 +16,9 @@ jobs:
     name: Build and Test
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Build and Test
         id: build-and-test
         uses: Forte-Service-Company-Ltd/application-infrastructure/.github/actions/onchain-build-and-test@INF-263-Onchain-Build-and-Test
