@@ -12,18 +12,12 @@ env:
   FOUNDRY_PROFILE: ci
 
 jobs:
-  build-test:
-    name: Build
-    runs-on: ubuntu-latest-m-16
-
+  check:
+    name: Build and Test
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Build and Test
+        id: build-and-test
+        uses: Forte-Service-Company-Ltd/application-infrastructure/.github/actions/onchain-build-and-test@INF-263-Onchain-Build-and-Test
         with:
-          submodules: recursive
-
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
-
-      - name: Build
-        run: |
-          forge clean && forge build --optimize
+          alchemy_key: ${{ secrets.ALCHEMY_KEY }}
