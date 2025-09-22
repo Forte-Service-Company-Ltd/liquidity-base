@@ -1,0 +1,28 @@
+{
+    "ignorePatterns": [
+      {
+        "pattern": "^https://www.infura.io"
+      },
+      {
+        "pattern": "^http://localhost"
+      }
+    ],
+    "replacementPatterns": [
+      {
+        "pattern": "https://github.com/Forte-Service-Company-Ltd/liquidity-base/",
+        "replacement": "/"
+      },
+      {
+        "pattern": "\/blob\/(.*)\/",
+        "replacement": "/"
+      }
+    ],
+    "httpHeaders": [
+      {
+        "urls": ["https://github.com/", "https://guides.github.com/", "https://help.github.com/", "https://docs.github.com/"],
+        "headers": {
+          "Accept-Encoding": "zstd, br, gzip, deflate"
+        }
+      }
+    ]
+  }
