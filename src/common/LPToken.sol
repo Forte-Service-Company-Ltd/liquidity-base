@@ -180,4 +180,11 @@ contract LPToken is Ownable2Step, ERC721, ERC721Enumerable, ILPToken {
         if (_ownerOf(tokenId) == address(0)) revert URIQueryForNonexistentToken();
         return Descriptor.constructTokenURI(tokenId, idToPool[tokenId], inactiveToken[tokenId]);
     }
+
+    /**
+     * @dev Overrides the renounceOwnership function from Ownable to prevent renouncing ownership
+     */
+    function renounceOwnership() public override onlyOwner {
+        revert RenouncingOwnershipForbidden();
+    }
 }
