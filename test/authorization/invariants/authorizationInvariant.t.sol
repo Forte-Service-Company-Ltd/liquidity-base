@@ -40,4 +40,10 @@ abstract contract authorizationInvariants is TestCommonSetup {
         (uint16 fee, , , , ) = pool.getFeeInfo();
         assertEq(fee, 30);
     }
+
+    function invariant_verifyRenounceOwnership_Reverts() public {
+        vm.startPrank(admin);
+        vm.expectRevert("RenouncingOwnershipForbidden()");
+        lpToken.renounceOwnership();
+    }
 }
