@@ -22,16 +22,24 @@ abstract contract FactoryBase is Ownable2Step, IFactory {
     address public proposedProtocolFeeCollector;
     address public lpTokenAddress;
     uint16 public protocolFee;
+    bool public gateDeployers;
+    bool public gateYTokens;
 
     constructor() Ownable(_msgSender()) {}
 
     modifier onlyAllowedDeployers() {
-        if (!IAllowList(deployerAllowList).isAllowed(_msgSender())) revert NotAnAllowedDeployer();
+        // only gate the deployers if the switch is turned on.
+        if (gateDeployers){
+            if (!IAllowList(deployerAllowList).isAllowed(_msgSender())) revert NotAnAllowedDeployer();
+        }
         _;
     }
 
     modifier onlyAllowedYTokens(address _yToken) {
-        if (!IAllowList(yTokenAllowList).isAllowed(_yToken)) revert YTokenNotAllowed();
+        // only gate the Y-Tokens if the switch is turned on.
+        if (gateYTokens){
+            if (!IAllowList(yTokenAllowList).isAllowed(_yToken)) revert YTokenNotAllowed();
+        }
         _;
     }
 
@@ -146,5 +154,14 @@ abstract contract FactoryBase is Ownable2Step, IFactory {
      */
     function _addPoolToAllowList(address pool) internal {
         ILPToken(lpTokenAddress).addPoolToAllowList(pool);
+    }
+
+
+    function gateDeployers(bool _gateDeployers) onlyOwner {
+        gateDeployers = _gateDeployers;
+    }
+
+    function gateYTokens(bool _gateYTokens) onlyOwner {
+        gateYTokens = _gateYTokens;
     }
 }
