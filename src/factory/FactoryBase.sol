@@ -157,11 +157,11 @@ abstract contract FactoryBase is Ownable2Step, IFactory {
     }
 
 
-    function gateDeployers(bool _gateDeployers) onlyOwner {
+    function setGateDeployers(bool _gateDeployers) external onlyOwner {
         gateDeployers = _gateDeployers;
     }
 
-    function gateYTokens(bool _gateYTokens) onlyOwner {
+    function setGateYTokens(bool _gateYTokens) external onlyOwner {
         gateYTokens = _gateYTokens;
     }
 }
