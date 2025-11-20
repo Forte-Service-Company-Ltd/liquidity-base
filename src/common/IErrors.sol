@@ -41,6 +41,7 @@ error TransactionExpired();
 
 /**** PoolFactoryErrors ****/
 error NotAnAllowedDeployer();
+error ByteCodeImmutable();
 
 /**** Input Errors ****/
 error ZeroAddress();
