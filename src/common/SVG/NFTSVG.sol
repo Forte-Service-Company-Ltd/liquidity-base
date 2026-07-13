@@ -252,7 +252,7 @@ library SVG {
                 '<path d="M48 480C48 473.373 53.3726 468 60 468H338C344.627 468 350 473.373 350 480V492C350 498.627 344.627 504 338 504H60C53.3726 504 48 498.627 48 492V480Z" fill="black" fill-opacity="0.6"/>',
                 '<text transform="translate(60 492)" fill="#959595" xml:space="preserve" style="white-space: pre" font-family="Helvetica, Arial, sans-serif" font-size="20" letter-spacing="0.5px"><tspan x="0" y="0">',
                 params.yTokenSymbol,
-                "</tspan></text>"
+                "</tspan></text>",
                 '<text transform="translate(180 492)" fill="white" xml:space="preserve" style="white-space: pre" font-family="Helvetica, Arial, sans-serif" font-size="20" letter-spacing="0.5px"><tspan x="0" y="0">',
                 abi.encodePacked(substring(params.yToken, 0, 6), "...", substring(params.yToken, 36, 42)),
                 "</tspan></text></g>"
