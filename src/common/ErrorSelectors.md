@@ -16,28 +16,16 @@ An online Keccak-256 hash digester can be found at https://emn178.github.io/onli
 
 | SELECTOR   | ERROR                                                  |
 | ---------- | ------------------------------------------------------ |
-| 0x058e826d | XnCannotBeZero()                                       |
-| 0x3e060e90 | BnCannotBeZero()                                       |
 | 0xb1b3aff4 | bytesLargerThanUint256()                               |
 | 0x1ccfdd2f | diffGreaterThanUint256()                               |
-| 0x1de42a90 | DivideByZero()                                         |
 | 0x13d54d96 | YTokenNotAllowed()                                     |
 | 0xfeaf73c7 | BeyondLiquidity()                                      |
 | 0x07149010 | LPFeeAboveMax(uint16,uint16)                           |
-| 0xbc19b2bf | MaxTotalSupplyTooLarge()                               |
 | 0xd0b73f52 | NotAnAllowedDeployer()                                 |
-| 0x22ef9850 | PriceRangeNotWideEnough()                              |
-| 0xc29ffb2f | PriceRangeTooLarge()                                   |
-| 0x692853b9 | MaxTotalSupplyCannotBeZero()                           |
-| 0x5b33356a | lowerPriceTooLow()                                     |
 | 0x9cf8540c | ZeroValueNotAllowed()                                  |
-| 0x90b8ec18 | TransferFailed()                                       |
 | 0xd92e233d | ZeroAddress()                                          |
 | 0x03137159 | NegativeValue()                                        |
-| 0x5d32e464 | CTooSmall(uint256)                                     |
 | 0x5bcae70a | DnTooLarge()                                           |
-| 0x4bc1f6e0 | CTooLarge()                                            |
-| 0xedd7abac | LiquidityRemovalForbidden()                            |
 | 0xc1ab6dc1 | InvalidToken()                                         |
 | 0xcd6c7802 | XOutOfBounds(uint256)                                  |
 | 0x32a1d94e | YTokenDecimalsGT18()                                   |
@@ -47,11 +35,6 @@ An online Keccak-256 hash digester can be found at https://emn178.github.io/onli
 | 0x97992322 | NotProtocolFeeCollector()                              |
 | 0xa8ed10f5 | NotProposedProtocolFeeCollector()                      |
 | 0x6d52fdaf | NoProtocolFeeCollector()                               |
-| 0x9d6b0927 | KTooLow()                                              |
-| 0x95d02cac | KTooHigh()                                             |
-| 0xac9c209c | VOutOfBounds()                                         |
-| 0xcc9d2d63 | VTooLow()                                              |
-| 0x2d281418 | VTooHigh()                                             |
 | 0x34477cc0 | NotEnoughCollateral()                                  |
 | 0x7445fc7e | CannotDepositInactiveLiquidity()                       |
 | 0x5195ca46 | InactiveLiquidityExceedsLimit()                        |
@@ -69,3 +52,4 @@ An online Keccak-256 hash digester can be found at https://emn178.github.io/onli
 | 0xb081fc31 | PoolAlreadyAllowed()                                   |
 | 0x9ebb32f0 | NotProposedFactory(address)                            |
 | 0x32cc7236 | NotFactory()                                           |
+| 0xc30d8680 | ByteCodeImmutable()                                    |
