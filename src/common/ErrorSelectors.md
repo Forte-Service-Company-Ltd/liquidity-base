@@ -46,7 +46,7 @@ An online Keccak-256 hash digester can be found at https://emn178.github.io/onli
 | 0xa95445d0 | QTooHigh()                                             |
 | 0xa14c4b50 | URIQueryForNonexistentToken()                          |
 | 0x781298c8 | RenouncingOwnershipForbidden()                         |
-| 0x2e397952 | TransactionExpired()                                   |
+| 0xe397952c | TransactionExpired()                                   |
 | 0xf31017e5 | PoolNotAllowed()                                       |
 | 0x46e5c364 | TokenNotFromPool()                                     |
 | 0xb081fc31 | PoolAlreadyAllowed()                                   |
