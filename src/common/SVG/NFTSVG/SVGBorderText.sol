@@ -2,13 +2,14 @@
 pragma solidity ^0.8.0;
 
 import {SVGParams} from "./SVGTypes.sol";
+import {SVGUtils} from "./SVGUtils.sol";
 
 /// @notice Builds the animated "Pool • 0x..." marquee text that follows the card's rounded border,
 /// plus the shared <defs> (border path, blur filters, clip paths) it and the gradient circles rely on.
 library SVGBorderText {
     string constant DEFS =
         "<defs>"
-        '<path id="borderPath" d="M58,26 L362,26 A32,32 0 0 1 394,58 L394,502 A32,32 0 0 1 362,534 L58,534 A32,32 0 0 1 26,502 L26,58 A32,32 0 0 1 58,26 z" fill="none"/>'
+        '<path id="borderPath" d="M64,16 L356,16 A48,48 0 0 1 404,64 L404,496 A48,48 0 0 1 356,544 L64,544 A48,48 0 0 1 16,496 L16,64 A48,48 0 0 1 64,16 z" fill="none"/>'
         '<filter id="filter0_f_2943_19260" x="-357" y="-574" width="1370" height="1370" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">'
         '<feFlood flood-opacity="0" result="BackgroundImageFix"/>'
         '<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>'
@@ -20,10 +21,10 @@ library SVGBorderText {
         '<feGaussianBlur stdDeviation="202" result="effect1_foregroundBlur_2943_19260"/>'
         "</filter>"
         '<clipPath id="clip0_2943_19260">'
-        '<rect width="420" height="560" rx="20" fill="white"/>'
+        '<rect width="420" height="560" rx="32" fill="white"/>'
         "</clipPath>"
         '<clipPath id="clip1_2943_19260">'
-        '<rect width="682" height="682" fill="white"/>'
+        '<rect width="420" height="560" fill="white"/>'
         "</clipPath>"
         "</defs>";
 
@@ -38,29 +39,39 @@ library SVGBorderText {
         'repeatCount="indefinite" />'
         "Pool &#x2022;&#xa0;";
 
+    /// @notice Builds one animated "Pool • 0x..." text-on-path block, scrolling from `fromOffset` to `toOffset`.
+    function _animatedPoolText(string memory fromOffset, string memory toOffset, string memory poolAddress)
+        private
+        pure
+        returns (string memory)
+    {
+        return string(
+            abi.encodePacked(
+                '<text font-family="',
+                SVGUtils.FONT_FAMILY,
+                '" font-size="14" fill="#F8F8F8" letter-spacing="1px">',
+                '<textPath href="#borderPath" startOffset="0%">',
+                '<animate attributeName="startOffset" ',
+                'from="',
+                fromOffset,
+                '" to="',
+                toOffset,
+                '" begin="0s" dur="30s" ',
+                'repeatCount="indefinite" />',
+                "Pool &#x2022;&#xa0;",
+                poolAddress,
+                "</textPath>",
+                "</text>"
+            )
+        );
+    }
+
     function generateBorderTextAndBackground(SVGParams memory params) public pure returns (string memory svg) {
         svg = string(
             abi.encodePacked(
                 '<g transform="translate(0,0)">',
-                '<text font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#F8F8F8" letter-spacing="0.5px">',
-                '<textPath href="#borderPath" startOffset="0%">',
-                '<animate attributeName="startOffset" ',
-                'from="-100%" to="0%" begin="0s" dur="30s" ',
-                'repeatCount="indefinite" />',
-                "Pool &#x2022;&#xa0;",
-                params.poolAddress,
-                "</textPath>",
-                "</text>",
-                '<text font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#F8F8F8" letter-spacing="0.5px">',
-                '<textPath href="#borderPath" startOffset="0%">',
-                '<animate attributeName="startOffset" ',
-                'from="0%" to="100%" ',
-                'begin="0s" dur="30s" ',
-                'repeatCount="indefinite" />',
-                "Pool &#x2022;&#xa0;",
-                params.poolAddress,
-                "</textPath>",
-                "</text>",
+                _animatedPoolText("-100%", "0%", params.poolAddress),
+                _animatedPoolText("0%", "100%", params.poolAddress),
                 "</g>",
                 "</svg>"
             )

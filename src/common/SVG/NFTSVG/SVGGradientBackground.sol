@@ -10,7 +10,7 @@ library SVGGradientBackground {
             abi.encodePacked(
                 '<svg width="420" height="560" viewBox="0 0 420 560" fill="none" xmlns="http://www.w3.org/2000/svg">',
                 '<g clip-path="url(#clip0_2943_19260)">',
-                '<rect width="420" height="560" rx="20" fill="black"/>',
+                '<rect width="420" height="560" rx="32" fill="black"/>',
                 '<g filter="url(#filter0_f_2943_19260)">',
                 '<circle cx="',
                 params.x1,
