@@ -9,7 +9,7 @@ import {SVGUtils} from "./SVGUtils.sol";
 library SVGBorderText {
     string constant DEFS =
         "<defs>"
-        '<path id="borderPath" d="M64,16 L356,16 A48,48 0 0 1 404,64 L404,496 A48,48 0 0 1 356,544 L64,544 A48,48 0 0 1 16,496 L16,64 A48,48 0 0 1 64,16 z" fill="none"/>'
+        '<path id="borderPath" d="M48,16 L372,16 A32,32 0 0 1 404,48 L404,512 A32,32 0 0 1 372,544 L48,544 A32,32 0 0 1 16,512 L16,48 A32,32 0 0 1 48,16 z" fill="none"/>'
         '<filter id="filter0_f_2943_19260" x="-357" y="-574" width="1370" height="1370" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">'
         '<feFlood flood-opacity="0" result="BackgroundImageFix"/>'
         '<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>'
