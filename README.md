@@ -6,13 +6,52 @@ The Liquidity Position NFT's image is generated on-chain (see [`src/common/SVG/N
 
 **1. Generate a sample `tokenURI`**
 
-[`test/util/ScratchRender.t.sol`](test/util/ScratchRender.t.sol) builds a sample NFT (USDC/WstETH, fee 1.00%, token ID 1) and writes its `tokenURI` to `scratch_tokenuri.txt`:
+There's no permanent test for this (a scratch test with no assertions doesn't belong in `test/`), so write a temporary one that builds a pool and prints its `tokenURI` with `console.log`, e.g.:
 
-```bash
-forge test --match-contract ScratchRenderTest -vv
+```solidity
+// test/util/Scratch.t.sol (temporary - don't commit)
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.24;
+
+import "forge-std/Test.sol";
+import "src/common/SVG/NFTSVG.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
+contract MockERC20 is ERC20 {
+    constructor(string memory name_, string memory symbol_) ERC20(name_, symbol_) {}
+}
+
+contract MockPool {
+    address public xToken;
+    address public yToken;
+    uint16 public fee;
+
+    constructor(address _xToken, address _yToken, uint16 _fee) {
+        xToken = _xToken;
+        yToken = _yToken;
+        fee = _fee;
+    }
+
+    function getFeeInfo() external view returns (uint16, uint16, address, address, uint256) {
+        return (fee, 0, address(0), address(0), 0);
+    }
+}
+
+contract ScratchTest is Test {
+    function test_render() public {
+        ERC20 usdc = new MockERC20("USDC", "USDC");
+        ERC20 wsteth = new MockERC20("WstETH", "WstETH");
+        MockPool pool = new MockPool(address(usdc), address(wsteth), 100);
+        console.log(Descriptor.constructTokenURI(1, address(pool), false));
+    }
+}
 ```
 
-To render a *different* pool/token instead, either edit the symbols/fee/token ID in that test file, or write your own script that calls `Descriptor.constructTokenURI(tokenId, poolAddress, isInactive)`.
+```bash
+forge test --match-contract ScratchTest -vv
+```
+
+Copy the printed `tokenURI` string into a local file named `scratch_tokenuri.txt` (the `scratch_*` prefix is gitignored, so it and the temporary test file above are discardable, not part of the repo).
 
 **2. Decode the `tokenURI` into an `.svg` file**
 

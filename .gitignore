@@ -32,3 +32,8 @@ node_modules/
 .venv/
 
 .DS_Store
+
+.vscode/
+
+# Scratch/debug output from the SVG render pipeline (see README) - discardable
+scratch_*
