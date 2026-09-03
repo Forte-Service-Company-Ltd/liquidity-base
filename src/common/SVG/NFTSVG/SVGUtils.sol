@@ -1,9 +1,17 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.0;
 
+import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
+import {SVGFontMetrics} from "./SVGFontMetrics.sol";
+
 /// @notice Small string helpers shared across the SVG generation libraries.
 library SVGUtils {
+    using Strings for uint256;
+
     string constant FONT_FAMILY = "Helvetica, Arial, sans-serif";
+    uint256 constant PILL_LEFT_PAD = 12;
+    uint256 constant PILL_RIGHT_PAD = 12;
+    uint256 constant PILL_LETTER_SPACING_TENTHS = 5; // 0.5px, matches the "0.5px" letter-spacing on these labels
 
     /// @notice Substring of a string
     function substring(string memory str, uint256 startIndex, uint256 endIndex) internal pure returns (string memory) {
@@ -49,6 +57,33 @@ library SVGUtils {
                 '">',
                 content,
                 "</tspan></text>"
+            )
+        );
+    }
+
+    /// @notice Builds a complete "label value" pill: a dark rounded background sized to exactly
+    /// fit `label` (gray) immediately followed by `value` (white), both at 16px/0.5px
+    /// letter-spacing - the shared shape behind the ID, TKNX, and TKNY badges.
+    /// @param pillY The y-coordinate of the background rect
+    /// @param textY The y-coordinate (baseline) of both text elements
+    /// @param label The gray label text (e.g. "ID", a token symbol)
+    /// @param value The white value text (e.g. " #1", a truncated address) - any leading space
+    /// meant to visually separate it from the label must already be part of this string
+    function labelValuePill(
+        string memory pillY,
+        string memory textY,
+        string memory label,
+        string memory value
+    ) internal pure returns (string memory) {
+        uint256 labelWidth = SVGFontMetrics.measureWidth(label, 16, PILL_LETTER_SPACING_TENTHS);
+        uint256 valueWidth = SVGFontMetrics.measureWidth(value, 16, PILL_LETTER_SPACING_TENTHS);
+        uint256 width = PILL_LEFT_PAD + labelWidth + valueWidth + PILL_RIGHT_PAD;
+        uint256 valueX = 40 + PILL_LEFT_PAD + labelWidth;
+        return string(
+            abi.encodePacked(
+                pillRect(pillY, width.toString()),
+                textTag("#999999", "16", "0.5px", "52", textY, label),
+                textTag("white", "16", "0.5px", valueX.toString(), textY, value)
             )
         );
     }
