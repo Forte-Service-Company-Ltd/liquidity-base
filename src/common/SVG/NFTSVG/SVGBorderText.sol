@@ -25,17 +25,6 @@ library SVGBorderText {
         "</clipPath>"
         "</defs>";
 
-    /// @dev Unused legacy fragment kept from the original implementation; superseded by
-    /// generateBorderTextAndBackground below, which builds both animation directions dynamically.
-    string constant BEGIN_ANIMATION =
-        '<g transform="translate(0,0)">'
-        '<text font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#F8F8F8" letter-spacing="0.5px">'
-        '<textPath href="#borderPath" startOffset="0%">'
-        '<animate attributeName="startOffset" '
-        'from="-100%" to="0%" begin="0s" dur="30s" '
-        'repeatCount="indefinite" />'
-        "Pool &#x2022;&#xa0;";
-
     /// @notice Builds one animated "Pool • 0x..." text-on-path block, scrolling from `fromOffset` to `toOffset`.
     function _animatedPoolText(string memory fromOffset, string memory toOffset, string memory poolAddress)
         private
