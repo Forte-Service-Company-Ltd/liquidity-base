@@ -19,21 +19,25 @@ library SVGHeader {
     function generateSVGTokenPairHeader(SVGParams memory params) internal pure returns (string memory svg) {
         string memory pairText = string(abi.encodePacked(params.xTokenSymbol, " / ", params.yTokenSymbol));
         uint width = LEFT_PAD + SVGFontMetrics.measureWidth(pairText, 24, 0) + RIGHT_PAD;
+        uint textX = SVGUtils.CARD_CONTENT_X + LEFT_PAD;
         svg = string(
             abi.encodePacked(
-                '<rect x="40" y="56" width="',
+                '<rect x="',
+                SVGUtils.CARD_CONTENT_X.toString(),
+                '" y="56" width="',
                 width.toString(),
                 '" height="48" rx="16" fill="black" fill-opacity="0.6"/>',
-                SVGUtils.textTag("white", "24", "0px", "56", "88", pairText)
+                SVGUtils.textTag("white", "24", "0px", textX.toString(), "88", pairText)
             )
         );
     }
 
     function generateFeeTier(SVGParams memory params) internal pure returns (string memory svg) {
+        string memory x = SVGUtils.CARD_CONTENT_X.toString();
         if (keccak256(abi.encodePacked(params.feeTier)) == keccak256(abi.encodePacked("INACTIVE"))) {
-            svg = SVGUtils.textTag("white", "72", "0px", "40", "197.117", params.feeTier);
+            svg = SVGUtils.textTag("white", "72", "0px", x, "197.117", params.feeTier);
         } else {
-            svg = SVGUtils.textTag("white", "96", "0px", "40", "197.117", params.feeTier);
+            svg = SVGUtils.textTag("white", "96", "0px", x, "197.117", params.feeTier);
         }
     }
 }

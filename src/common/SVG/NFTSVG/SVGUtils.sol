@@ -9,6 +9,7 @@ library SVGUtils {
     using Strings for uint256;
 
     string constant FONT_FAMILY = "Helvetica, Arial, sans-serif";
+    uint256 constant CARD_CONTENT_X = 40;
     uint256 constant PILL_LEFT_PAD = 12;
     uint256 constant PILL_RIGHT_PAD = 12;
     uint256 constant PILL_LETTER_SPACING_TENTHS = 5; // 0.5px, matches the "0.5px" letter-spacing on these labels
@@ -26,7 +27,15 @@ library SVGUtils {
     /// @notice Builds the dark rounded "pill" background rect shared by the ID/token-symbol/address badges.
     function pillRect(string memory y, string memory width) internal pure returns (string memory) {
         return string(
-            abi.encodePacked('<rect x="40" y="', y, '" width="', width, '" height="32" rx="8" fill="black" fill-opacity="0.6"/>')
+            abi.encodePacked(
+                '<rect x="',
+                CARD_CONTENT_X.toString(),
+                '" y="',
+                y,
+                '" width="',
+                width,
+                '" height="32" rx="8" fill="black" fill-opacity="0.6"/>'
+            )
         );
     }
 
@@ -78,11 +87,12 @@ library SVGUtils {
         uint256 labelWidth = SVGFontMetrics.measureWidth(label, 16, PILL_LETTER_SPACING_TENTHS);
         uint256 valueWidth = SVGFontMetrics.measureWidth(value, 16, PILL_LETTER_SPACING_TENTHS);
         uint256 width = PILL_LEFT_PAD + labelWidth + valueWidth + PILL_RIGHT_PAD;
-        uint256 valueX = 40 + PILL_LEFT_PAD + labelWidth;
+        uint256 labelX = CARD_CONTENT_X + PILL_LEFT_PAD;
+        uint256 valueX = labelX + labelWidth;
         return string(
             abi.encodePacked(
                 pillRect(pillY, width.toString()),
-                textTag("#999999", "16", "0.5px", "52", textY, label),
+                textTag("#999999", "16", "0.5px", labelX.toString(), textY, label),
                 textTag("white", "16", "0.5px", valueX.toString(), textY, value)
             )
         );
