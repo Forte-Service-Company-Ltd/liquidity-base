@@ -37,3 +37,4 @@ node_modules/
 
 # Scratch/debug output from the SVG render pipeline (see README) - discardable
 scratch_*
+test/util/Scratch.t.sol

@@ -5,9 +5,10 @@ pragma solidity ^0.8.0;
 library HexStrings {
     bytes16 internal constant ALPHABET = "0123456789abcdef";
 
-    /// @notice Convert a number to a hex string without the '0x' prefix with a fixed length
+    /// @notice Convert a number to a fixed-width hex string without the '0x' prefix
     /// @param value The number to convert
-    /// @param length The length of the output string, starting from the last character of the string
+    /// @param length The number of bytes to render, taken from the least-significant end of `value` -
+    /// the output is `length * 2` hex characters (e.g. length=3 renders a 3-byte RGB color as 6 hex digits)
     /// @return The hex string
     function toHexStringNoPrefix(uint256 value, uint256 length) internal pure returns (string memory) {
         bytes memory buffer = new bytes(2 * length);

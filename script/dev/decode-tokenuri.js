@@ -1,4 +1,4 @@
-// Decodes a base64 tokenURI (written by test/util/ScratchRender.t.sol) into a
+// Decodes a base64 tokenURI (printed by a temporary test/util/Scratch.t.sol, see README) into a
 // readable name/description plus a standalone .svg file you can open or convert to PNG.
 //
 // Usage:
