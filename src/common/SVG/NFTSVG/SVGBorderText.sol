@@ -52,7 +52,7 @@ library SVGBorderText {
         );
     }
 
-    function generateBorderTextAndBackground(SVGParams memory params) public pure returns (string memory svg) {
+    function generateBorderTextAndBackground(SVGParams memory params) internal pure returns (string memory svg) {
         svg = string(
             abi.encodePacked(
                 '<g transform="translate(0,0)">',
