@@ -4,17 +4,21 @@ pragma solidity ^0.8.0;
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {SVGParams} from "./SVGTypes.sol";
 import {SVGUtils} from "./SVGUtils.sol";
+import {SVGFontMetrics} from "./SVGFontMetrics.sol";
 
 /// @notice Builds the token-pair ticker header (e.g. "USDC / WETH") and the large fee-tier percentage text.
 library SVGHeader {
     using Strings for uint256;
+
+    uint256 constant LEFT_PAD = 16;
+    uint256 constant RIGHT_PAD = 16;
 
     /// @notice returns the token pair header of the SVG
     /// @param params The SVGParams struct containing the parameters for the SVG
     /// @return svg The SVG string associated with the NFT
     function generateSVGTokenPairHeader(SVGParams memory params) internal pure returns (string memory svg) {
         string memory pairText = string(abi.encodePacked(params.xTokenSymbol, " / ", params.yTokenSymbol));
-        uint width = (bytes(pairText).length * 27) / 2 + 32;
+        uint width = LEFT_PAD + SVGFontMetrics.measureWidth(pairText, 24, 0) + RIGHT_PAD;
         svg = string(
             abi.encodePacked(
                 '<rect x="40" y="56" width="',

@@ -23,9 +23,6 @@ library SVGBorderText {
         '<clipPath id="clip0_2943_19260">'
         '<rect width="420" height="560" rx="32" fill="white"/>'
         "</clipPath>"
-        '<clipPath id="clip1_2943_19260">'
-        '<rect width="420" height="560" fill="white"/>'
-        "</clipPath>"
         "</defs>";
 
     /// @dev Unused legacy fragment kept from the original implementation; superseded by
