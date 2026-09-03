@@ -35,7 +35,7 @@ library SVGBorderText {
             abi.encodePacked(
                 '<text font-family="',
                 SVGUtils.FONT_FAMILY,
-                '" font-size="14" fill="#F8F8F8" letter-spacing="1px">',
+                '" font-size="14" fill="#F8F8F8" letter-spacing="0.5px">',
                 '<textPath href="#borderPath" startOffset="0%">',
                 '<animate attributeName="startOffset" ',
                 'from="',
